@@ -1114,4 +1114,13 @@
         </profile>
         <!-- jhipster-needle-maven-add-profile -->
     </profiles>
+    <organization>
+    	<name>DeARX Services (Pty) Ltd</name>
+    	<url>https://www.dearx.co.za/</url>
+    </organization>
+    <url>https://github.com/christhonie/leave-application</url>
+    <scm>
+    	<url>https://github.com/christhonie/leave-application</url>
+    	<connection>scm:git:https://github.com/christhonie/leave-application.git</connection>
+    </scm>
 </project>
