@@ -8,8 +8,9 @@ The application is was generated using [JHipster 6.10.5][] as a starting point, 
 
 Before you can build this project, you must install and configure the following dependencies on your machine:
 
-1. [Node.js][]: We use Node to run a development web server and build the project.
-   Depending on your system, you can install Node either from source or as a pre-packaged bundle.
+### NodeJS: 
+
+We use [Node.js][] to run a development web server and build the project. Depending on your system, you can install Node either from source or as a pre-packaged bundle.
 
 After installing Node, you should be able to run the following command to install development tools.
 You will only need to run this command when dependencies change in [package.json](package.json).
@@ -36,6 +37,170 @@ specifying a newer version in [package.json](package.json). You can also run `np
 Add the `help` flag on any command to see how you can use it. For example, `npm help update`.
 
 The `npm run` command will list all of the scripts available to run for this project.
+
+### Java
+
+The back-end application uses the Java 11 Java Development Kit, version 11 LTS or later.  Ensure that your JAVA_HOME environent variable is set.
+
+### JHipster
+
+Install JHipster using NPM;
+
+```
+npm install -g generator-jhipster
+```
+
+### Environment variables
+Remember to setup your JAVA_HOME and MVN_HOME environment variables and include those (with the correct reference to the /bin directory) to your path. Ensure that any other Java install directories are removed from the path.
+
+### Optional installations
+
+#### Yeoman
+
+If you want to use a module or a blueprint (for instance from the JHipster Marketplace), install Yeoman: 
+
+```
+npm install -g yo
+```
+
+### Testing your installation
+Test your installation with the following commands;
+```shell
+$ java -version
+$ mvn -v
+$ git --version 
+```
+
+### Configure git
+Setup your git installation by supplying your name, email address and, a requirement for Windows installations, the line feed / carriage return setting;
+```shell
+$ git config --global user.name "John Doe"
+$ git config --global user.email johndoe@example.com
+$ git config --global core.autocrlf true
+```
+
+NOTE: Windows users are required to set the autocrlf property!!
+
+Run the following command to confirm these settings have been applied;
+```shell
+$ git config --list
+```
+
+### Integrated development environment
+We recommend one of the following IDE's for development;
+* Spring STS
+* Eclipse Neon or later
+
+## Version control
+
+The project uses Git as version control mechanism, together with GitFlow as a release methodology (see later in this document). As a result the main branches are;
+* master - Stable, production ready code. The master branch will also have the release tags for the production releases.
+* development - Stable development code. This usually represents the latest code.
+* feature/* - In-development, feature branches, representing new features not yet integrated.
+* release/* - Temporary branches for code being prepared for release
+* hotfix/* - Temporary branches for hotfixes in master. Branched off master
+* support/* - Support branches for code in production. Branched off master
+* support/x/* - Temporary branches for hotfixes in support branches. Branced off x.
+
+### Checking the code out for the first time
+Use the link provided at the top of the repository page as the URL to clone the project from.
+```shell
+$ git clone https://github.com/christhonie/leave-application.git
+```
+
+Note that both SSH or HTTPS can be used. The former is preferred, which elimintate the need to use a password (if the key used is not protected by a password). The setup of SSH is ourside the scope of this documents.
+
+### Protected branches
+Users could be limited in pushing or merging protected branches. This is dependent on the configuration of the Git repository. In the case of protected branches the developer should create feature, release or hotfix branches, which will be considered for inclusion into the project by a project leader using a merge request. See the procedure to be followed below. 
+
+### References
+To become familiar with Git, GitFlow and how to migrate from SVN see these guides;
+
+Git Tutorials: https://www.atlassian.com/git/tutorials
+What is Git?: https://www.atlassian.com/git/tutorials/what-is-git
+Git Sheet Sheet: https://www.atlassian.com/git/tutorials/atlassian-git-cheatsheet
+Migrating from SVN to Git: http://git.or.cz/course/svn.html
+
+## Your first build
+The first build is best performed from the command line. Use the following command to get started;
+
+```shell
+mvn clean install
+```
+
+## Build instructions
+
+Always use the clean goal when building the project for deployment.
+
+Run the install goal from the root directory;
+
+```shell
+mvn clean install
+```
+
+This will ensure that all the dependencies are compiled and installed on your local M2 Maven repository.
+
+Applications should be run from your local PC to ensure that the code actually run. This process will also execute any included unit and integration tests.
+
+```shell
+mvn spring-boot:run
+```
+
+## Deployment to the development servers
+
+We use Cargo to deploy to the local DEV Tomcat instances. From the Core directory run;
+
+```shell
+mvn -Pwar clean install cargo:redeploy
+```
+
+## Release process
+
+This project makes use of GitFlow for release management.  
+
+```shell
+mvn gitflow:release-start
+```
+
+Apply any additional version changes, prepare DB migration scripts, generate documentation.
+
+```shell
+mvn gitflow:release-finish
+```
+
+## Development 
+
+### Configuration files
+
+The system primarily uses Spring Configuration to manage the system configuration variables.
+
+#### Classpath application.properties
+This is the top level configuration file, found in the class path and also at /src/main/java/resources, includes all global default values at design time. 
+
+This file should NEVER include environment specific values, such as URLs. It is better to leave such values unassigned, so that they can be specified in the subsequent files. It is better for the application to fail at start-up when mandatory, environment specific values are missing, rather that setting default ones.
+
+#### Classpath application-server.properties
+This is the second level configuration file, found in the class path and also at /src/main/java/resources, is used by the servlet (server) version of the application. It should include configuration values specific to a Tomcat deployment. 
+
+This file should also NEVER include environment specific values (see above).
+
+#### Classpath application-development.properties
+This is the second level configuration file used for development builds, using the embedded Tomcat server. Use this file for any configuration files specific to your development machine or when debugging on it. This file is excluded from Git and therefore contains your personal settings.
+
+#### Classpath application-development.properties.sample
+This is the template file for application-development.properties. During the build, if the application-development.properties file is missing, the sample file is used as an initial version.
+
+#### External application-server.properties
+Versions of the application deployed to Tomcat servers can be configured to use an external configuration file. This is desirable in production and QA environments, where it is not practical to recompile the application to make configuration changes.
+
+This file is intended to include environment specific values, which make it easy for an IT person to make changes if and when required. Typically the server should be restarted for the changes to take effect.
+
+#### logback-spring.xml
+This is the logback (logging) configuration file. It defines the default logging level of the various loggers and defines the appenders to use (file and logging server).
+
+All file based appenders which logs continiously MUST implement a rolling file appender or similar. This will ensure that old log files are first compressed for storage and eventually purged. The retention period of log files should typically not be longer than one month. When using a logging server it should be set much shorter, like 3-7 days.
+
+Projects could be configured to log to LogStash, a centralised logging server. The LogStash appender is responsible for shipping log files to this server in an asynchronous manner.
 
 ### PWA Support
 
