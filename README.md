@@ -1,6 +1,8 @@
-# LeaveApplication
+# Leave Application
 
-This application was generated using JHipster 6.10.5, you can find documentation and help at [https://www.jhipster.tech/documentation-archive/v6.10.5](https://www.jhipster.tech/documentation-archive/v6.10.5).
+This is a web based leave application developed by and for DeARX Services. This application forms part of the Java training series hosted by DeARX Cape Town and is being developed by the team for their 2021 practical project.
+
+The application is was generated using [JHipster 6.10.5][] as a starting point, and developed further by custom modifications. The application is based on [Java 11](https://www.oracle.com/java/) for the back-end and [Angular](https://angular.io/) for the front-end. It uses [Maven](https://maven.apache.org/) for dependency management in Java and [NPM](https://www.npmjs.com/) for the same in the front-end.
 
 ## Development
 
@@ -37,7 +39,7 @@ The `npm run` command will list all of the scripts available to run for this pro
 
 ### PWA Support
 
-JHipster ships with PWA (Progressive Web App) support, and it's turned off by default. One of the main components of a PWA is a service worker.
+This application ships with PWA (Progressive Web App) support, and it's turned off by default. One of the main components of a PWA is a service worker.
 
 The service worker initialization code is commented out by default. To enable it, uncomment the following code in `src/main/webapp/index.html`:
 
@@ -106,7 +108,7 @@ update src/main/webapp/app/app.module.ts
 
 ### Packaging as jar
 
-To build the final jar and optimize the LeaveApplication application for production, run:
+To build the final jar and optimize the Leave Application application for production, run:
 
 ```
 
@@ -184,7 +186,7 @@ For more information, refer to the [Code quality page][].
 
 ## Using Docker to simplify development (optional)
 
-You can use Docker to improve your JHipster development experience. A number of docker-compose configuration are available in the [src/main/docker](src/main/docker) folder to launch required third party services.
+You can use Docker to improve your development experience. A number of docker-compose configuration are available in the [src/main/docker](src/main/docker) folder to launch required third party services.
 
 For example, to start a mysql database in a docker container, run:
 
@@ -218,7 +220,7 @@ For more information refer to [Using Docker and Docker-Compose][], this page als
 To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`), this will let you generate configuration files for a number of Continuous Integration systems. Consult the [Setting up Continuous Integration][] page for more information.
 
 [jhipster homepage and latest documentation]: https://www.jhipster.tech
-[jhipster 6.10.5 archive]: https://www.jhipster.tech/documentation-archive/v6.10.5
+[jhipster 6.10.5]: https://www.jhipster.tech/documentation-archive/v6.10.5
 [using jhipster in development]: https://www.jhipster.tech/documentation-archive/v6.10.5/development/
 [using docker and docker-compose]: https://www.jhipster.tech/documentation-archive/v6.10.5/docker-compose
 [using jhipster in production]: https://www.jhipster.tech/documentation-archive/v6.10.5/production/
