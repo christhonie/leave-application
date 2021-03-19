@@ -31,6 +31,17 @@
     </changeSet>
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
 
+    <changeSet id="20210312135833-2" author="Christhonie Geldenhuys">
+        <loadData
+                  file="config/liquibase/data/leave_status.csv"
+                  separator=";"
+                  tableName="leave_status">
+            <column name="id" type="numeric"/>
+            <column name="name" type="string"/>
+            <column name="description" type="string"/>
+        </loadData>
+    </changeSet>
+
     <!--
         Load sample data generated with Faker.js
         - This data can be easily edited using a CSV editor (or even MS Excel) and
