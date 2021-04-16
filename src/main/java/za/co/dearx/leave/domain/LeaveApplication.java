@@ -51,7 +51,8 @@ public class LeaveApplication implements Serializable {
     @JsonIgnoreProperties(value = "leaveApplications", allowSetters = true)
     private LeaveType leaveType;
 
-    @ManyToOne
+    @NotNull
+    @ManyToOne(optional = false)
     @JsonIgnoreProperties(value = "leaveApplications", allowSetters = true)
     private LeaveStatus leaveStatus;
 
