@@ -59,13 +59,50 @@ public class LeaveApplicationResource {
     @PostMapping("/leave-applications")
     public ResponseEntity<LeaveApplicationDTO> createLeaveApplication(@Valid @RequestBody LeaveApplicationDTO leaveApplicationDTO)
         throws URISyntaxException {
-        log.debug("REST request to save LeaveApplication : {}", leaveApplicationDTO);
+        log.debug("REST request to create LeaveApplication for normal CRUD operations: {}", leaveApplicationDTO);
         if (leaveApplicationDTO.getId() != null) {
             throw new BadRequestAlertException("A new leaveApplication cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        LeaveApplicationDTO result = leaveApplicationService.save(leaveApplicationDTO);
+        LeaveApplicationDTO result = leaveApplicationService.create(leaveApplicationDTO);
         return ResponseEntity
             .created(new URI("/api/leave-applications/" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+            .body(result);
+    }
+
+    /**
+     * {@code POST  /leave-applications/save} : Create/Save a new leaveApplicatio before submission as part of the application process.
+     *
+     * @param leaveApplicationDTO the leaveApplicationDTO to create.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new leaveApplicationDTO, or with status {@code 400 (Bad Request)} if the leaveApplication has already an ID.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PostMapping("/leave-applications/save")
+    public ResponseEntity<LeaveApplicationDTO> saveLeaveApplication(@Valid @RequestBody LeaveApplicationDTO leaveApplicationDTO)
+        throws URISyntaxException {
+        log.debug("REST request to save LeaveApplication during leave process: {}", leaveApplicationDTO);
+        LeaveApplicationDTO result = leaveApplicationService.save(leaveApplicationDTO);
+        return ResponseEntity
+            .created(new URI("/api/leave-applications/save" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+            .body(result);
+    }
+
+    /**
+     * {@code POST  /leave-applications/submit} : Submit a new or saved leaveApplicatio as part of the application process.
+     *
+     * @param leaveApplicationDTO the leaveApplicationDTO to create.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new leaveApplicationDTO, or with status {@code 400 (Bad Request)} if the leaveApplication has already an ID.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PostMapping("/leave-applications/submit")
+    public ResponseEntity<LeaveApplicationDTO> submitLeaveApplication(@Valid @RequestBody LeaveApplicationDTO leaveApplicationDTO)
+        throws URISyntaxException {
+        log.debug("REST request to submit LeaveApplication during leave process: {}", leaveApplicationDTO);
+        LeaveApplicationDTO result = leaveApplicationService.save(leaveApplicationDTO);
+        //TODO Either set created or updated response
+        return ResponseEntity
+            .created(new URI("/api/leave-applications/submit" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
@@ -86,7 +123,7 @@ public class LeaveApplicationResource {
         if (leaveApplicationDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        LeaveApplicationDTO result = leaveApplicationService.save(leaveApplicationDTO);
+        LeaveApplicationDTO result = leaveApplicationService.create(leaveApplicationDTO);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, leaveApplicationDTO.getId().toString()))

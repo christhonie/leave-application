@@ -75,4 +75,9 @@ public class LeaveStatusService {
         log.debug("Request to delete LeaveStatus : {}", id);
         leaveStatusRepository.deleteById(id);
     }
+
+    public static LeaveStatus getDraft() {
+        // TODO Find a way to return the default Draft state
+        return null;
+    }
 }

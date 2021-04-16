@@ -1,6 +1,7 @@
 package za.co.dearx.leave.service;
 
 import java.util.Optional;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -30,16 +31,46 @@ public class LeaveApplicationService {
     }
 
     /**
-     * Save a leaveApplication.
+     * Create a leaveApplication as part of normal CRUD operations.
      *
      * @param leaveApplicationDTO the entity to save.
      * @return the persisted entity.
      */
-    public LeaveApplicationDTO save(LeaveApplicationDTO leaveApplicationDTO) {
+    public LeaveApplicationDTO create(LeaveApplicationDTO leaveApplicationDTO) {
         log.debug("Request to save LeaveApplication : {}", leaveApplicationDTO);
         LeaveApplication leaveApplication = leaveApplicationMapper.toEntity(leaveApplicationDTO);
         leaveApplication = leaveApplicationRepository.save(leaveApplication);
         return leaveApplicationMapper.toDto(leaveApplication);
+    }
+
+    /**
+     * Save a leaveApplication as part of a new process.
+     *
+     * @param leaveApplicationDTO the entity to save.
+     * @return the persisted entity.
+     */
+    public LeaveApplicationDTO save(@Valid LeaveApplicationDTO leaveApplicationDTO) {
+        log.debug("Request to save LeaveApplication : {}", leaveApplicationDTO);
+        LeaveApplication leaveApplication = leaveApplicationMapper.toEntity(leaveApplicationDTO);
+        leaveApplication.setLeaveStatus(LeaveStatusService.getDraft());
+        leaveApplication = leaveApplicationRepository.save(leaveApplication);
+        return leaveApplicationMapper.toDto(leaveApplication);
+        //TODO Make sure we cannot save a deleted record. Must throw exception.
+    }
+
+    /**
+     * Submit a leaveApplication as part of a new (or saved) process.
+     *
+     * @param leaveApplicationDTO the entity to save.
+     * @return the persisted entity.
+     */
+    public LeaveApplicationDTO submit(@Valid LeaveApplicationDTO leaveApplicationDTO) {
+        log.debug("Request to save LeaveApplication : {}", leaveApplicationDTO);
+        LeaveApplication leaveApplication = leaveApplicationMapper.toEntity(leaveApplicationDTO);
+        //TODO Set this somewhere: leaveApplication.setLeaveStatus(LeaveStatusService.getDraft());
+        leaveApplication = leaveApplicationRepository.save(leaveApplication);
+        return leaveApplicationMapper.toDto(leaveApplication);
+        //TODO Make sure we cannot save a deleted record. Must throw exception.
     }
 
     /**
@@ -52,6 +83,7 @@ public class LeaveApplicationService {
     public Page<LeaveApplicationDTO> findAll(Pageable pageable) {
         log.debug("Request to get all LeaveApplications");
         return leaveApplicationRepository.findAll(pageable).map(leaveApplicationMapper::toDto);
+        //TODO Only return non-deleted records by default. Maybe this is done in QueryService
     }
 
     /**
@@ -73,6 +105,14 @@ public class LeaveApplicationService {
      */
     public void delete(Long id) {
         log.debug("Request to delete LeaveApplication : {}", id);
-        leaveApplicationRepository.deleteById(id);
+        leaveApplicationRepository
+            .findById(id)
+            .ifPresent(
+                record -> {
+                    //TODO Add after code regeneration
+                    //record.setDeleted(true);
+                    leaveApplicationRepository.save(record);
+                }
+            );
     }
 }
