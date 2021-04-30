@@ -38,6 +38,8 @@ public class DecisionsService {
     public DecisionsDTO save(DecisionsDTO decisionsDTO) {
         log.debug("Request to save Decisions : {}", decisionsDTO);
         Decisions decisions = decisionsMapper.toEntity(decisionsDTO);
+        //TODO Investigate if this was really necessary
+        decisions.getComment().setComment(decisionsDTO.getCommentComment());
         decisions = decisionsRepository.save(decisions);
         return decisionsMapper.toDto(decisions);
     }
