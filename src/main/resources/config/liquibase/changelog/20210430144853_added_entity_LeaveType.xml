@@ -29,7 +29,21 @@
     <changeSet id="20210430144853-1-relations" author="jhipster">
 
     </changeSet>
+
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
+    <changeSet id="20210312135933-2" author="Christhonie Geldenhuys">
+        <loadData
+                  file="config/liquibase/data/leave_type.csv"
+                  separator=";"
+                  tableName="leave_type">
+            <column name="id" type="numeric"/>
+            <column name="name" type="string"/>
+            <column name="description" type="string"/>
+            <column name="from_start_date" type="boolean"/>
+            <column name="prorata" type="boolean"/>
+        </loadData>
+    </changeSet>
 
     <!--
         Load sample data generated with Faker.js

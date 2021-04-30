@@ -1,11 +1,6 @@
-id;name;description
-1;salmon leading-edge;navigating
-2;Personal Loan Account Money Market Account ubiquit;Sleek Rubber Fish
-3;programming;back-end
-4;Wooden index wireless;bypassing synergy
-5;Usability;Knolls payment
-6;Rustic Plastic Bike;Optimized Web
-7;Refined Strategist Shoal;Persistent Auto Loan Account Multi-lateral
-8;input Refined action-items;grid-enabled leverage connecting
-9;Auto Loan Account Fresh;Maine
-10;Dynamic;Bedfordshire Marketing Direct
+id;name;description;from_start_date;prorata
+6;Leave Type 6;The 6th leave type;true;false
+7;Leave Type 7;The 7th leave type;false;true
+8;Leave Type 8;The 8th leave type;true;false
+9;Leave Type 9;The 9th leave type;true;true
+10;Leave Type 10;The 10th leave type;true;false
