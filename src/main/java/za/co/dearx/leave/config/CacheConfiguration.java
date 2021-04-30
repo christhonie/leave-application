@@ -49,6 +49,19 @@ public class CacheConfiguration {
             createCache(cm, za.co.dearx.leave.domain.User.class.getName() + ".authorities");
             createCache(cm, za.co.dearx.leave.domain.PersistentToken.class.getName());
             createCache(cm, za.co.dearx.leave.domain.User.class.getName() + ".persistentTokens");
+            createCache(cm, za.co.dearx.leave.domain.Role.class.getName());
+            createCache(cm, za.co.dearx.leave.domain.Role.class.getName() + ".users");
+            createCache(cm, za.co.dearx.leave.domain.Team.class.getName());
+            createCache(cm, za.co.dearx.leave.domain.Team.class.getName() + ".members");
+            createCache(cm, za.co.dearx.leave.domain.Staff.class.getName());
+            createCache(cm, za.co.dearx.leave.domain.Staff.class.getName() + ".teams");
+            createCache(cm, za.co.dearx.leave.domain.LeaveStatus.class.getName());
+            createCache(cm, za.co.dearx.leave.domain.LeaveType.class.getName());
+            createCache(cm, za.co.dearx.leave.domain.LeaveEntitlement.class.getName());
+            createCache(cm, za.co.dearx.leave.domain.EntitlementValue.class.getName());
+            createCache(cm, za.co.dearx.leave.domain.LeaveApplication.class.getName());
+            createCache(cm, za.co.dearx.leave.domain.Comment.class.getName());
+            createCache(cm, za.co.dearx.leave.domain.Decisions.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }

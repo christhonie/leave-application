@@ -1,0 +1,10 @@
+{
+  "leaveApplicationApp": {
+    "DecisionChoice": {
+      "null": "",
+      "APPROVE": "APPROVE",
+      "REJECT": "REJECT",
+      "WITHDRAW": "WITHDRAW"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "leaveApplicationApp": {
+    "leaveStatus": {
+      "home": {
+        "title": "Leave Statuses",
+        "createLabel": "Create a new Leave Status",
+        "createOrEditLabel": "Create or edit a Leave Status",
+        "notFound": "No Leave Statuses found"
+      },
+      "created": "A new Leave Status is created with identifier {{ param }}",
+      "updated": "A Leave Status is updated with identifier {{ param }}",
+      "deleted": "A Leave Status is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Leave Status {{ id }}?"
+      },
+      "detail": {
+        "title": "Leave Status"
+      },
+      "name": "Name",
+      "description": "Description"
+    }
+  }
+}

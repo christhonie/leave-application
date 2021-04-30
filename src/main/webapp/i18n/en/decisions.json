@@ -1,0 +1,26 @@
+{
+  "leaveApplicationApp": {
+    "decisions": {
+      "home": {
+        "title": "Decisions",
+        "createLabel": "Create a new Decisions",
+        "createOrEditLabel": "Create or edit a Decisions",
+        "notFound": "No Decisions found"
+      },
+      "created": "A new Decisions is created with identifier {{ param }}",
+      "updated": "A Decisions is updated with identifier {{ param }}",
+      "deleted": "A Decisions is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Decisions {{ id }}?"
+      },
+      "detail": {
+        "title": "Decisions"
+      },
+      "choice": "Choice",
+      "decidedOn": "Decided On",
+      "comment": "Comment",
+      "user": "User",
+      "leaveApplication": "Leave Application"
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "name": "LeaveApplication",
+  "fields": [
+    {
+      "fieldName": "startDate",
+      "fieldType": "LocalDate",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "endDate",
+      "fieldType": "LocalDate",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "appliedDate",
+      "fieldType": "ZonedDateTime",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "updateDate",
+      "fieldType": "ZonedDateTime"
+    },
+    {
+      "fieldName": "days",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "deleted",
+      "fieldType": "Boolean",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "leaveType",
+      "otherEntityRelationshipName": "leaveApplication",
+      "relationshipValidateRules": "required",
+      "relationshipName": "leaveType",
+      "otherEntityField": "name"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "leaveStatus",
+      "otherEntityRelationshipName": "leaveApplication",
+      "relationshipName": "leaveStatus",
+      "otherEntityField": "name"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "staff",
+      "otherEntityRelationshipName": "leaveApplication",
+      "relationshipValidateRules": "required",
+      "relationshipName": "staff",
+      "otherEntityField": "name"
+    }
+  ],
+  "changelogDate": "20210430145153",
+  "entityTableName": "leave_application",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceClass",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "clientRootFolder": "",
+  "applications": "*"
+}

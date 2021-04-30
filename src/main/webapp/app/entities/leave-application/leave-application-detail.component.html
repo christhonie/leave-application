@@ -1,0 +1,68 @@
+<div class="row justify-content-center">
+    <div class="col-8">
+        <div *ngIf="leaveApplication">
+            <h2><span jhiTranslate="leaveApplicationApp.leaveApplication.detail.title">Leave Application</span> {{ leaveApplication.id }}</h2>
+
+            <hr>
+
+            <jhi-alert-error></jhi-alert-error>
+
+            <dl class="row-md jh-entity-details">
+                <dt><span jhiTranslate="leaveApplicationApp.leaveApplication.startDate">Start Date</span></dt>
+                <dd>
+                    <span>{{ leaveApplication.startDate }}</span>
+                </dd>
+                <dt><span jhiTranslate="leaveApplicationApp.leaveApplication.endDate">End Date</span></dt>
+                <dd>
+                    <span>{{ leaveApplication.endDate }}</span>
+                </dd>
+                <dt><span jhiTranslate="leaveApplicationApp.leaveApplication.appliedDate">Applied Date</span></dt>
+                <dd>
+                    <span>{{ leaveApplication.appliedDate }}</span>
+                </dd>
+                <dt><span jhiTranslate="leaveApplicationApp.leaveApplication.updateDate">Update Date</span></dt>
+                <dd>
+                    <span>{{ leaveApplication.updateDate }}</span>
+                </dd>
+                <dt><span jhiTranslate="leaveApplicationApp.leaveApplication.days">Days</span></dt>
+                <dd>
+                    <span>{{ leaveApplication.days }}</span>
+                </dd>
+                <dt><span jhiTranslate="leaveApplicationApp.leaveApplication.deleted">Deleted</span></dt>
+                <dd>
+                    <span>{{ leaveApplication.deleted }}</span>
+                </dd>
+                <dt><span jhiTranslate="leaveApplicationApp.leaveApplication.leaveType">Leave Type</span></dt>
+                <dd>
+                    <div *ngIf="leaveApplication.leaveTypeId">
+                        <a [routerLink]="['/leave-type', leaveApplication.leaveTypeId, 'view']">{{ leaveApplication.leaveTypeName }}</a>
+                    </div>
+                </dd>
+                <dt><span jhiTranslate="leaveApplicationApp.leaveApplication.leaveStatus">Leave Status</span></dt>
+                <dd>
+                    <div *ngIf="leaveApplication.leaveStatusId">
+                        <a [routerLink]="['/leave-status', leaveApplication.leaveStatusId, 'view']">{{ leaveApplication.leaveStatusName }}</a>
+                    </div>
+                </dd>
+                <dt><span jhiTranslate="leaveApplicationApp.leaveApplication.staff">Staff</span></dt>
+                <dd>
+                    <div *ngIf="leaveApplication.staffId">
+                        <a [routerLink]="['/staff', leaveApplication.staffId, 'view']">{{ leaveApplication.staffName }}</a>
+                    </div>
+                </dd>
+            </dl>
+
+            <button type="submit"
+                    (click)="previousState()"
+                    class="btn btn-info">
+                <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+            </button>
+
+            <button type="button"
+                    [routerLink]="['/leave-application', leaveApplication.id, 'edit']"
+                    class="btn btn-primary">
+                <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+            </button>
+        </div>
+    </div>
+</div>
