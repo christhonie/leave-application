@@ -106,7 +106,7 @@ enum DecisionChoice {
  
 entity Decisions {
   choice DecisionChoice required
-  decidedOn DateTime required
+  decidedOn Instant required
 }
 relationship ManyToOne {
 	Decisions{user(login) required} to User
