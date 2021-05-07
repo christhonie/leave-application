@@ -29,12 +29,15 @@ public class LeaveTypeCriteria implements Serializable, Criteria {
 
     private StringFilter description;
 
+    private StringFilter processName;
+
     public LeaveTypeCriteria() {}
 
     public LeaveTypeCriteria(LeaveTypeCriteria other) {
         this.id = other.id == null ? null : other.id.copy();
         this.name = other.name == null ? null : other.name.copy();
         this.description = other.description == null ? null : other.description.copy();
+        this.processName = other.processName == null ? null : other.processName.copy();
     }
 
     @Override
@@ -66,6 +69,14 @@ public class LeaveTypeCriteria implements Serializable, Criteria {
         this.description = description;
     }
 
+    public StringFilter getProcessName() {
+        return processName;
+    }
+
+    public void setProcessName(StringFilter processName) {
+        this.processName = processName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -75,12 +86,17 @@ public class LeaveTypeCriteria implements Serializable, Criteria {
             return false;
         }
         final LeaveTypeCriteria that = (LeaveTypeCriteria) o;
-        return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(description, that.description);
+        return (
+            Objects.equals(id, that.id) &&
+            Objects.equals(name, that.name) &&
+            Objects.equals(description, that.description) &&
+            Objects.equals(processName, that.processName)
+        );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description);
+        return Objects.hash(id, name, description, processName);
     }
 
     // prettier-ignore
@@ -90,6 +106,7 @@ public class LeaveTypeCriteria implements Serializable, Criteria {
                 (id != null ? "id=" + id + ", " : "") +
                 (name != null ? "name=" + name + ", " : "") +
                 (description != null ? "description=" + description + ", " : "") +
+                (processName != null ? "processName=" + processName + ", " : "") +
             "}";
     }
 }

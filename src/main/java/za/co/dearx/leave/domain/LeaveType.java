@@ -28,6 +28,10 @@ public class LeaveType implements Serializable {
     @Column(name = "description", length = 200)
     private String description;
 
+    @Size(max = 200)
+    @Column(name = "process_name", length = 200)
+    private String processName;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public Long getId() {
         return id;
@@ -63,6 +67,19 @@ public class LeaveType implements Serializable {
         this.description = description;
     }
 
+    public String getProcessName() {
+        return processName;
+    }
+
+    public LeaveType processName(String processName) {
+        this.processName = processName;
+        return this;
+    }
+
+    public void setProcessName(String processName) {
+        this.processName = processName;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -88,6 +105,7 @@ public class LeaveType implements Serializable {
             "id=" + getId() +
             ", name='" + getName() + "'" +
             ", description='" + getDescription() + "'" +
+            ", processName='" + getProcessName() + "'" +
             "}";
     }
 }

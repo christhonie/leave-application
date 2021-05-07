@@ -39,6 +39,9 @@ public class LeaveTypeResourceIT {
     private static final String DEFAULT_DESCRIPTION = "AAAAAAAAAA";
     private static final String UPDATED_DESCRIPTION = "BBBBBBBBBB";
 
+    private static final String DEFAULT_PROCESS_NAME = "AAAAAAAAAA";
+    private static final String UPDATED_PROCESS_NAME = "BBBBBBBBBB";
+
     @Autowired
     private LeaveTypeRepository leaveTypeRepository;
 
@@ -66,7 +69,7 @@ public class LeaveTypeResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static LeaveType createEntity(EntityManager em) {
-        LeaveType leaveType = new LeaveType().name(DEFAULT_NAME).description(DEFAULT_DESCRIPTION);
+        LeaveType leaveType = new LeaveType().name(DEFAULT_NAME).description(DEFAULT_DESCRIPTION).processName(DEFAULT_PROCESS_NAME);
         return leaveType;
     }
 
@@ -77,7 +80,7 @@ public class LeaveTypeResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static LeaveType createUpdatedEntity(EntityManager em) {
-        LeaveType leaveType = new LeaveType().name(UPDATED_NAME).description(UPDATED_DESCRIPTION);
+        LeaveType leaveType = new LeaveType().name(UPDATED_NAME).description(UPDATED_DESCRIPTION).processName(UPDATED_PROCESS_NAME);
         return leaveType;
     }
 
@@ -107,6 +110,7 @@ public class LeaveTypeResourceIT {
         LeaveType testLeaveType = leaveTypeList.get(leaveTypeList.size() - 1);
         assertThat(testLeaveType.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testLeaveType.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
+        assertThat(testLeaveType.getProcessName()).isEqualTo(DEFAULT_PROCESS_NAME);
     }
 
     @Test
@@ -169,7 +173,8 @@ public class LeaveTypeResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(leaveType.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
-            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)));
+            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
+            .andExpect(jsonPath("$.[*].processName").value(hasItem(DEFAULT_PROCESS_NAME)));
     }
 
     @Test
@@ -185,7 +190,8 @@ public class LeaveTypeResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(leaveType.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
-            .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION));
+            .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION))
+            .andExpect(jsonPath("$.processName").value(DEFAULT_PROCESS_NAME));
     }
 
     @Test
@@ -362,6 +368,84 @@ public class LeaveTypeResourceIT {
         defaultLeaveTypeShouldBeFound("description.doesNotContain=" + UPDATED_DESCRIPTION);
     }
 
+    @Test
+    @Transactional
+    public void getAllLeaveTypesByProcessNameIsEqualToSomething() throws Exception {
+        // Initialize the database
+        leaveTypeRepository.saveAndFlush(leaveType);
+
+        // Get all the leaveTypeList where processName equals to DEFAULT_PROCESS_NAME
+        defaultLeaveTypeShouldBeFound("processName.equals=" + DEFAULT_PROCESS_NAME);
+
+        // Get all the leaveTypeList where processName equals to UPDATED_PROCESS_NAME
+        defaultLeaveTypeShouldNotBeFound("processName.equals=" + UPDATED_PROCESS_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllLeaveTypesByProcessNameIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        leaveTypeRepository.saveAndFlush(leaveType);
+
+        // Get all the leaveTypeList where processName not equals to DEFAULT_PROCESS_NAME
+        defaultLeaveTypeShouldNotBeFound("processName.notEquals=" + DEFAULT_PROCESS_NAME);
+
+        // Get all the leaveTypeList where processName not equals to UPDATED_PROCESS_NAME
+        defaultLeaveTypeShouldBeFound("processName.notEquals=" + UPDATED_PROCESS_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllLeaveTypesByProcessNameIsInShouldWork() throws Exception {
+        // Initialize the database
+        leaveTypeRepository.saveAndFlush(leaveType);
+
+        // Get all the leaveTypeList where processName in DEFAULT_PROCESS_NAME or UPDATED_PROCESS_NAME
+        defaultLeaveTypeShouldBeFound("processName.in=" + DEFAULT_PROCESS_NAME + "," + UPDATED_PROCESS_NAME);
+
+        // Get all the leaveTypeList where processName equals to UPDATED_PROCESS_NAME
+        defaultLeaveTypeShouldNotBeFound("processName.in=" + UPDATED_PROCESS_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllLeaveTypesByProcessNameIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        leaveTypeRepository.saveAndFlush(leaveType);
+
+        // Get all the leaveTypeList where processName is not null
+        defaultLeaveTypeShouldBeFound("processName.specified=true");
+
+        // Get all the leaveTypeList where processName is null
+        defaultLeaveTypeShouldNotBeFound("processName.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllLeaveTypesByProcessNameContainsSomething() throws Exception {
+        // Initialize the database
+        leaveTypeRepository.saveAndFlush(leaveType);
+
+        // Get all the leaveTypeList where processName contains DEFAULT_PROCESS_NAME
+        defaultLeaveTypeShouldBeFound("processName.contains=" + DEFAULT_PROCESS_NAME);
+
+        // Get all the leaveTypeList where processName contains UPDATED_PROCESS_NAME
+        defaultLeaveTypeShouldNotBeFound("processName.contains=" + UPDATED_PROCESS_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllLeaveTypesByProcessNameNotContainsSomething() throws Exception {
+        // Initialize the database
+        leaveTypeRepository.saveAndFlush(leaveType);
+
+        // Get all the leaveTypeList where processName does not contain DEFAULT_PROCESS_NAME
+        defaultLeaveTypeShouldNotBeFound("processName.doesNotContain=" + DEFAULT_PROCESS_NAME);
+
+        // Get all the leaveTypeList where processName does not contain UPDATED_PROCESS_NAME
+        defaultLeaveTypeShouldBeFound("processName.doesNotContain=" + UPDATED_PROCESS_NAME);
+    }
+
     /**
      * Executes the search, and checks that the default entity is returned.
      */
@@ -372,7 +456,8 @@ public class LeaveTypeResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(leaveType.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
-            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)));
+            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
+            .andExpect(jsonPath("$.[*].processName").value(hasItem(DEFAULT_PROCESS_NAME)));
 
         // Check, that the count call also returns 1
         restLeaveTypeMockMvc
@@ -420,7 +505,7 @@ public class LeaveTypeResourceIT {
         LeaveType updatedLeaveType = leaveTypeRepository.findById(leaveType.getId()).get();
         // Disconnect from session so that the updates on updatedLeaveType are not directly saved in db
         em.detach(updatedLeaveType);
-        updatedLeaveType.name(UPDATED_NAME).description(UPDATED_DESCRIPTION);
+        updatedLeaveType.name(UPDATED_NAME).description(UPDATED_DESCRIPTION).processName(UPDATED_PROCESS_NAME);
         LeaveTypeDTO leaveTypeDTO = leaveTypeMapper.toDto(updatedLeaveType);
 
         restLeaveTypeMockMvc
@@ -438,6 +523,7 @@ public class LeaveTypeResourceIT {
         LeaveType testLeaveType = leaveTypeList.get(leaveTypeList.size() - 1);
         assertThat(testLeaveType.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testLeaveType.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
+        assertThat(testLeaveType.getProcessName()).isEqualTo(UPDATED_PROCESS_NAME);
     }
 
     @Test

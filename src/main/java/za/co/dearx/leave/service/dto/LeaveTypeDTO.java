@@ -16,6 +16,9 @@ public class LeaveTypeDTO implements Serializable {
     @Size(max = 200)
     private String description;
 
+    @Size(max = 200)
+    private String processName;
+
     public Long getId() {
         return id;
     }
@@ -38,6 +41,14 @@ public class LeaveTypeDTO implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getProcessName() {
+        return processName;
+    }
+
+    public void setProcessName(String processName) {
+        this.processName = processName;
     }
 
     @Override
@@ -64,6 +75,7 @@ public class LeaveTypeDTO implements Serializable {
             "id=" + getId() +
             ", name='" + getName() + "'" +
             ", description='" + getDescription() + "'" +
+            ", processName='" + getProcessName() + "'" +
             "}";
     }
 }

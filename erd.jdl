@@ -46,6 +46,7 @@ entity LeaveStatus {
 entity LeaveType {
 	name String maxlength(50) required
 	description String maxlength(200)
+    processName String maxlength(200)
 }
 
 //*************************************

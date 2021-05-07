@@ -91,6 +91,9 @@ public class LeaveTypeQueryService extends QueryService<LeaveType> {
             if (criteria.getDescription() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getDescription(), LeaveType_.description));
             }
+            if (criteria.getProcessName() != null) {
+                specification = specification.and(buildStringSpecification(criteria.getProcessName(), LeaveType_.processName));
+            }
         }
         return specification;
     }

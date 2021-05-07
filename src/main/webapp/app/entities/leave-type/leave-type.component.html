@@ -25,6 +25,7 @@
                     <th scope="col"  jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col"  jhiSortBy="name"><span jhiTranslate="leaveApplicationApp.leaveType.name">Name</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col"  jhiSortBy="description"><span jhiTranslate="leaveApplicationApp.leaveType.description">Description</span> <fa-icon icon="sort"></fa-icon></th>
+                    <th scope="col"  jhiSortBy="processName"><span jhiTranslate="leaveApplicationApp.leaveType.processName">Process Name</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col"></th>
                 </tr>
             </thead>
@@ -33,6 +34,7 @@
                     <td><a [routerLink]="['/leave-type', leaveType.id, 'view']">{{ leaveType.id }}</a></td>
                     <td>{{ leaveType.name }}</td>
                     <td>{{ leaveType.description }}</td>
+                    <td>{{ leaveType.processName }}</td>
                     <td class="text-right">
                         <div class="btn-group">
                             <button type="submit"

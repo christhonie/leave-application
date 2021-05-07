@@ -20,7 +20,7 @@ describe('Service Tests', () => {
       service = injector.get(LeaveTypeService);
       httpMock = injector.get(HttpTestingController);
 
-      elemDefault = new LeaveType(0, 'AAAAAAA', 'AAAAAAA');
+      elemDefault = new LeaveType(0, 'AAAAAAA', 'AAAAAAA', 'AAAAAAA');
     });
 
     describe('Service methods', () => {
@@ -56,6 +56,7 @@ describe('Service Tests', () => {
           {
             name: 'BBBBBB',
             description: 'BBBBBB',
+            processName: 'BBBBBB',
           },
           elemDefault
         );
@@ -74,6 +75,7 @@ describe('Service Tests', () => {
           {
             name: 'BBBBBB',
             description: 'BBBBBB',
+            processName: 'BBBBBB',
           },
           elemDefault
         );

@@ -4,13 +4,26 @@
     {
       "fieldName": "name",
       "fieldType": "String",
-      "fieldValidateRules": ["maxlength", "required"],
+      "fieldValidateRules": [
+        "maxlength",
+        "required"
+      ],
       "fieldValidateRulesMaxlength": "50"
     },
     {
       "fieldName": "description",
       "fieldType": "String",
-      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRules": [
+        "maxlength"
+      ],
+      "fieldValidateRulesMaxlength": "200"
+    },
+    {
+      "fieldName": "processName",
+      "fieldType": "String",
+      "fieldValidateRules": [
+        "maxlength"
+      ],
       "fieldValidateRulesMaxlength": "200"
     }
   ],
