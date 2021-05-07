@@ -1,0 +1,24 @@
+{
+  "leaveApplicationApp": {
+    "entitlementValue": {
+      "home": {
+        "title": "Entitlement Values",
+        "createLabel": "Create a new Entitlement Value",
+        "createOrEditLabel": "Create or edit a Entitlement Value",
+        "notFound": "No Entitlement Values found"
+      },
+      "created": "A new Entitlement Value is created with identifier {{ param }}",
+      "updated": "A Entitlement Value is updated with identifier {{ param }}",
+      "deleted": "A Entitlement Value is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Entitlement Value {{ id }}?"
+      },
+      "detail": {
+        "title": "Entitlement Value"
+      },
+      "entitlementValue": "Entitlement Value",
+      "entitlement": "Entitlement",
+      "staff": "Staff"
+    }
+  }
+}

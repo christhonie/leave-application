@@ -1,0 +1,41 @@
+{
+  "name": "EntitlementValue",
+  "fields": [
+    {
+      "fieldName": "entitlementValue",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "leaveEntitlement",
+      "otherEntityRelationshipName": "entitlementValue",
+      "relationshipValidateRules": "required",
+      "relationshipName": "entitlement",
+      "otherEntityField": "id",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "staff",
+      "otherEntityRelationshipName": "entitlementValue",
+      "relationshipValidateRules": "required",
+      "relationshipName": "staff",
+      "otherEntityField": "name",
+      "ownerSide": true
+    }
+  ],
+  "changelogDate": "20210430145053",
+  "entityTableName": "entitlement_value",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceClass",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "clientRootFolder": "",
+  "applications": "*"
+}
