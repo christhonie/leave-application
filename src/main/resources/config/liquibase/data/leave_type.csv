@@ -1,0 +1,6 @@
+id;name;description;process_name
+1;Sick Leave;Sick leave is paid time off from work to address health needs;NULL
+2;Annual Leave;Annual leave is paid time off work granted by employers to be used for whatever the employee wishes;annual-leave
+3;Compassionate Leave;A form of absence taken when an employee has to deal with a sensitive or upsetting situation;NULL
+4;Maternity leave;Leave for pregnancy;NULL
+5;Paternity leave;Leave to men to care for newborn children;NULL

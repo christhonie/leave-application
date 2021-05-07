@@ -1,0 +1,72 @@
+<div class="row justify-content-center">
+    <div class="col-8">
+        <div *ngIf="staff">
+            <h2><span jhiTranslate="leaveApplicationApp.staff.detail.title">Staff</span> {{ staff.id }}</h2>
+
+            <hr>
+
+            <jhi-alert-error></jhi-alert-error>
+
+            <dl class="row-md jh-entity-details">
+                <dt><span jhiTranslate="leaveApplicationApp.staff.position">Position</span></dt>
+                <dd>
+                    <span>{{ staff.position }}</span>
+                </dd>
+                <dt><span jhiTranslate="leaveApplicationApp.staff.employeeID">Employee ID</span></dt>
+                <dd>
+                    <span>{{ staff.employeeID }}</span>
+                </dd>
+                <dt><span jhiTranslate="leaveApplicationApp.staff.startDate">Start Date</span></dt>
+                <dd>
+                    <span>{{ staff.startDate }}</span>
+                </dd>
+                <dt><span jhiTranslate="leaveApplicationApp.staff.name">Name</span></dt>
+                <dd>
+                    <span>{{ staff.name }}</span>
+                </dd>
+                <dt><span jhiTranslate="leaveApplicationApp.staff.firstName">First Name</span></dt>
+                <dd>
+                    <span>{{ staff.firstName }}</span>
+                </dd>
+                <dt><span jhiTranslate="leaveApplicationApp.staff.lastName">Last Name</span></dt>
+                <dd>
+                    <span>{{ staff.lastName }}</span>
+                </dd>
+                <dt><span jhiTranslate="leaveApplicationApp.staff.email">Email</span></dt>
+                <dd>
+                    <span>{{ staff.email }}</span>
+                </dd>
+                <dt><span jhiTranslate="leaveApplicationApp.staff.contractNumber">Contract Number</span></dt>
+                <dd>
+                    <span>{{ staff.contractNumber }}</span>
+                </dd>
+                <dt><span jhiTranslate="leaveApplicationApp.staff.gender">Gender</span></dt>
+                <dd>
+                    <span>{{ staff.gender }}</span>
+                </dd>
+                <dt><span jhiTranslate="leaveApplicationApp.staff.user">User</span></dt>
+                <dd>
+                    {{ staff.userLogin }}
+                </dd>
+                <dt><span jhiTranslate="leaveApplicationApp.staff.team">Team</span></dt>
+                <dd>
+                    <span *ngFor="let team of staff.teams; let last = last">
+                        <a [routerLink]="['/team', team?.id, 'view']">{{ team.name }}</a>{{ last ? '' : ', ' }}
+                    </span>
+                </dd>
+            </dl>
+
+            <button type="submit"
+                    (click)="previousState()"
+                    class="btn btn-info">
+                <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+            </button>
+
+            <button type="button"
+                    [routerLink]="['/staff', staff.id, 'edit']"
+                    class="btn btn-primary">
+                <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+            </button>
+        </div>
+    </div>
+</div>

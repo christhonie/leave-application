@@ -1,0 +1,129 @@
+//*************************************
+// People and groups 
+//*************************************
+
+entity Role {
+	name String maxlength(50) required
+}
+relationship ManyToMany {
+	Role{user(login)} to User
+}
+
+entity Team {
+	name String maxlength(50) required
+}
+relationship ManyToOne {
+  Team{manager(login)} to User
+}
+
+entity Staff {
+	position String maxlength(50)
+	employeeID String maxlength(50) required
+	startDate LocalDate required
+	name String maxlength(100)
+	firstName String maxlength(50) required
+	lastName String maxlength(50) required
+	email String maxlength(100)
+	contractNumber String maxlength(50)
+	gender String maxlength(2) required
+}
+relationship ManyToMany {
+	Staff{team(name)} to Team{member(name)}
+}
+relationship ManyToOne {
+	Staff{user(login)} to User
+}
+
+//*************************************
+// Master data
+//*************************************
+
+entity LeaveStatus {
+	name String maxlength(50) required
+	description String maxlength(200)
+}
+
+entity LeaveType {
+	name String maxlength(50) required
+	description String maxlength(200)
+    processName String maxlength(200)
+}
+
+//*************************************
+// Leave
+//*************************************
+
+entity LeaveEntitlement {
+	entitlementDate LocalDate required
+	days BigDecimal required
+}
+relationship ManyToOne {
+	LeaveEntitlement{leaveType(name) required} to LeaveType
+  	LeaveEntitlement{staff(name) required} to Staff
+}
+
+entity EntitlementValue {
+	entitlementValue BigDecimal required
+}
+relationship OneToOne {
+	EntitlementValue{entitlement required} to LeaveEntitlement
+	EntitlementValue{staff(name) required} to Staff
+}
+
+entity LeaveApplication {
+    /* The first date of leave. */
+	startDate LocalDate required
+	/* The last date of leave (inclusive).*/
+	endDate LocalDate required
+    /* This field will be set by the back-end when saving a new application. */ 
+	appliedDate ZonedDateTime required
+	/* This indicates when the final decision of the process was made. It is set by the back-end when the application is approved, rejected or withdrawn. */
+	updateDate ZonedDateTime 
+	/* Read only and calculated by the back-end. This is the difference between the end date and start date. */
+	days BigDecimal required
+	/* Default to false. Set to true when the record is deleted. */
+	deleted Boolean required
+}
+relationship ManyToOne {
+	LeaveApplication{leaveType(name) required} to LeaveType
+	/* Read only. The status is set by the back-end based on the API operation being called. */
+	LeaveApplication{leaveStatus(name)} to LeaveStatus
+	LeaveApplication{staff(name) required} to Staff
+}
+
+entity Comment {
+	comment String maxlength(5000) required
+}
+relationship ManyToOne {
+	Comment{leaveApplication required} to LeaveApplication
+	Comment{user(login) required} to User
+}
+
+enum DecisionChoice {
+	APPROVE,
+    REJECT,
+    WITHDRAW
+}
+ 
+entity Decisions {
+  choice DecisionChoice required
+  decidedOn Instant required
+}
+relationship ManyToOne {
+	Decisions{user(login) required} to User
+    Decisions{leaveApplication required} to LeaveApplication 
+}
+relationship OneToOne {
+    /** Optional comment DTO */
+    Decisions{comment(comment)} to Comment
+}
+
+// Set pagination options
+paginate all with pagination
+
+// Set service options to all except few
+service all with serviceClass
+dto all with mapstruct
+
+// Set entity filtering
+filter all
