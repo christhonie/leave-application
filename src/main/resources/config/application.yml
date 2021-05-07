@@ -171,8 +171,9 @@ camunda.bpm:
   database:
     table-prefix:
   admin-user:
-    id: demo
-    password: demo
-    firstName: Demo
+    id: admin
+    password: admin
+    firstName: The
+    last-name: Oracle
   filter:
     create: All tasks
