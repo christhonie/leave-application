@@ -1,0 +1,44 @@
+{
+  "name": "LeaveEntitlement",
+  "fields": [
+    {
+      "fieldName": "entitlementDate",
+      "fieldType": "LocalDate",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "days",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "leaveType",
+      "otherEntityRelationshipName": "leaveEntitlement",
+      "relationshipValidateRules": "required",
+      "relationshipName": "leaveType",
+      "otherEntityField": "name"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "staff",
+      "otherEntityRelationshipName": "leaveEntitlement",
+      "relationshipValidateRules": "required",
+      "relationshipName": "staff",
+      "otherEntityField": "name"
+    }
+  ],
+  "changelogDate": "20210430144953",
+  "entityTableName": "leave_entitlement",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceClass",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "clientRootFolder": "",
+  "applications": "*"
+}

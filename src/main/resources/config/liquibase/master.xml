@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.9.xsd">
+
+    <property name="now" value="now()" dbms="h2"/>
+    <property name="now" value="now()" dbms="mysql, mariadb"/>
+
+    <property name="floatType" value="float4" dbms="postgresql, h2"/>
+    <property name="floatType" value="float" dbms="mysql, oracle, mssql, mariadb"/>
+    <property name="clobType" value="clob" dbms="h2"/>
+    <property name="clobType" value="clob" dbms="mysql, oracle, mssql, mariadb, postgresql"/>
+    <property name="uuidType" value="varchar(36)" dbms="h2, mysql, mariadb"/>
+
+    <include file="config/liquibase/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20210430144453_added_entity_Role.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20210430144553_added_entity_Team.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20210430144653_added_entity_Staff.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20210430144753_added_entity_LeaveStatus.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20210430144853_added_entity_LeaveType.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20210430144953_added_entity_LeaveEntitlement.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20210430145053_added_entity_EntitlementValue.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20210430145153_added_entity_LeaveApplication.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20210430145253_added_entity_Comment.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20210430145353_added_entity_Decisions.xml" relativeToChangelogFile="false"/>
+    <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
+    <include file="config/liquibase/changelog/20210430144453_added_entity_constraints_Role.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20210430144553_added_entity_constraints_Team.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20210430144653_added_entity_constraints_Staff.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20210430144953_added_entity_constraints_LeaveEntitlement.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20210430145053_added_entity_constraints_EntitlementValue.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20210430145153_added_entity_constraints_LeaveApplication.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20210430145253_added_entity_constraints_Comment.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20210430145353_added_entity_constraints_Decisions.xml" relativeToChangelogFile="false"/>
+    <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
+    <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
+</databaseChangeLog>

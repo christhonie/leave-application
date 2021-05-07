@@ -1,0 +1,54 @@
+{
+  "name": "Decisions",
+  "fields": [
+    {
+      "fieldName": "choice",
+      "fieldType": "DecisionChoice",
+      "fieldValues": "APPROVE,REJECT,WITHDRAW",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "decidedOn",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "comment",
+      "otherEntityRelationshipName": "decisions",
+      "javadoc": "Optional comment DTO",
+      "relationshipName": "comment",
+      "otherEntityField": "comment",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "user",
+      "otherEntityRelationshipName": "decisions",
+      "relationshipValidateRules": "required",
+      "relationshipName": "user",
+      "otherEntityField": "login"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "leaveApplication",
+      "otherEntityRelationshipName": "decisions",
+      "relationshipValidateRules": "required",
+      "relationshipName": "leaveApplication",
+      "otherEntityField": "id"
+    }
+  ],
+  "changelogDate": "20210430145353",
+  "entityTableName": "decisions",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceClass",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "clientRootFolder": "",
+  "applications": "*"
+}
