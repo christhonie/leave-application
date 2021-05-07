@@ -55,14 +55,14 @@ public class StaffResourceIT {
     private static final LocalDate UPDATED_START_DATE = LocalDate.now(ZoneId.systemDefault());
     private static final LocalDate SMALLER_START_DATE = LocalDate.ofEpochDay(-1L);
 
-    private static final String DEFAULT_NAME = "AAAAAAAAAA";
-    private static final String UPDATED_NAME = "BBBBBBBBBB";
-
     private static final String DEFAULT_FIRST_NAME = "AAAAAAAAAA";
     private static final String UPDATED_FIRST_NAME = "BBBBBBBBBB";
 
     private static final String DEFAULT_LAST_NAME = "AAAAAAAAAA";
     private static final String UPDATED_LAST_NAME = "BBBBBBBBBB";
+
+    private static final String DEFAULT_NAME = DEFAULT_FIRST_NAME + " " + DEFAULT_LAST_NAME;
+    private static final String UPDATED_NAME = UPDATED_FIRST_NAME + " " + UPDATED_LAST_NAME;
 
     private static final String DEFAULT_EMAIL = "AAAAAAAAAA";
     private static final String UPDATED_EMAIL = "BBBBBBBBBB";
@@ -110,7 +110,6 @@ public class StaffResourceIT {
             .position(DEFAULT_POSITION)
             .employeeID(DEFAULT_EMPLOYEE_ID)
             .startDate(DEFAULT_START_DATE)
-            .name(DEFAULT_NAME)
             .firstName(DEFAULT_FIRST_NAME)
             .lastName(DEFAULT_LAST_NAME)
             .email(DEFAULT_EMAIL)
@@ -130,7 +129,6 @@ public class StaffResourceIT {
             .position(UPDATED_POSITION)
             .employeeID(UPDATED_EMPLOYEE_ID)
             .startDate(UPDATED_START_DATE)
-            .name(UPDATED_NAME)
             .firstName(UPDATED_FIRST_NAME)
             .lastName(UPDATED_LAST_NAME)
             .email(UPDATED_EMAIL)
@@ -636,84 +634,6 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByNameIsEqualToSomething() throws Exception {
-        // Initialize the database
-        staffRepository.saveAndFlush(staff);
-
-        // Get all the staffList where name equals to DEFAULT_NAME
-        defaultStaffShouldBeFound("name.equals=" + DEFAULT_NAME);
-
-        // Get all the staffList where name equals to UPDATED_NAME
-        defaultStaffShouldNotBeFound("name.equals=" + UPDATED_NAME);
-    }
-
-    @Test
-    @Transactional
-    public void getAllStaffByNameIsNotEqualToSomething() throws Exception {
-        // Initialize the database
-        staffRepository.saveAndFlush(staff);
-
-        // Get all the staffList where name not equals to DEFAULT_NAME
-        defaultStaffShouldNotBeFound("name.notEquals=" + DEFAULT_NAME);
-
-        // Get all the staffList where name not equals to UPDATED_NAME
-        defaultStaffShouldBeFound("name.notEquals=" + UPDATED_NAME);
-    }
-
-    @Test
-    @Transactional
-    public void getAllStaffByNameIsInShouldWork() throws Exception {
-        // Initialize the database
-        staffRepository.saveAndFlush(staff);
-
-        // Get all the staffList where name in DEFAULT_NAME or UPDATED_NAME
-        defaultStaffShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
-
-        // Get all the staffList where name equals to UPDATED_NAME
-        defaultStaffShouldNotBeFound("name.in=" + UPDATED_NAME);
-    }
-
-    @Test
-    @Transactional
-    public void getAllStaffByNameIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        staffRepository.saveAndFlush(staff);
-
-        // Get all the staffList where name is not null
-        defaultStaffShouldBeFound("name.specified=true");
-
-        // Get all the staffList where name is null
-        defaultStaffShouldNotBeFound("name.specified=false");
-    }
-
-    @Test
-    @Transactional
-    public void getAllStaffByNameContainsSomething() throws Exception {
-        // Initialize the database
-        staffRepository.saveAndFlush(staff);
-
-        // Get all the staffList where name contains DEFAULT_NAME
-        defaultStaffShouldBeFound("name.contains=" + DEFAULT_NAME);
-
-        // Get all the staffList where name contains UPDATED_NAME
-        defaultStaffShouldNotBeFound("name.contains=" + UPDATED_NAME);
-    }
-
-    @Test
-    @Transactional
-    public void getAllStaffByNameNotContainsSomething() throws Exception {
-        // Initialize the database
-        staffRepository.saveAndFlush(staff);
-
-        // Get all the staffList where name does not contain DEFAULT_NAME
-        defaultStaffShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
-
-        // Get all the staffList where name does not contain UPDATED_NAME
-        defaultStaffShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
-    }
-
-    @Test
-    @Transactional
     public void getAllStaffByFirstNameIsEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
@@ -1209,7 +1129,6 @@ public class StaffResourceIT {
             .position(UPDATED_POSITION)
             .employeeID(UPDATED_EMPLOYEE_ID)
             .startDate(UPDATED_START_DATE)
-            .name(UPDATED_NAME)
             .firstName(UPDATED_FIRST_NAME)
             .lastName(UPDATED_LAST_NAME)
             .email(UPDATED_EMAIL)

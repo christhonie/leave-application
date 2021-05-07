@@ -36,10 +36,6 @@ public class Staff implements Serializable {
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
 
-    @Size(max = 100)
-    @Column(name = "name", length = 100)
-    private String name;
-
     @NotNull
     @Size(max = 50)
     @Column(name = "first_name", length = 50, nullable = false)
@@ -124,17 +120,11 @@ public class Staff implements Serializable {
         this.startDate = startDate;
     }
 
+    @Transient
     public String getName() {
-        return name;
-    }
-
-    public Staff name(String name) {
-        this.name = name;
-        return this;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        if (firstName != null && !firstName.isEmpty() && lastName != null && !lastName.isEmpty()) return (
+            firstName + " " + lastName
+        ); else return firstName + lastName;
     }
 
     public String getFirstName() {
