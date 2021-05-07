@@ -2,6 +2,7 @@ package za.co.dearx.leave.service.dto;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import javax.validation.constraints.*;
 
@@ -9,6 +10,7 @@ import javax.validation.constraints.*;
  * A DTO for the {@link za.co.dearx.leave.domain.Role} entity.
  */
 public class RoleDTO implements Serializable {
+
     private Long id;
 
     @NotNull
@@ -50,12 +52,16 @@ public class RoleDTO implements Serializable {
             return false;
         }
 
-        return id != null && id.equals(((RoleDTO) o).id);
+        RoleDTO roleDTO = (RoleDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, roleDTO.id);
     }
 
     @Override
     public int hashCode() {
-        return 31;
+        return Objects.hash(this.id);
     }
 
     // prettier-ignore
@@ -64,7 +70,7 @@ public class RoleDTO implements Serializable {
         return "RoleDTO{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
-            ", users='" + getUsers() + "'" +
+            ", users=" + getUsers() +
             "}";
     }
 }

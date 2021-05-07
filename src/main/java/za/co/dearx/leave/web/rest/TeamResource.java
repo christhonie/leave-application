@@ -1,13 +1,12 @@
 package za.co.dearx.leave.web.rest;
 
-import io.github.jhipster.web.util.HeaderUtil;
-import io.github.jhipster.web.util.PaginationUtil;
-import io.github.jhipster.web.util.ResponseUtil;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,9 +17,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import tech.jhipster.web.util.HeaderUtil;
+import tech.jhipster.web.util.PaginationUtil;
+import tech.jhipster.web.util.ResponseUtil;
+import za.co.dearx.leave.repository.TeamRepository;
 import za.co.dearx.leave.service.TeamQueryService;
 import za.co.dearx.leave.service.TeamService;
-import za.co.dearx.leave.service.dto.TeamCriteria;
+import za.co.dearx.leave.service.criteria.TeamCriteria;
 import za.co.dearx.leave.service.dto.TeamDTO;
 import za.co.dearx.leave.web.rest.errors.BadRequestAlertException;
 
@@ -30,6 +33,7 @@ import za.co.dearx.leave.web.rest.errors.BadRequestAlertException;
 @RestController
 @RequestMapping("/api")
 public class TeamResource {
+
     private final Logger log = LoggerFactory.getLogger(TeamResource.class);
 
     private static final String ENTITY_NAME = "team";
@@ -39,10 +43,13 @@ public class TeamResource {
 
     private final TeamService teamService;
 
+    private final TeamRepository teamRepository;
+
     private final TeamQueryService teamQueryService;
 
-    public TeamResource(TeamService teamService, TeamQueryService teamQueryService) {
+    public TeamResource(TeamService teamService, TeamRepository teamRepository, TeamQueryService teamQueryService) {
         this.teamService = teamService;
+        this.teamRepository = teamRepository;
         this.teamQueryService = teamQueryService;
     }
 
@@ -67,25 +74,73 @@ public class TeamResource {
     }
 
     /**
-     * {@code PUT  /teams} : Updates an existing team.
+     * {@code PUT  /teams/:id} : Updates an existing team.
      *
+     * @param id the id of the teamDTO to save.
      * @param teamDTO the teamDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated teamDTO,
      * or with status {@code 400 (Bad Request)} if the teamDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the teamDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/teams")
-    public ResponseEntity<TeamDTO> updateTeam(@Valid @RequestBody TeamDTO teamDTO) throws URISyntaxException {
-        log.debug("REST request to update Team : {}", teamDTO);
+    @PutMapping("/teams/{id}")
+    public ResponseEntity<TeamDTO> updateTeam(
+        @PathVariable(value = "id", required = false) final Long id,
+        @Valid @RequestBody TeamDTO teamDTO
+    ) throws URISyntaxException {
+        log.debug("REST request to update Team : {}, {}", id, teamDTO);
         if (teamDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
+        if (!Objects.equals(id, teamDTO.getId())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+
+        if (!teamRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
         TeamDTO result = teamService.save(teamDTO);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, teamDTO.getId().toString()))
             .body(result);
+    }
+
+    /**
+     * {@code PATCH  /teams/:id} : Partial updates given fields of an existing team, field will ignore if it is null
+     *
+     * @param id the id of the teamDTO to save.
+     * @param teamDTO the teamDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated teamDTO,
+     * or with status {@code 400 (Bad Request)} if the teamDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the teamDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the teamDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PatchMapping(value = "/teams/{id}", consumes = "application/merge-patch+json")
+    public ResponseEntity<TeamDTO> partialUpdateTeam(
+        @PathVariable(value = "id", required = false) final Long id,
+        @NotNull @RequestBody TeamDTO teamDTO
+    ) throws URISyntaxException {
+        log.debug("REST request to partial update Team partially : {}, {}", id, teamDTO);
+        if (teamDTO.getId() == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!Objects.equals(id, teamDTO.getId())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+
+        if (!teamRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        Optional<TeamDTO> result = teamService.partialUpdate(teamDTO);
+
+        return ResponseUtil.wrapOrNotFound(
+            result,
+            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, teamDTO.getId().toString())
+        );
     }
 
     /**

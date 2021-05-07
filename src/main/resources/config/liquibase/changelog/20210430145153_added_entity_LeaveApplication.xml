@@ -3,17 +3,15 @@
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
     xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.9.xsd
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd
                         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
-
-        <property name="autoIncrement" value="true"/>
 
     <!--
         Added the entity LeaveApplication.
     -->
     <changeSet id="20210430145153-1" author="jhipster">
         <createTable tableName="leave_application">
-            <column name="id" type="bigint" autoIncrement="${autoIncrement}">
+            <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="start_date" type="date">
@@ -22,10 +20,10 @@
             <column name="end_date" type="date">
                 <constraints nullable="false" />
             </column>
-            <column name="applied_date" type="datetime">
+            <column name="applied_date" type="${datetimeType}">
                 <constraints nullable="false" />
             </column>
-            <column name="update_date" type="datetime">
+            <column name="update_date" type="${datetimeType}">
                 <constraints nullable="true" />
             </column>
             <column name="days" type="decimal(21,2)">
@@ -45,13 +43,10 @@
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
-        <dropDefaultValue tableName="leave_application" columnName="applied_date" columnDataType="datetime"/>
-        <dropDefaultValue tableName="leave_application" columnName="update_date" columnDataType="datetime"/>
+        <dropDefaultValue tableName="leave_application" columnName="applied_date" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="leave_application" columnName="update_date" columnDataType="${datetimeType}"/>
     </changeSet>
 
-    <changeSet id="20210430145153-1-relations" author="jhipster">
-
-    </changeSet>
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
 
     <!--
@@ -70,8 +65,8 @@
             <column name="id" type="numeric"/>
             <column name="start_date" type="date"/>
             <column name="end_date" type="date"/>
-            <column name="applied_date" type="datetime"/>
-            <column name="update_date" type="datetime"/>
+            <column name="applied_date" type="${datetimeType}"/>
+            <column name="update_date" type="${datetimeType}"/>
             <column name="days" type="numeric"/>
             <column name="deleted" type="boolean"/>
             <column name="leave_type_id" type="numeric"/>
@@ -79,5 +74,4 @@
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>
-
 </databaseChangeLog>

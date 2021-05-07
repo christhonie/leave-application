@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import za.co.dearx.leave.domain.Staff;
 
 /**
- * Spring Data  repository for the Staff entity.
+ * Spring Data SQL repository for the Staff entity.
  */
 @Repository
 public interface StaffRepository extends JpaRepository<Staff, Long>, JpaSpecificationExecutor<Staff> {

@@ -3,12 +3,14 @@ package za.co.dearx.leave.service.dto;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Objects;
 import javax.validation.constraints.*;
 
 /**
  * A DTO for the {@link za.co.dearx.leave.domain.LeaveEntitlement} entity.
  */
 public class LeaveEntitlementDTO implements Serializable {
+
     private Long id;
 
     @NotNull
@@ -17,13 +19,9 @@ public class LeaveEntitlementDTO implements Serializable {
     @NotNull
     private BigDecimal days;
 
-    private Long leaveTypeId;
+    private LeaveTypeDTO leaveType;
 
-    private String leaveTypeName;
-
-    private Long staffId;
-
-    private String staffName;
+    private StaffDTO staff;
 
     public Long getId() {
         return id;
@@ -49,36 +47,20 @@ public class LeaveEntitlementDTO implements Serializable {
         this.days = days;
     }
 
-    public Long getLeaveTypeId() {
-        return leaveTypeId;
+    public LeaveTypeDTO getLeaveType() {
+        return leaveType;
     }
 
-    public void setLeaveTypeId(Long leaveTypeId) {
-        this.leaveTypeId = leaveTypeId;
+    public void setLeaveType(LeaveTypeDTO leaveType) {
+        this.leaveType = leaveType;
     }
 
-    public String getLeaveTypeName() {
-        return leaveTypeName;
+    public StaffDTO getStaff() {
+        return staff;
     }
 
-    public void setLeaveTypeName(String leaveTypeName) {
-        this.leaveTypeName = leaveTypeName;
-    }
-
-    public Long getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
-    }
-
-    public String getStaffName() {
-        return staffName;
-    }
-
-    public void setStaffName(String staffName) {
-        this.staffName = staffName;
+    public void setStaff(StaffDTO staff) {
+        this.staff = staff;
     }
 
     @Override
@@ -90,12 +72,16 @@ public class LeaveEntitlementDTO implements Serializable {
             return false;
         }
 
-        return id != null && id.equals(((LeaveEntitlementDTO) o).id);
+        LeaveEntitlementDTO leaveEntitlementDTO = (LeaveEntitlementDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, leaveEntitlementDTO.id);
     }
 
     @Override
     public int hashCode() {
-        return 31;
+        return Objects.hash(this.id);
     }
 
     // prettier-ignore
@@ -105,10 +91,8 @@ public class LeaveEntitlementDTO implements Serializable {
             "id=" + getId() +
             ", entitlementDate='" + getEntitlementDate() + "'" +
             ", days=" + getDays() +
-            ", leaveTypeId=" + getLeaveTypeId() +
-            ", leaveTypeName='" + getLeaveTypeName() + "'" +
-            ", staffId=" + getStaffId() +
-            ", staffName='" + getStaffName() + "'" +
+            ", leaveType=" + getLeaveType() +
+            ", staff=" + getStaff() +
             "}";
     }
 }

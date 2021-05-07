@@ -16,6 +16,7 @@ import za.co.dearx.leave.domain.enumeration.DecisionChoice;
 @Table(name = "decisions")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Decisions implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -34,18 +35,18 @@ public class Decisions implements Serializable {
     /**
      * Optional comment DTO
      */
+    @JsonIgnoreProperties(value = { "leaveApplication", "user" }, allowSetters = true)
     @OneToOne
     @JoinColumn(unique = true)
     private Comment comment;
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = "decisions", allowSetters = true)
     private User user;
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = "decisions", allowSetters = true)
+    @JsonIgnoreProperties(value = { "leaveType", "leaveStatus", "staff" }, allowSetters = true)
     private LeaveApplication leaveApplication;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -57,8 +58,13 @@ public class Decisions implements Serializable {
         this.id = id;
     }
 
+    public Decisions id(Long id) {
+        this.id = id;
+        return this;
+    }
+
     public DecisionChoice getChoice() {
-        return choice;
+        return this.choice;
     }
 
     public Decisions choice(DecisionChoice choice) {
@@ -71,7 +77,7 @@ public class Decisions implements Serializable {
     }
 
     public Instant getDecidedOn() {
-        return decidedOn;
+        return this.decidedOn;
     }
 
     public Decisions decidedOn(Instant decidedOn) {
@@ -84,11 +90,11 @@ public class Decisions implements Serializable {
     }
 
     public Comment getComment() {
-        return comment;
+        return this.comment;
     }
 
     public Decisions comment(Comment comment) {
-        this.comment = comment;
+        this.setComment(comment);
         return this;
     }
 
@@ -97,11 +103,11 @@ public class Decisions implements Serializable {
     }
 
     public User getUser() {
-        return user;
+        return this.user;
     }
 
     public Decisions user(User user) {
-        this.user = user;
+        this.setUser(user);
         return this;
     }
 
@@ -110,11 +116,11 @@ public class Decisions implements Serializable {
     }
 
     public LeaveApplication getLeaveApplication() {
-        return leaveApplication;
+        return this.leaveApplication;
     }
 
     public Decisions leaveApplication(LeaveApplication leaveApplication) {
-        this.leaveApplication = leaveApplication;
+        this.setLeaveApplication(leaveApplication);
         return this;
     }
 
@@ -137,7 +143,8 @@ public class Decisions implements Serializable {
 
     @Override
     public int hashCode() {
-        return 31;
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        return getClass().hashCode();
     }
 
     // prettier-ignore

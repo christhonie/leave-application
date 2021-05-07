@@ -9,12 +9,9 @@ import za.co.dearx.leave.service.dto.LeaveStatusDTO;
  */
 @Mapper(componentModel = "spring", uses = {})
 public interface LeaveStatusMapper extends EntityMapper<LeaveStatusDTO, LeaveStatus> {
-    default LeaveStatus fromId(Long id) {
-        if (id == null) {
-            return null;
-        }
-        LeaveStatus leaveStatus = new LeaveStatus();
-        leaveStatus.setId(id);
-        return leaveStatus;
-    }
+    @Named("name")
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "name", source = "name")
+    LeaveStatusDTO toDtoName(LeaveStatus leaveStatus);
 }

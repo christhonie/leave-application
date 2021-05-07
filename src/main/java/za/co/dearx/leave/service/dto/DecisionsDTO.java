@@ -3,6 +3,7 @@ package za.co.dearx.leave.service.dto;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Objects;
 import javax.validation.constraints.*;
 import za.co.dearx.leave.domain.enumeration.DecisionChoice;
 
@@ -10,6 +11,7 @@ import za.co.dearx.leave.domain.enumeration.DecisionChoice;
  * A DTO for the {@link za.co.dearx.leave.domain.Decisions} entity.
  */
 public class DecisionsDTO implements Serializable {
+
     private Long id;
 
     @NotNull
@@ -18,19 +20,11 @@ public class DecisionsDTO implements Serializable {
     @NotNull
     private Instant decidedOn;
 
-    /**
-     * Optional comment DTO
-     */
-    @ApiModelProperty(value = "Optional comment DTO")
-    private Long commentId;
+    private CommentDTO comment;
 
-    private String commentComment;
+    private UserDTO user;
 
-    private Long userId;
-
-    private String userLogin;
-
-    private Long leaveApplicationId;
+    private LeaveApplicationDTO leaveApplication;
 
     public Long getId() {
         return id;
@@ -56,44 +50,28 @@ public class DecisionsDTO implements Serializable {
         this.decidedOn = decidedOn;
     }
 
-    public Long getCommentId() {
-        return commentId;
+    public CommentDTO getComment() {
+        return comment;
     }
 
-    public void setCommentId(Long commentId) {
-        this.commentId = commentId;
+    public void setComment(CommentDTO comment) {
+        this.comment = comment;
     }
 
-    public String getCommentComment() {
-        return commentComment;
+    public UserDTO getUser() {
+        return user;
     }
 
-    public void setCommentComment(String commentComment) {
-        this.commentComment = commentComment;
+    public void setUser(UserDTO user) {
+        this.user = user;
     }
 
-    public Long getUserId() {
-        return userId;
+    public LeaveApplicationDTO getLeaveApplication() {
+        return leaveApplication;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public String getUserLogin() {
-        return userLogin;
-    }
-
-    public void setUserLogin(String userLogin) {
-        this.userLogin = userLogin;
-    }
-
-    public Long getLeaveApplicationId() {
-        return leaveApplicationId;
-    }
-
-    public void setLeaveApplicationId(Long leaveApplicationId) {
-        this.leaveApplicationId = leaveApplicationId;
+    public void setLeaveApplication(LeaveApplicationDTO leaveApplication) {
+        this.leaveApplication = leaveApplication;
     }
 
     @Override
@@ -105,12 +83,16 @@ public class DecisionsDTO implements Serializable {
             return false;
         }
 
-        return id != null && id.equals(((DecisionsDTO) o).id);
+        DecisionsDTO decisionsDTO = (DecisionsDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, decisionsDTO.id);
     }
 
     @Override
     public int hashCode() {
-        return 31;
+        return Objects.hash(this.id);
     }
 
     // prettier-ignore
@@ -120,11 +102,9 @@ public class DecisionsDTO implements Serializable {
             "id=" + getId() +
             ", choice='" + getChoice() + "'" +
             ", decidedOn='" + getDecidedOn() + "'" +
-            ", commentId=" + getCommentId() +
-            ", commentComment='" + getCommentComment() + "'" +
-            ", userId=" + getUserId() +
-            ", userLogin='" + getUserLogin() + "'" +
-            ", leaveApplicationId=" + getLeaveApplicationId() +
+            ", comment=" + getComment() +
+            ", user=" + getUser() +
+            ", leaveApplication=" + getLeaveApplication() +
             "}";
     }
 }

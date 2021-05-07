@@ -18,6 +18,7 @@ import za.co.dearx.leave.service.mapper.StaffMapper;
 @Service
 @Transactional
 public class StaffService {
+
     private final Logger log = LoggerFactory.getLogger(StaffService.class);
 
     private final StaffRepository staffRepository;
@@ -40,6 +41,27 @@ public class StaffService {
         Staff staff = staffMapper.toEntity(staffDTO);
         staff = staffRepository.save(staff);
         return staffMapper.toDto(staff);
+    }
+
+    /**
+     * Partially update a staff.
+     *
+     * @param staffDTO the entity to update partially.
+     * @return the persisted entity.
+     */
+    public Optional<StaffDTO> partialUpdate(StaffDTO staffDTO) {
+        log.debug("Request to partially update Staff : {}", staffDTO);
+
+        return staffRepository
+            .findById(staffDTO.getId())
+            .map(
+                existingStaff -> {
+                    staffMapper.partialUpdate(existingStaff, staffDTO);
+                    return existingStaff;
+                }
+            )
+            .map(staffRepository::save)
+            .map(staffMapper::toDto);
     }
 
     /**

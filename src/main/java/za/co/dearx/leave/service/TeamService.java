@@ -18,6 +18,7 @@ import za.co.dearx.leave.service.mapper.TeamMapper;
 @Service
 @Transactional
 public class TeamService {
+
     private final Logger log = LoggerFactory.getLogger(TeamService.class);
 
     private final TeamRepository teamRepository;
@@ -40,6 +41,27 @@ public class TeamService {
         Team team = teamMapper.toEntity(teamDTO);
         team = teamRepository.save(team);
         return teamMapper.toDto(team);
+    }
+
+    /**
+     * Partially update a team.
+     *
+     * @param teamDTO the entity to update partially.
+     * @return the persisted entity.
+     */
+    public Optional<TeamDTO> partialUpdate(TeamDTO teamDTO) {
+        log.debug("Request to partially update Team : {}", teamDTO);
+
+        return teamRepository
+            .findById(teamDTO.getId())
+            .map(
+                existingTeam -> {
+                    teamMapper.partialUpdate(existingTeam, teamDTO);
+                    return existingTeam;
+                }
+            )
+            .map(teamRepository::save)
+            .map(teamMapper::toDto);
     }
 
     /**

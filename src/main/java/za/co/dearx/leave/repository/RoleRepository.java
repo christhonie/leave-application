@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import za.co.dearx.leave.domain.Role;
 
 /**
- * Spring Data  repository for the Role entity.
+ * Spring Data SQL repository for the Role entity.
  */
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificationExecutor<Role> {

@@ -5,10 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import za.co.dearx.leave.web.rest.TestUtil;
 
-public class StaffDTOTest {
+class StaffDTOTest {
 
     @Test
-    public void dtoEqualsVerifier() throws Exception {
+    void dtoEqualsVerifier() throws Exception {
         TestUtil.equalsVerifier(StaffDTO.class);
         StaffDTO staffDTO1 = new StaffDTO();
         staffDTO1.setId(1L);

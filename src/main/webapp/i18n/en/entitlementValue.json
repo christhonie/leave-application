@@ -3,6 +3,7 @@
     "entitlementValue": {
       "home": {
         "title": "Entitlement Values",
+        "refreshListLabel": "Refresh list",
         "createLabel": "Create a new Entitlement Value",
         "createOrEditLabel": "Create or edit a Entitlement Value",
         "notFound": "No Entitlement Values found"
@@ -16,6 +17,7 @@
       "detail": {
         "title": "Entitlement Value"
       },
+      "id": "ID",
       "entitlementValue": "Entitlement Value",
       "entitlement": "Entitlement",
       "staff": "Staff"

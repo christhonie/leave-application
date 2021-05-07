@@ -7,49 +7,49 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import za.co.dearx.leave.LeaveApplicationApp;
+import za.co.dearx.leave.IntegrationTest;
 import za.co.dearx.leave.domain.LeaveStatus;
 import za.co.dearx.leave.repository.LeaveStatusRepository;
-import za.co.dearx.leave.service.LeaveStatusQueryService;
-import za.co.dearx.leave.service.LeaveStatusService;
-import za.co.dearx.leave.service.dto.LeaveStatusCriteria;
+import za.co.dearx.leave.service.criteria.LeaveStatusCriteria;
 import za.co.dearx.leave.service.dto.LeaveStatusDTO;
 import za.co.dearx.leave.service.mapper.LeaveStatusMapper;
 
 /**
  * Integration tests for the {@link LeaveStatusResource} REST controller.
  */
-@SpringBootTest(classes = LeaveApplicationApp.class)
+@IntegrationTest
 @AutoConfigureMockMvc
 @WithMockUser
-public class LeaveStatusResourceIT {
+class LeaveStatusResourceIT {
+
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
 
     private static final String DEFAULT_DESCRIPTION = "AAAAAAAAAA";
     private static final String UPDATED_DESCRIPTION = "BBBBBBBBBB";
 
+    private static final String ENTITY_API_URL = "/api/leave-statuses";
+    private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
+
+    private static Random random = new Random();
+    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
     @Autowired
     private LeaveStatusRepository leaveStatusRepository;
 
     @Autowired
     private LeaveStatusMapper leaveStatusMapper;
-
-    @Autowired
-    private LeaveStatusService leaveStatusService;
-
-    @Autowired
-    private LeaveStatusQueryService leaveStatusQueryService;
 
     @Autowired
     private EntityManager em;
@@ -88,13 +88,13 @@ public class LeaveStatusResourceIT {
 
     @Test
     @Transactional
-    public void createLeaveStatus() throws Exception {
+    void createLeaveStatus() throws Exception {
         int databaseSizeBeforeCreate = leaveStatusRepository.findAll().size();
         // Create the LeaveStatus
         LeaveStatusDTO leaveStatusDTO = leaveStatusMapper.toDto(leaveStatus);
         restLeaveStatusMockMvc
             .perform(
-                post("/api/leave-statuses")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveStatusDTO))
@@ -111,17 +111,17 @@ public class LeaveStatusResourceIT {
 
     @Test
     @Transactional
-    public void createLeaveStatusWithExistingId() throws Exception {
-        int databaseSizeBeforeCreate = leaveStatusRepository.findAll().size();
-
+    void createLeaveStatusWithExistingId() throws Exception {
         // Create the LeaveStatus with an existing ID
         leaveStatus.setId(1L);
         LeaveStatusDTO leaveStatusDTO = leaveStatusMapper.toDto(leaveStatus);
 
+        int databaseSizeBeforeCreate = leaveStatusRepository.findAll().size();
+
         // An entity with an existing ID cannot be created, so this API call must fail
         restLeaveStatusMockMvc
             .perform(
-                post("/api/leave-statuses")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveStatusDTO))
@@ -135,7 +135,7 @@ public class LeaveStatusResourceIT {
 
     @Test
     @Transactional
-    public void checkNameIsRequired() throws Exception {
+    void checkNameIsRequired() throws Exception {
         int databaseSizeBeforeTest = leaveStatusRepository.findAll().size();
         // set the field null
         leaveStatus.setName(null);
@@ -145,7 +145,7 @@ public class LeaveStatusResourceIT {
 
         restLeaveStatusMockMvc
             .perform(
-                post("/api/leave-statuses")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveStatusDTO))
@@ -158,13 +158,13 @@ public class LeaveStatusResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveStatuses() throws Exception {
+    void getAllLeaveStatuses() throws Exception {
         // Initialize the database
         leaveStatusRepository.saveAndFlush(leaveStatus);
 
         // Get all the leaveStatusList
         restLeaveStatusMockMvc
-            .perform(get("/api/leave-statuses?sort=id,desc"))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(leaveStatus.getId().intValue())))
@@ -174,13 +174,13 @@ public class LeaveStatusResourceIT {
 
     @Test
     @Transactional
-    public void getLeaveStatus() throws Exception {
+    void getLeaveStatus() throws Exception {
         // Initialize the database
         leaveStatusRepository.saveAndFlush(leaveStatus);
 
         // Get the leaveStatus
         restLeaveStatusMockMvc
-            .perform(get("/api/leave-statuses/{id}", leaveStatus.getId()))
+            .perform(get(ENTITY_API_URL_ID, leaveStatus.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(leaveStatus.getId().intValue()))
@@ -190,7 +190,7 @@ public class LeaveStatusResourceIT {
 
     @Test
     @Transactional
-    public void getLeaveStatusesByIdFiltering() throws Exception {
+    void getLeaveStatusesByIdFiltering() throws Exception {
         // Initialize the database
         leaveStatusRepository.saveAndFlush(leaveStatus);
 
@@ -208,7 +208,7 @@ public class LeaveStatusResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveStatusesByNameIsEqualToSomething() throws Exception {
+    void getAllLeaveStatusesByNameIsEqualToSomething() throws Exception {
         // Initialize the database
         leaveStatusRepository.saveAndFlush(leaveStatus);
 
@@ -221,7 +221,7 @@ public class LeaveStatusResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveStatusesByNameIsNotEqualToSomething() throws Exception {
+    void getAllLeaveStatusesByNameIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leaveStatusRepository.saveAndFlush(leaveStatus);
 
@@ -234,7 +234,7 @@ public class LeaveStatusResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveStatusesByNameIsInShouldWork() throws Exception {
+    void getAllLeaveStatusesByNameIsInShouldWork() throws Exception {
         // Initialize the database
         leaveStatusRepository.saveAndFlush(leaveStatus);
 
@@ -247,7 +247,7 @@ public class LeaveStatusResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveStatusesByNameIsNullOrNotNull() throws Exception {
+    void getAllLeaveStatusesByNameIsNullOrNotNull() throws Exception {
         // Initialize the database
         leaveStatusRepository.saveAndFlush(leaveStatus);
 
@@ -260,7 +260,7 @@ public class LeaveStatusResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveStatusesByNameContainsSomething() throws Exception {
+    void getAllLeaveStatusesByNameContainsSomething() throws Exception {
         // Initialize the database
         leaveStatusRepository.saveAndFlush(leaveStatus);
 
@@ -273,7 +273,7 @@ public class LeaveStatusResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveStatusesByNameNotContainsSomething() throws Exception {
+    void getAllLeaveStatusesByNameNotContainsSomething() throws Exception {
         // Initialize the database
         leaveStatusRepository.saveAndFlush(leaveStatus);
 
@@ -286,7 +286,7 @@ public class LeaveStatusResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveStatusesByDescriptionIsEqualToSomething() throws Exception {
+    void getAllLeaveStatusesByDescriptionIsEqualToSomething() throws Exception {
         // Initialize the database
         leaveStatusRepository.saveAndFlush(leaveStatus);
 
@@ -299,7 +299,7 @@ public class LeaveStatusResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveStatusesByDescriptionIsNotEqualToSomething() throws Exception {
+    void getAllLeaveStatusesByDescriptionIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leaveStatusRepository.saveAndFlush(leaveStatus);
 
@@ -312,7 +312,7 @@ public class LeaveStatusResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveStatusesByDescriptionIsInShouldWork() throws Exception {
+    void getAllLeaveStatusesByDescriptionIsInShouldWork() throws Exception {
         // Initialize the database
         leaveStatusRepository.saveAndFlush(leaveStatus);
 
@@ -325,7 +325,7 @@ public class LeaveStatusResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveStatusesByDescriptionIsNullOrNotNull() throws Exception {
+    void getAllLeaveStatusesByDescriptionIsNullOrNotNull() throws Exception {
         // Initialize the database
         leaveStatusRepository.saveAndFlush(leaveStatus);
 
@@ -338,7 +338,7 @@ public class LeaveStatusResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveStatusesByDescriptionContainsSomething() throws Exception {
+    void getAllLeaveStatusesByDescriptionContainsSomething() throws Exception {
         // Initialize the database
         leaveStatusRepository.saveAndFlush(leaveStatus);
 
@@ -351,7 +351,7 @@ public class LeaveStatusResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveStatusesByDescriptionNotContainsSomething() throws Exception {
+    void getAllLeaveStatusesByDescriptionNotContainsSomething() throws Exception {
         // Initialize the database
         leaveStatusRepository.saveAndFlush(leaveStatus);
 
@@ -367,7 +367,7 @@ public class LeaveStatusResourceIT {
      */
     private void defaultLeaveStatusShouldBeFound(String filter) throws Exception {
         restLeaveStatusMockMvc
-            .perform(get("/api/leave-statuses?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(leaveStatus.getId().intValue())))
@@ -376,7 +376,7 @@ public class LeaveStatusResourceIT {
 
         // Check, that the count call also returns 1
         restLeaveStatusMockMvc
-            .perform(get("/api/leave-statuses/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -387,7 +387,7 @@ public class LeaveStatusResourceIT {
      */
     private void defaultLeaveStatusShouldNotBeFound(String filter) throws Exception {
         restLeaveStatusMockMvc
-            .perform(get("/api/leave-statuses?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -395,7 +395,7 @@ public class LeaveStatusResourceIT {
 
         // Check, that the count call also returns 0
         restLeaveStatusMockMvc
-            .perform(get("/api/leave-statuses/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));
@@ -403,14 +403,14 @@ public class LeaveStatusResourceIT {
 
     @Test
     @Transactional
-    public void getNonExistingLeaveStatus() throws Exception {
+    void getNonExistingLeaveStatus() throws Exception {
         // Get the leaveStatus
-        restLeaveStatusMockMvc.perform(get("/api/leave-statuses/{id}", Long.MAX_VALUE)).andExpect(status().isNotFound());
+        restLeaveStatusMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    public void updateLeaveStatus() throws Exception {
+    void putNewLeaveStatus() throws Exception {
         // Initialize the database
         leaveStatusRepository.saveAndFlush(leaveStatus);
 
@@ -425,7 +425,7 @@ public class LeaveStatusResourceIT {
 
         restLeaveStatusMockMvc
             .perform(
-                put("/api/leave-statuses")
+                put(ENTITY_API_URL_ID, leaveStatusDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveStatusDTO))
@@ -442,8 +442,9 @@ public class LeaveStatusResourceIT {
 
     @Test
     @Transactional
-    public void updateNonExistingLeaveStatus() throws Exception {
+    void putNonExistingLeaveStatus() throws Exception {
         int databaseSizeBeforeUpdate = leaveStatusRepository.findAll().size();
+        leaveStatus.setId(count.incrementAndGet());
 
         // Create the LeaveStatus
         LeaveStatusDTO leaveStatusDTO = leaveStatusMapper.toDto(leaveStatus);
@@ -451,7 +452,7 @@ public class LeaveStatusResourceIT {
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restLeaveStatusMockMvc
             .perform(
-                put("/api/leave-statuses")
+                put(ENTITY_API_URL_ID, leaveStatusDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveStatusDTO))
@@ -465,7 +466,187 @@ public class LeaveStatusResourceIT {
 
     @Test
     @Transactional
-    public void deleteLeaveStatus() throws Exception {
+    void putWithIdMismatchLeaveStatus() throws Exception {
+        int databaseSizeBeforeUpdate = leaveStatusRepository.findAll().size();
+        leaveStatus.setId(count.incrementAndGet());
+
+        // Create the LeaveStatus
+        LeaveStatusDTO leaveStatusDTO = leaveStatusMapper.toDto(leaveStatus);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeaveStatusMockMvc
+            .perform(
+                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(leaveStatusDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the LeaveStatus in the database
+        List<LeaveStatus> leaveStatusList = leaveStatusRepository.findAll();
+        assertThat(leaveStatusList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void putWithMissingIdPathParamLeaveStatus() throws Exception {
+        int databaseSizeBeforeUpdate = leaveStatusRepository.findAll().size();
+        leaveStatus.setId(count.incrementAndGet());
+
+        // Create the LeaveStatus
+        LeaveStatusDTO leaveStatusDTO = leaveStatusMapper.toDto(leaveStatus);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeaveStatusMockMvc
+            .perform(
+                put(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(leaveStatusDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the LeaveStatus in the database
+        List<LeaveStatus> leaveStatusList = leaveStatusRepository.findAll();
+        assertThat(leaveStatusList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void partialUpdateLeaveStatusWithPatch() throws Exception {
+        // Initialize the database
+        leaveStatusRepository.saveAndFlush(leaveStatus);
+
+        int databaseSizeBeforeUpdate = leaveStatusRepository.findAll().size();
+
+        // Update the leaveStatus using partial update
+        LeaveStatus partialUpdatedLeaveStatus = new LeaveStatus();
+        partialUpdatedLeaveStatus.setId(leaveStatus.getId());
+
+        restLeaveStatusMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedLeaveStatus.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedLeaveStatus))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the LeaveStatus in the database
+        List<LeaveStatus> leaveStatusList = leaveStatusRepository.findAll();
+        assertThat(leaveStatusList).hasSize(databaseSizeBeforeUpdate);
+        LeaveStatus testLeaveStatus = leaveStatusList.get(leaveStatusList.size() - 1);
+        assertThat(testLeaveStatus.getName()).isEqualTo(DEFAULT_NAME);
+        assertThat(testLeaveStatus.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
+    }
+
+    @Test
+    @Transactional
+    void fullUpdateLeaveStatusWithPatch() throws Exception {
+        // Initialize the database
+        leaveStatusRepository.saveAndFlush(leaveStatus);
+
+        int databaseSizeBeforeUpdate = leaveStatusRepository.findAll().size();
+
+        // Update the leaveStatus using partial update
+        LeaveStatus partialUpdatedLeaveStatus = new LeaveStatus();
+        partialUpdatedLeaveStatus.setId(leaveStatus.getId());
+
+        partialUpdatedLeaveStatus.name(UPDATED_NAME).description(UPDATED_DESCRIPTION);
+
+        restLeaveStatusMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedLeaveStatus.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedLeaveStatus))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the LeaveStatus in the database
+        List<LeaveStatus> leaveStatusList = leaveStatusRepository.findAll();
+        assertThat(leaveStatusList).hasSize(databaseSizeBeforeUpdate);
+        LeaveStatus testLeaveStatus = leaveStatusList.get(leaveStatusList.size() - 1);
+        assertThat(testLeaveStatus.getName()).isEqualTo(UPDATED_NAME);
+        assertThat(testLeaveStatus.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
+    }
+
+    @Test
+    @Transactional
+    void patchNonExistingLeaveStatus() throws Exception {
+        int databaseSizeBeforeUpdate = leaveStatusRepository.findAll().size();
+        leaveStatus.setId(count.incrementAndGet());
+
+        // Create the LeaveStatus
+        LeaveStatusDTO leaveStatusDTO = leaveStatusMapper.toDto(leaveStatus);
+
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
+        restLeaveStatusMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, leaveStatusDTO.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(leaveStatusDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the LeaveStatus in the database
+        List<LeaveStatus> leaveStatusList = leaveStatusRepository.findAll();
+        assertThat(leaveStatusList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithIdMismatchLeaveStatus() throws Exception {
+        int databaseSizeBeforeUpdate = leaveStatusRepository.findAll().size();
+        leaveStatus.setId(count.incrementAndGet());
+
+        // Create the LeaveStatus
+        LeaveStatusDTO leaveStatusDTO = leaveStatusMapper.toDto(leaveStatus);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeaveStatusMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(leaveStatusDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the LeaveStatus in the database
+        List<LeaveStatus> leaveStatusList = leaveStatusRepository.findAll();
+        assertThat(leaveStatusList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithMissingIdPathParamLeaveStatus() throws Exception {
+        int databaseSizeBeforeUpdate = leaveStatusRepository.findAll().size();
+        leaveStatus.setId(count.incrementAndGet());
+
+        // Create the LeaveStatus
+        LeaveStatusDTO leaveStatusDTO = leaveStatusMapper.toDto(leaveStatus);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeaveStatusMockMvc
+            .perform(
+                patch(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(leaveStatusDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the LeaveStatus in the database
+        List<LeaveStatus> leaveStatusList = leaveStatusRepository.findAll();
+        assertThat(leaveStatusList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void deleteLeaveStatus() throws Exception {
         // Initialize the database
         leaveStatusRepository.saveAndFlush(leaveStatus);
 
@@ -473,7 +654,7 @@ public class LeaveStatusResourceIT {
 
         // Delete the leaveStatus
         restLeaveStatusMockMvc
-            .perform(delete("/api/leave-statuses/{id}", leaveStatus.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, leaveStatus.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

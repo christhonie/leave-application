@@ -24,6 +24,7 @@ import za.co.dearx.leave.service.mapper.LeaveApplicationMapper;
 @Service
 @Transactional
 public class LeaveApplicationService {
+
     private final Logger log = LoggerFactory.getLogger(LeaveApplicationService.class);
 
     private final LeaveApplicationRepository leaveApplicationRepository;
@@ -133,6 +134,27 @@ public class LeaveApplicationService {
         leaveApplication = leaveApplicationRepository.save(leaveApplication);
         return leaveApplicationMapper.toDto(leaveApplication);
         //TODO Make sure we cannot save a deleted record. Must throw exception.
+    }
+
+    /**
+     * Partially update a leaveApplication.
+     *
+     * @param leaveApplicationDTO the entity to update partially.
+     * @return the persisted entity.
+     */
+    public Optional<LeaveApplicationDTO> partialUpdate(LeaveApplicationDTO leaveApplicationDTO) {
+        log.debug("Request to partially update LeaveApplication : {}", leaveApplicationDTO);
+
+        return leaveApplicationRepository
+            .findById(leaveApplicationDTO.getId())
+            .map(
+                existingLeaveApplication -> {
+                    leaveApplicationMapper.partialUpdate(existingLeaveApplication, leaveApplicationDTO);
+                    return existingLeaveApplication;
+                }
+            )
+            .map(leaveApplicationRepository::save)
+            .map(leaveApplicationMapper::toDto);
     }
 
     /**

@@ -16,17 +16,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import za.co.dearx.leave.LeaveApplicationApp;
+import za.co.dearx.leave.IntegrationTest;
 import za.co.dearx.leave.domain.Authority;
 import za.co.dearx.leave.domain.User;
 import za.co.dearx.leave.repository.UserRepository;
 import za.co.dearx.leave.security.AuthoritiesConstants;
+import za.co.dearx.leave.service.dto.AdminUserDTO;
 import za.co.dearx.leave.service.dto.UserDTO;
 import za.co.dearx.leave.service.mapper.UserMapper;
 import za.co.dearx.leave.web.rest.vm.ManagedUserVM;
@@ -36,8 +36,9 @@ import za.co.dearx.leave.web.rest.vm.ManagedUserVM;
  */
 @AutoConfigureMockMvc
 @WithMockUser(authorities = AuthoritiesConstants.ADMIN)
-@SpringBootTest(classes = LeaveApplicationApp.class)
-public class UserResourceIT {
+@IntegrationTest
+class UserResourceIT {
+
     private static final String DEFAULT_LOGIN = "johndoe";
     private static final String UPDATED_LOGIN = "jhipster";
 
@@ -103,16 +104,24 @@ public class UserResourceIT {
         return user;
     }
 
-    @BeforeEach
-    public void initTest() {
-        user = createEntity(em);
+    /**
+     * Setups the database with one user.
+     */
+    public static User initTestUser(UserRepository userRepository, EntityManager em) {
+        User user = createEntity(em);
         user.setLogin(DEFAULT_LOGIN);
         user.setEmail(DEFAULT_EMAIL);
+        return user;
+    }
+
+    @BeforeEach
+    public void initTest() {
+        user = initTestUser(userRepository, em);
     }
 
     @Test
     @Transactional
-    public void createUser() throws Exception {
+    void createUser() throws Exception {
         int databaseSizeBeforeCreate = userRepository.findAll().size();
 
         // Create the User
@@ -129,7 +138,7 @@ public class UserResourceIT {
 
         restUserMockMvc
             .perform(
-                post("/api/users")
+                post("/api/admin/users")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(managedUserVM))
                     .with(csrf())
@@ -153,11 +162,11 @@ public class UserResourceIT {
 
     @Test
     @Transactional
-    public void createUserWithExistingId() throws Exception {
+    void createUserWithExistingId() throws Exception {
         int databaseSizeBeforeCreate = userRepository.findAll().size();
 
         ManagedUserVM managedUserVM = new ManagedUserVM();
-        managedUserVM.setId(1L);
+        managedUserVM.setId(DEFAULT_ID);
         managedUserVM.setLogin(DEFAULT_LOGIN);
         managedUserVM.setPassword(DEFAULT_PASSWORD);
         managedUserVM.setFirstName(DEFAULT_FIRSTNAME);
@@ -171,7 +180,7 @@ public class UserResourceIT {
         // An entity with an existing ID cannot be created, so this API call must fail
         restUserMockMvc
             .perform(
-                post("/api/users")
+                post("/api/admin/users")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(managedUserVM))
                     .with(csrf())
@@ -184,7 +193,7 @@ public class UserResourceIT {
 
     @Test
     @Transactional
-    public void createUserWithExistingLogin() throws Exception {
+    void createUserWithExistingLogin() throws Exception {
         // Initialize the database
         userRepository.saveAndFlush(user);
         int databaseSizeBeforeCreate = userRepository.findAll().size();
@@ -203,7 +212,7 @@ public class UserResourceIT {
         // Create the User
         restUserMockMvc
             .perform(
-                post("/api/users")
+                post("/api/admin/users")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(managedUserVM))
                     .with(csrf())
@@ -216,7 +225,7 @@ public class UserResourceIT {
 
     @Test
     @Transactional
-    public void createUserWithExistingEmail() throws Exception {
+    void createUserWithExistingEmail() throws Exception {
         // Initialize the database
         userRepository.saveAndFlush(user);
         int databaseSizeBeforeCreate = userRepository.findAll().size();
@@ -235,7 +244,7 @@ public class UserResourceIT {
         // Create the User
         restUserMockMvc
             .perform(
-                post("/api/users")
+                post("/api/admin/users")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(managedUserVM))
                     .with(csrf())
@@ -248,13 +257,13 @@ public class UserResourceIT {
 
     @Test
     @Transactional
-    public void getAllUsers() throws Exception {
+    void getAllUsers() throws Exception {
         // Initialize the database
         userRepository.saveAndFlush(user);
 
         // Get all the users
         restUserMockMvc
-            .perform(get("/api/users?sort=id,desc").accept(MediaType.APPLICATION_JSON))
+            .perform(get("/api/admin/users?sort=id,desc").accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].login").value(hasItem(DEFAULT_LOGIN)))
@@ -267,21 +276,7 @@ public class UserResourceIT {
 
     @Test
     @Transactional
-    void getAllUsersSortedByParameters() throws Exception {
-        // Initialize the database
-        userRepository.saveAndFlush(user);
-
-        restUserMockMvc.perform(get("/api/users?sort=resetKey,desc").accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
-        restUserMockMvc.perform(get("/api/users?sort=password,desc").accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
-        restUserMockMvc
-            .perform(get("/api/users?sort=resetKey,id,desc").accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isBadRequest());
-        restUserMockMvc.perform(get("/api/users?sort=id,desc").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
-    }
-
-    @Test
-    @Transactional
-    public void getUser() throws Exception {
+    void getUser() throws Exception {
         // Initialize the database
         userRepository.saveAndFlush(user);
 
@@ -289,7 +284,7 @@ public class UserResourceIT {
 
         // Get the user
         restUserMockMvc
-            .perform(get("/api/users/{login}", user.getLogin()))
+            .perform(get("/api/admin/users/{login}", user.getLogin()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.login").value(user.getLogin()))
@@ -304,13 +299,13 @@ public class UserResourceIT {
 
     @Test
     @Transactional
-    public void getNonExistingUser() throws Exception {
-        restUserMockMvc.perform(get("/api/users/unknown")).andExpect(status().isNotFound());
+    void getNonExistingUser() throws Exception {
+        restUserMockMvc.perform(get("/api/admin/users/unknown")).andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    public void updateUser() throws Exception {
+    void updateUser() throws Exception {
         // Initialize the database
         userRepository.saveAndFlush(user);
         int databaseSizeBeforeUpdate = userRepository.findAll().size();
@@ -325,7 +320,7 @@ public class UserResourceIT {
         managedUserVM.setFirstName(UPDATED_FIRSTNAME);
         managedUserVM.setLastName(UPDATED_LASTNAME);
         managedUserVM.setEmail(UPDATED_EMAIL);
-        managedUserVM.setActivated(updatedUser.getActivated());
+        managedUserVM.setActivated(updatedUser.isActivated());
         managedUserVM.setImageUrl(UPDATED_IMAGEURL);
         managedUserVM.setLangKey(UPDATED_LANGKEY);
         managedUserVM.setCreatedBy(updatedUser.getCreatedBy());
@@ -336,7 +331,7 @@ public class UserResourceIT {
 
         restUserMockMvc
             .perform(
-                put("/api/users")
+                put("/api/admin/users")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(managedUserVM))
                     .with(csrf())
@@ -347,7 +342,7 @@ public class UserResourceIT {
         assertPersistedUsers(
             users -> {
                 assertThat(users).hasSize(databaseSizeBeforeUpdate);
-                User testUser = users.get(users.size() - 1);
+                User testUser = users.stream().filter(usr -> usr.getId().equals(updatedUser.getId())).findFirst().get();
                 assertThat(testUser.getFirstName()).isEqualTo(UPDATED_FIRSTNAME);
                 assertThat(testUser.getLastName()).isEqualTo(UPDATED_LASTNAME);
                 assertThat(testUser.getEmail()).isEqualTo(UPDATED_EMAIL);
@@ -359,7 +354,7 @@ public class UserResourceIT {
 
     @Test
     @Transactional
-    public void updateUserLogin() throws Exception {
+    void updateUserLogin() throws Exception {
         // Initialize the database
         userRepository.saveAndFlush(user);
         int databaseSizeBeforeUpdate = userRepository.findAll().size();
@@ -374,7 +369,7 @@ public class UserResourceIT {
         managedUserVM.setFirstName(UPDATED_FIRSTNAME);
         managedUserVM.setLastName(UPDATED_LASTNAME);
         managedUserVM.setEmail(UPDATED_EMAIL);
-        managedUserVM.setActivated(updatedUser.getActivated());
+        managedUserVM.setActivated(updatedUser.isActivated());
         managedUserVM.setImageUrl(UPDATED_IMAGEURL);
         managedUserVM.setLangKey(UPDATED_LANGKEY);
         managedUserVM.setCreatedBy(updatedUser.getCreatedBy());
@@ -385,7 +380,7 @@ public class UserResourceIT {
 
         restUserMockMvc
             .perform(
-                put("/api/users")
+                put("/api/admin/users")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(managedUserVM))
                     .with(csrf())
@@ -396,7 +391,7 @@ public class UserResourceIT {
         assertPersistedUsers(
             users -> {
                 assertThat(users).hasSize(databaseSizeBeforeUpdate);
-                User testUser = users.get(users.size() - 1);
+                User testUser = users.stream().filter(usr -> usr.getId().equals(updatedUser.getId())).findFirst().get();
                 assertThat(testUser.getLogin()).isEqualTo(UPDATED_LOGIN);
                 assertThat(testUser.getFirstName()).isEqualTo(UPDATED_FIRSTNAME);
                 assertThat(testUser.getLastName()).isEqualTo(UPDATED_LASTNAME);
@@ -409,7 +404,7 @@ public class UserResourceIT {
 
     @Test
     @Transactional
-    public void updateUserExistingEmail() throws Exception {
+    void updateUserExistingEmail() throws Exception {
         // Initialize the database with 2 users
         userRepository.saveAndFlush(user);
 
@@ -434,7 +429,7 @@ public class UserResourceIT {
         managedUserVM.setFirstName(updatedUser.getFirstName());
         managedUserVM.setLastName(updatedUser.getLastName());
         managedUserVM.setEmail("jhipster@localhost"); // this email should already be used by anotherUser
-        managedUserVM.setActivated(updatedUser.getActivated());
+        managedUserVM.setActivated(updatedUser.isActivated());
         managedUserVM.setImageUrl(updatedUser.getImageUrl());
         managedUserVM.setLangKey(updatedUser.getLangKey());
         managedUserVM.setCreatedBy(updatedUser.getCreatedBy());
@@ -445,7 +440,7 @@ public class UserResourceIT {
 
         restUserMockMvc
             .perform(
-                put("/api/users")
+                put("/api/admin/users")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(managedUserVM))
                     .with(csrf())
@@ -455,7 +450,7 @@ public class UserResourceIT {
 
     @Test
     @Transactional
-    public void updateUserExistingLogin() throws Exception {
+    void updateUserExistingLogin() throws Exception {
         // Initialize the database
         userRepository.saveAndFlush(user);
 
@@ -480,7 +475,7 @@ public class UserResourceIT {
         managedUserVM.setFirstName(updatedUser.getFirstName());
         managedUserVM.setLastName(updatedUser.getLastName());
         managedUserVM.setEmail(updatedUser.getEmail());
-        managedUserVM.setActivated(updatedUser.getActivated());
+        managedUserVM.setActivated(updatedUser.isActivated());
         managedUserVM.setImageUrl(updatedUser.getImageUrl());
         managedUserVM.setLangKey(updatedUser.getLangKey());
         managedUserVM.setCreatedBy(updatedUser.getCreatedBy());
@@ -491,7 +486,7 @@ public class UserResourceIT {
 
         restUserMockMvc
             .perform(
-                put("/api/users")
+                put("/api/admin/users")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(managedUserVM))
                     .with(csrf())
@@ -501,14 +496,14 @@ public class UserResourceIT {
 
     @Test
     @Transactional
-    public void deleteUser() throws Exception {
+    void deleteUser() throws Exception {
         // Initialize the database
         userRepository.saveAndFlush(user);
         int databaseSizeBeforeDelete = userRepository.findAll().size();
 
         // Delete the user
         restUserMockMvc
-            .perform(delete("/api/users/{login}", user.getLogin()).accept(MediaType.APPLICATION_JSON).with(csrf()))
+            .perform(delete("/api/admin/users/{login}", user.getLogin()).accept(MediaType.APPLICATION_JSON).with(csrf()))
             .andExpect(status().isNoContent());
 
         assertThat(cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).get(user.getLogin())).isNull();
@@ -518,21 +513,10 @@ public class UserResourceIT {
     }
 
     @Test
-    @Transactional
-    public void getAllAuthorities() throws Exception {
-        restUserMockMvc
-            .perform(get("/api/users/authorities").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$").isArray())
-            .andExpect(jsonPath("$").value(hasItems(AuthoritiesConstants.USER, AuthoritiesConstants.ADMIN)));
-    }
-
-    @Test
-    public void testUserEquals() throws Exception {
+    void testUserEquals() throws Exception {
         TestUtil.equalsVerifier(User.class);
         User user1 = new User();
-        user1.setId(1L);
+        user1.setId(DEFAULT_ID);
         User user2 = new User();
         user2.setId(user1.getId());
         assertThat(user1).isEqualTo(user2);
@@ -543,8 +527,8 @@ public class UserResourceIT {
     }
 
     @Test
-    public void testUserDTOtoUser() {
-        UserDTO userDTO = new UserDTO();
+    void testUserDTOtoUser() {
+        AdminUserDTO userDTO = new AdminUserDTO();
         userDTO.setId(DEFAULT_ID);
         userDTO.setLogin(DEFAULT_LOGIN);
         userDTO.setFirstName(DEFAULT_FIRSTNAME);
@@ -563,7 +547,7 @@ public class UserResourceIT {
         assertThat(user.getFirstName()).isEqualTo(DEFAULT_FIRSTNAME);
         assertThat(user.getLastName()).isEqualTo(DEFAULT_LASTNAME);
         assertThat(user.getEmail()).isEqualTo(DEFAULT_EMAIL);
-        assertThat(user.getActivated()).isEqualTo(true);
+        assertThat(user.isActivated()).isTrue();
         assertThat(user.getImageUrl()).isEqualTo(DEFAULT_IMAGEURL);
         assertThat(user.getLangKey()).isEqualTo(DEFAULT_LANGKEY);
         assertThat(user.getCreatedBy()).isNull();
@@ -574,7 +558,7 @@ public class UserResourceIT {
     }
 
     @Test
-    public void testUserToUserDTO() {
+    void testUserToUserDTO() {
         user.setId(DEFAULT_ID);
         user.setCreatedBy(DEFAULT_LOGIN);
         user.setCreatedDate(Instant.now());
@@ -586,14 +570,14 @@ public class UserResourceIT {
         authorities.add(authority);
         user.setAuthorities(authorities);
 
-        UserDTO userDTO = userMapper.userToUserDTO(user);
+        AdminUserDTO userDTO = userMapper.userToAdminUserDTO(user);
 
         assertThat(userDTO.getId()).isEqualTo(DEFAULT_ID);
         assertThat(userDTO.getLogin()).isEqualTo(DEFAULT_LOGIN);
         assertThat(userDTO.getFirstName()).isEqualTo(DEFAULT_FIRSTNAME);
         assertThat(userDTO.getLastName()).isEqualTo(DEFAULT_LASTNAME);
         assertThat(userDTO.getEmail()).isEqualTo(DEFAULT_EMAIL);
-        assertThat(userDTO.isActivated()).isEqualTo(true);
+        assertThat(userDTO.isActivated()).isTrue();
         assertThat(userDTO.getImageUrl()).isEqualTo(DEFAULT_IMAGEURL);
         assertThat(userDTO.getLangKey()).isEqualTo(DEFAULT_LANGKEY);
         assertThat(userDTO.getCreatedBy()).isEqualTo(DEFAULT_LOGIN);
@@ -605,12 +589,10 @@ public class UserResourceIT {
     }
 
     @Test
-    public void testAuthorityEquals() {
+    void testAuthorityEquals() {
         Authority authorityA = new Authority();
-        assertThat(authorityA).isEqualTo(authorityA);
-        assertThat(authorityA).isNotEqualTo(null);
-        assertThat(authorityA).isNotEqualTo(new Object());
-        assertThat(authorityA.hashCode()).isEqualTo(0);
+        assertThat(authorityA).isNotEqualTo(null).isNotEqualTo(new Object());
+        assertThat(authorityA.hashCode()).isZero();
         assertThat(authorityA.toString()).isNotNull();
 
         Authority authorityB = new Authority();
@@ -623,8 +605,7 @@ public class UserResourceIT {
         assertThat(authorityA).isNotEqualTo(authorityB);
 
         authorityB.setName(AuthoritiesConstants.USER);
-        assertThat(authorityA).isEqualTo(authorityB);
-        assertThat(authorityA.hashCode()).isEqualTo(authorityB.hashCode());
+        assertThat(authorityA).isEqualTo(authorityB).hasSameHashCodeAs(authorityB);
     }
 
     private void assertPersistedUsers(Consumer<List<User>> userAssertion) {

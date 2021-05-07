@@ -18,6 +18,7 @@ import za.co.dearx.leave.service.mapper.RoleMapper;
 @Service
 @Transactional
 public class RoleService {
+
     private final Logger log = LoggerFactory.getLogger(RoleService.class);
 
     private final RoleRepository roleRepository;
@@ -40,6 +41,27 @@ public class RoleService {
         Role role = roleMapper.toEntity(roleDTO);
         role = roleRepository.save(role);
         return roleMapper.toDto(role);
+    }
+
+    /**
+     * Partially update a role.
+     *
+     * @param roleDTO the entity to update partially.
+     * @return the persisted entity.
+     */
+    public Optional<RoleDTO> partialUpdate(RoleDTO roleDTO) {
+        log.debug("Request to partially update Role : {}", roleDTO);
+
+        return roleRepository
+            .findById(roleDTO.getId())
+            .map(
+                existingRole -> {
+                    roleMapper.partialUpdate(existingRole, roleDTO);
+                    return existingRole;
+                }
+            )
+            .map(roleRepository::save)
+            .map(roleMapper::toDto);
     }
 
     /**

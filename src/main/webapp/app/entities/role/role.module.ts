@@ -1,16 +1,15 @@
 import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
 
-import { LeaveApplicationSharedModule } from 'app/shared/shared.module';
-import { RoleComponent } from './role.component';
-import { RoleDetailComponent } from './role-detail.component';
-import { RoleUpdateComponent } from './role-update.component';
-import { RoleDeleteDialogComponent } from './role-delete-dialog.component';
-import { roleRoute } from './role.route';
+import { SharedModule } from 'app/shared/shared.module';
+import { RoleComponent } from './list/role.component';
+import { RoleDetailComponent } from './detail/role-detail.component';
+import { RoleUpdateComponent } from './update/role-update.component';
+import { RoleDeleteDialogComponent } from './delete/role-delete-dialog.component';
+import { RoleRoutingModule } from './route/role-routing.module';
 
 @NgModule({
-  imports: [LeaveApplicationSharedModule, RouterModule.forChild(roleRoute)],
+  imports: [SharedModule, RoleRoutingModule],
   declarations: [RoleComponent, RoleDetailComponent, RoleUpdateComponent, RoleDeleteDialogComponent],
   entryComponents: [RoleDeleteDialogComponent],
 })
-export class LeaveApplicationRoleModule {}
+export class RoleModule {}

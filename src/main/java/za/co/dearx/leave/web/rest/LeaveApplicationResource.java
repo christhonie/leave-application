@@ -1,13 +1,12 @@
 package za.co.dearx.leave.web.rest;
 
-import io.github.jhipster.web.util.HeaderUtil;
-import io.github.jhipster.web.util.PaginationUtil;
-import io.github.jhipster.web.util.ResponseUtil;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,9 +17,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import tech.jhipster.web.util.HeaderUtil;
+import tech.jhipster.web.util.PaginationUtil;
+import tech.jhipster.web.util.ResponseUtil;
+import za.co.dearx.leave.repository.LeaveApplicationRepository;
 import za.co.dearx.leave.service.LeaveApplicationQueryService;
 import za.co.dearx.leave.service.LeaveApplicationService;
-import za.co.dearx.leave.service.dto.LeaveApplicationCriteria;
+import za.co.dearx.leave.service.criteria.LeaveApplicationCriteria;
 import za.co.dearx.leave.service.dto.LeaveApplicationDTO;
 import za.co.dearx.leave.service.exception.ValidationException;
 import za.co.dearx.leave.web.rest.errors.BadRequestAlertException;
@@ -31,6 +34,7 @@ import za.co.dearx.leave.web.rest.errors.BadRequestAlertException;
 @RestController
 @RequestMapping("/api")
 public class LeaveApplicationResource {
+
     private final Logger log = LoggerFactory.getLogger(LeaveApplicationResource.class);
 
     private static final String ENTITY_NAME = "leaveApplication";
@@ -40,13 +44,17 @@ public class LeaveApplicationResource {
 
     private final LeaveApplicationService leaveApplicationService;
 
+    private final LeaveApplicationRepository leaveApplicationRepository;
+
     private final LeaveApplicationQueryService leaveApplicationQueryService;
 
     public LeaveApplicationResource(
         LeaveApplicationService leaveApplicationService,
+        LeaveApplicationRepository leaveApplicationRepository,
         LeaveApplicationQueryService leaveApplicationQueryService
     ) {
         this.leaveApplicationService = leaveApplicationService;
+        this.leaveApplicationRepository = leaveApplicationRepository;
         this.leaveApplicationQueryService = leaveApplicationQueryService;
     }
 
@@ -126,16 +134,19 @@ public class LeaveApplicationResource {
     /**
      * {@code PUT  /leave-applications} : Updates an existing leaveApplication.
      *
+     * @param id the id of the leaveApplicationDTO to save.
      * @param leaveApplicationDTO the leaveApplicationDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated leaveApplicationDTO,
      * or with status {@code 400 (Bad Request)} if the leaveApplicationDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the leaveApplicationDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/leave-applications")
-    public ResponseEntity<LeaveApplicationDTO> updateLeaveApplication(@Valid @RequestBody LeaveApplicationDTO leaveApplicationDTO)
-        throws URISyntaxException {
-        log.debug("REST request to update LeaveApplication : {}", leaveApplicationDTO);
+    @PutMapping("/leave-applications/{id}")
+    public ResponseEntity<LeaveApplicationDTO> updateLeaveApplication(
+        @PathVariable(value = "id", required = false) final Long id,
+        @Valid @RequestBody LeaveApplicationDTO leaveApplicationDTO
+    ) throws URISyntaxException {
+        log.debug("REST request to update LeaveApplication : {}, {}", id, leaveApplicationDTO);
         if (leaveApplicationDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -149,6 +160,42 @@ public class LeaveApplicationResource {
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, leaveApplicationDTO.getId().toString()))
             .body(result);
+    }
+
+    /**
+     * {@code PATCH  /leave-applications/:id} : Partial updates given fields of an existing leaveApplication, field will ignore if it is null
+     *
+     * @param id the id of the leaveApplicationDTO to save.
+     * @param leaveApplicationDTO the leaveApplicationDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated leaveApplicationDTO,
+     * or with status {@code 400 (Bad Request)} if the leaveApplicationDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the leaveApplicationDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the leaveApplicationDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PatchMapping(value = "/leave-applications/{id}", consumes = "application/merge-patch+json")
+    public ResponseEntity<LeaveApplicationDTO> partialUpdateLeaveApplication(
+        @PathVariable(value = "id", required = false) final Long id,
+        @NotNull @RequestBody LeaveApplicationDTO leaveApplicationDTO
+    ) throws URISyntaxException {
+        log.debug("REST request to partial update LeaveApplication partially : {}, {}", id, leaveApplicationDTO);
+        if (leaveApplicationDTO.getId() == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!Objects.equals(id, leaveApplicationDTO.getId())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+
+        if (!leaveApplicationRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        Optional<LeaveApplicationDTO> result = leaveApplicationService.partialUpdate(leaveApplicationDTO);
+
+        return ResponseUtil.wrapOrNotFound(
+            result,
+            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, leaveApplicationDTO.getId().toString())
+        );
     }
 
     /**

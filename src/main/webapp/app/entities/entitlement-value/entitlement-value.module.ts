@@ -1,15 +1,14 @@
 import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
 
-import { LeaveApplicationSharedModule } from 'app/shared/shared.module';
-import { EntitlementValueComponent } from './entitlement-value.component';
-import { EntitlementValueDetailComponent } from './entitlement-value-detail.component';
-import { EntitlementValueUpdateComponent } from './entitlement-value-update.component';
-import { EntitlementValueDeleteDialogComponent } from './entitlement-value-delete-dialog.component';
-import { entitlementValueRoute } from './entitlement-value.route';
+import { SharedModule } from 'app/shared/shared.module';
+import { EntitlementValueComponent } from './list/entitlement-value.component';
+import { EntitlementValueDetailComponent } from './detail/entitlement-value-detail.component';
+import { EntitlementValueUpdateComponent } from './update/entitlement-value-update.component';
+import { EntitlementValueDeleteDialogComponent } from './delete/entitlement-value-delete-dialog.component';
+import { EntitlementValueRoutingModule } from './route/entitlement-value-routing.module';
 
 @NgModule({
-  imports: [LeaveApplicationSharedModule, RouterModule.forChild(entitlementValueRoute)],
+  imports: [SharedModule, EntitlementValueRoutingModule],
   declarations: [
     EntitlementValueComponent,
     EntitlementValueDetailComponent,
@@ -18,4 +17,4 @@ import { entitlementValueRoute } from './entitlement-value.route';
   ],
   entryComponents: [EntitlementValueDeleteDialogComponent],
 })
-export class LeaveApplicationEntitlementValueModule {}
+export class EntitlementValueModule {}

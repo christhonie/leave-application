@@ -1,6 +1,5 @@
 package za.co.dearx.leave.service;
 
-import io.github.jhipster.service.QueryService;
 import java.util.List;
 import javax.persistence.criteria.JoinType;
 import org.slf4j.Logger;
@@ -10,10 +9,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tech.jhipster.service.QueryService;
 import za.co.dearx.leave.domain.*; // for static metamodels
 import za.co.dearx.leave.domain.Decisions;
 import za.co.dearx.leave.repository.DecisionsRepository;
-import za.co.dearx.leave.service.dto.DecisionsCriteria;
+import za.co.dearx.leave.service.criteria.DecisionsCriteria;
 import za.co.dearx.leave.service.dto.DecisionsDTO;
 import za.co.dearx.leave.service.mapper.DecisionsMapper;
 
@@ -26,6 +26,7 @@ import za.co.dearx.leave.service.mapper.DecisionsMapper;
 @Service
 @Transactional(readOnly = true)
 public class DecisionsQueryService extends QueryService<Decisions> {
+
     private final Logger log = LoggerFactory.getLogger(DecisionsQueryService.class);
 
     private final DecisionsRepository decisionsRepository;

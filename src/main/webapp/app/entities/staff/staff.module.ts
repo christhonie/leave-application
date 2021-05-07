@@ -1,16 +1,15 @@
 import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
 
-import { LeaveApplicationSharedModule } from 'app/shared/shared.module';
-import { StaffComponent } from './staff.component';
-import { StaffDetailComponent } from './staff-detail.component';
-import { StaffUpdateComponent } from './staff-update.component';
-import { StaffDeleteDialogComponent } from './staff-delete-dialog.component';
-import { staffRoute } from './staff.route';
+import { SharedModule } from 'app/shared/shared.module';
+import { StaffComponent } from './list/staff.component';
+import { StaffDetailComponent } from './detail/staff-detail.component';
+import { StaffUpdateComponent } from './update/staff-update.component';
+import { StaffDeleteDialogComponent } from './delete/staff-delete-dialog.component';
+import { StaffRoutingModule } from './route/staff-routing.module';
 
 @NgModule({
-  imports: [LeaveApplicationSharedModule, RouterModule.forChild(staffRoute)],
+  imports: [SharedModule, StaffRoutingModule],
   declarations: [StaffComponent, StaffDetailComponent, StaffUpdateComponent, StaffDeleteDialogComponent],
   entryComponents: [StaffDeleteDialogComponent],
 })
-export class LeaveApplicationStaffModule {}
+export class StaffModule {}

@@ -1,6 +1,5 @@
 package za.co.dearx.leave.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.util.HashSet;
@@ -17,6 +16,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "team")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Team implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -29,12 +29,11 @@ public class Team implements Serializable {
     private String name;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = "teams", allowSetters = true)
     private User manager;
 
     @ManyToMany(mappedBy = "teams")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnore
+    @JsonIgnoreProperties(value = { "user", "teams" }, allowSetters = true)
     private Set<Staff> members = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -46,8 +45,13 @@ public class Team implements Serializable {
         this.id = id;
     }
 
+    public Team id(Long id) {
+        this.id = id;
+        return this;
+    }
+
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public Team name(String name) {
@@ -60,11 +64,11 @@ public class Team implements Serializable {
     }
 
     public User getManager() {
-        return manager;
+        return this.manager;
     }
 
     public Team manager(User user) {
-        this.manager = user;
+        this.setManager(user);
         return this;
     }
 
@@ -73,11 +77,11 @@ public class Team implements Serializable {
     }
 
     public Set<Staff> getMembers() {
-        return members;
+        return this.members;
     }
 
     public Team members(Set<Staff> staff) {
-        this.members = staff;
+        this.setMembers(staff);
         return this;
     }
 
@@ -94,6 +98,12 @@ public class Team implements Serializable {
     }
 
     public void setMembers(Set<Staff> staff) {
+        if (this.members != null) {
+            this.members.forEach(i -> i.removeTeam(this));
+        }
+        if (staff != null) {
+            staff.forEach(i -> i.addTeam(this));
+        }
         this.members = staff;
     }
 
@@ -112,7 +122,8 @@ public class Team implements Serializable {
 
     @Override
     public int hashCode() {
-        return 31;
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        return getClass().hashCode();
     }
 
     // prettier-ignore

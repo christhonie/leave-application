@@ -9,12 +9,9 @@ import za.co.dearx.leave.service.dto.LeaveTypeDTO;
  */
 @Mapper(componentModel = "spring", uses = {})
 public interface LeaveTypeMapper extends EntityMapper<LeaveTypeDTO, LeaveType> {
-    default LeaveType fromId(Long id) {
-        if (id == null) {
-            return null;
-        }
-        LeaveType leaveType = new LeaveType();
-        leaveType.setId(id);
-        return leaveType;
-    }
+    @Named("name")
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "name", source = "name")
+    LeaveTypeDTO toDtoName(LeaveType leaveType);
 }

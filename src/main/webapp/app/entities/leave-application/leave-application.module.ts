@@ -1,15 +1,14 @@
 import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
 
-import { LeaveApplicationSharedModule } from 'app/shared/shared.module';
-import { LeaveApplicationComponent } from './leave-application.component';
-import { LeaveApplicationDetailComponent } from './leave-application-detail.component';
-import { LeaveApplicationUpdateComponent } from './leave-application-update.component';
-import { LeaveApplicationDeleteDialogComponent } from './leave-application-delete-dialog.component';
-import { leaveApplicationRoute } from './leave-application.route';
+import { SharedModule } from 'app/shared/shared.module';
+import { LeaveApplicationComponent } from './list/leave-application.component';
+import { LeaveApplicationDetailComponent } from './detail/leave-application-detail.component';
+import { LeaveApplicationUpdateComponent } from './update/leave-application-update.component';
+import { LeaveApplicationDeleteDialogComponent } from './delete/leave-application-delete-dialog.component';
+import { LeaveApplicationRoutingModule } from './route/leave-application-routing.module';
 
 @NgModule({
-  imports: [LeaveApplicationSharedModule, RouterModule.forChild(leaveApplicationRoute)],
+  imports: [SharedModule, LeaveApplicationRoutingModule],
   declarations: [
     LeaveApplicationComponent,
     LeaveApplicationDetailComponent,
@@ -18,4 +17,4 @@ import { leaveApplicationRoute } from './leave-application.route';
   ],
   entryComponents: [LeaveApplicationDeleteDialogComponent],
 })
-export class LeaveApplicationLeaveApplicationModule {}
+export class LeaveApplicationModule {}

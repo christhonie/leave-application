@@ -9,53 +9,53 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import za.co.dearx.leave.LeaveApplicationApp;
+import za.co.dearx.leave.IntegrationTest;
 import za.co.dearx.leave.domain.Comment;
 import za.co.dearx.leave.domain.Decisions;
 import za.co.dearx.leave.domain.LeaveApplication;
 import za.co.dearx.leave.domain.User;
 import za.co.dearx.leave.domain.enumeration.DecisionChoice;
 import za.co.dearx.leave.repository.DecisionsRepository;
-import za.co.dearx.leave.service.DecisionsQueryService;
-import za.co.dearx.leave.service.DecisionsService;
-import za.co.dearx.leave.service.dto.DecisionsCriteria;
+import za.co.dearx.leave.service.criteria.DecisionsCriteria;
 import za.co.dearx.leave.service.dto.DecisionsDTO;
 import za.co.dearx.leave.service.mapper.DecisionsMapper;
 
 /**
  * Integration tests for the {@link DecisionsResource} REST controller.
  */
-@SpringBootTest(classes = LeaveApplicationApp.class)
+@IntegrationTest
 @AutoConfigureMockMvc
 @WithMockUser
-public class DecisionsResourceIT {
+class DecisionsResourceIT {
+
     private static final DecisionChoice DEFAULT_CHOICE = DecisionChoice.APPROVE;
     private static final DecisionChoice UPDATED_CHOICE = DecisionChoice.REJECT;
 
     private static final Instant DEFAULT_DECIDED_ON = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_DECIDED_ON = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
+    private static final String ENTITY_API_URL = "/api/decisions";
+    private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
+
+    private static Random random = new Random();
+    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
     @Autowired
     private DecisionsRepository decisionsRepository;
 
     @Autowired
     private DecisionsMapper decisionsMapper;
-
-    @Autowired
-    private DecisionsService decisionsService;
-
-    @Autowired
-    private DecisionsQueryService decisionsQueryService;
 
     @Autowired
     private EntityManager em;
@@ -124,13 +124,13 @@ public class DecisionsResourceIT {
 
     @Test
     @Transactional
-    public void createDecisions() throws Exception {
+    void createDecisions() throws Exception {
         int databaseSizeBeforeCreate = decisionsRepository.findAll().size();
         // Create the Decisions
         DecisionsDTO decisionsDTO = decisionsMapper.toDto(decisions);
         restDecisionsMockMvc
             .perform(
-                post("/api/decisions")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(decisionsDTO))
@@ -147,17 +147,17 @@ public class DecisionsResourceIT {
 
     @Test
     @Transactional
-    public void createDecisionsWithExistingId() throws Exception {
-        int databaseSizeBeforeCreate = decisionsRepository.findAll().size();
-
+    void createDecisionsWithExistingId() throws Exception {
         // Create the Decisions with an existing ID
         decisions.setId(1L);
         DecisionsDTO decisionsDTO = decisionsMapper.toDto(decisions);
 
+        int databaseSizeBeforeCreate = decisionsRepository.findAll().size();
+
         // An entity with an existing ID cannot be created, so this API call must fail
         restDecisionsMockMvc
             .perform(
-                post("/api/decisions")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(decisionsDTO))
@@ -171,7 +171,7 @@ public class DecisionsResourceIT {
 
     @Test
     @Transactional
-    public void checkChoiceIsRequired() throws Exception {
+    void checkChoiceIsRequired() throws Exception {
         int databaseSizeBeforeTest = decisionsRepository.findAll().size();
         // set the field null
         decisions.setChoice(null);
@@ -181,7 +181,7 @@ public class DecisionsResourceIT {
 
         restDecisionsMockMvc
             .perform(
-                post("/api/decisions")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(decisionsDTO))
@@ -194,7 +194,7 @@ public class DecisionsResourceIT {
 
     @Test
     @Transactional
-    public void checkDecidedOnIsRequired() throws Exception {
+    void checkDecidedOnIsRequired() throws Exception {
         int databaseSizeBeforeTest = decisionsRepository.findAll().size();
         // set the field null
         decisions.setDecidedOn(null);
@@ -204,7 +204,7 @@ public class DecisionsResourceIT {
 
         restDecisionsMockMvc
             .perform(
-                post("/api/decisions")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(decisionsDTO))
@@ -217,13 +217,13 @@ public class DecisionsResourceIT {
 
     @Test
     @Transactional
-    public void getAllDecisions() throws Exception {
+    void getAllDecisions() throws Exception {
         // Initialize the database
         decisionsRepository.saveAndFlush(decisions);
 
         // Get all the decisionsList
         restDecisionsMockMvc
-            .perform(get("/api/decisions?sort=id,desc"))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(decisions.getId().intValue())))
@@ -233,13 +233,13 @@ public class DecisionsResourceIT {
 
     @Test
     @Transactional
-    public void getDecisions() throws Exception {
+    void getDecisions() throws Exception {
         // Initialize the database
         decisionsRepository.saveAndFlush(decisions);
 
         // Get the decisions
         restDecisionsMockMvc
-            .perform(get("/api/decisions/{id}", decisions.getId()))
+            .perform(get(ENTITY_API_URL_ID, decisions.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(decisions.getId().intValue()))
@@ -249,7 +249,7 @@ public class DecisionsResourceIT {
 
     @Test
     @Transactional
-    public void getDecisionsByIdFiltering() throws Exception {
+    void getDecisionsByIdFiltering() throws Exception {
         // Initialize the database
         decisionsRepository.saveAndFlush(decisions);
 
@@ -267,7 +267,7 @@ public class DecisionsResourceIT {
 
     @Test
     @Transactional
-    public void getAllDecisionsByChoiceIsEqualToSomething() throws Exception {
+    void getAllDecisionsByChoiceIsEqualToSomething() throws Exception {
         // Initialize the database
         decisionsRepository.saveAndFlush(decisions);
 
@@ -280,7 +280,7 @@ public class DecisionsResourceIT {
 
     @Test
     @Transactional
-    public void getAllDecisionsByChoiceIsNotEqualToSomething() throws Exception {
+    void getAllDecisionsByChoiceIsNotEqualToSomething() throws Exception {
         // Initialize the database
         decisionsRepository.saveAndFlush(decisions);
 
@@ -293,7 +293,7 @@ public class DecisionsResourceIT {
 
     @Test
     @Transactional
-    public void getAllDecisionsByChoiceIsInShouldWork() throws Exception {
+    void getAllDecisionsByChoiceIsInShouldWork() throws Exception {
         // Initialize the database
         decisionsRepository.saveAndFlush(decisions);
 
@@ -306,7 +306,7 @@ public class DecisionsResourceIT {
 
     @Test
     @Transactional
-    public void getAllDecisionsByChoiceIsNullOrNotNull() throws Exception {
+    void getAllDecisionsByChoiceIsNullOrNotNull() throws Exception {
         // Initialize the database
         decisionsRepository.saveAndFlush(decisions);
 
@@ -319,7 +319,7 @@ public class DecisionsResourceIT {
 
     @Test
     @Transactional
-    public void getAllDecisionsByDecidedOnIsEqualToSomething() throws Exception {
+    void getAllDecisionsByDecidedOnIsEqualToSomething() throws Exception {
         // Initialize the database
         decisionsRepository.saveAndFlush(decisions);
 
@@ -332,7 +332,7 @@ public class DecisionsResourceIT {
 
     @Test
     @Transactional
-    public void getAllDecisionsByDecidedOnIsNotEqualToSomething() throws Exception {
+    void getAllDecisionsByDecidedOnIsNotEqualToSomething() throws Exception {
         // Initialize the database
         decisionsRepository.saveAndFlush(decisions);
 
@@ -345,7 +345,7 @@ public class DecisionsResourceIT {
 
     @Test
     @Transactional
-    public void getAllDecisionsByDecidedOnIsInShouldWork() throws Exception {
+    void getAllDecisionsByDecidedOnIsInShouldWork() throws Exception {
         // Initialize the database
         decisionsRepository.saveAndFlush(decisions);
 
@@ -358,7 +358,7 @@ public class DecisionsResourceIT {
 
     @Test
     @Transactional
-    public void getAllDecisionsByDecidedOnIsNullOrNotNull() throws Exception {
+    void getAllDecisionsByDecidedOnIsNullOrNotNull() throws Exception {
         // Initialize the database
         decisionsRepository.saveAndFlush(decisions);
 
@@ -371,7 +371,7 @@ public class DecisionsResourceIT {
 
     @Test
     @Transactional
-    public void getAllDecisionsByCommentIsEqualToSomething() throws Exception {
+    void getAllDecisionsByCommentIsEqualToSomething() throws Exception {
         // Initialize the database
         decisionsRepository.saveAndFlush(decisions);
         Comment comment = CommentResourceIT.createEntity(em);
@@ -384,37 +384,45 @@ public class DecisionsResourceIT {
         // Get all the decisionsList where comment equals to commentId
         defaultDecisionsShouldBeFound("commentId.equals=" + commentId);
 
-        // Get all the decisionsList where comment equals to commentId + 1
+        // Get all the decisionsList where comment equals to (commentId + 1)
         defaultDecisionsShouldNotBeFound("commentId.equals=" + (commentId + 1));
     }
 
     @Test
     @Transactional
-    public void getAllDecisionsByUserIsEqualToSomething() throws Exception {
-        // Get already existing entity
-        User user = decisions.getUser();
+    void getAllDecisionsByUserIsEqualToSomething() throws Exception {
+        // Initialize the database
+        decisionsRepository.saveAndFlush(decisions);
+        User user = UserResourceIT.createEntity(em);
+        em.persist(user);
+        em.flush();
+        decisions.setUser(user);
         decisionsRepository.saveAndFlush(decisions);
         Long userId = user.getId();
 
         // Get all the decisionsList where user equals to userId
         defaultDecisionsShouldBeFound("userId.equals=" + userId);
 
-        // Get all the decisionsList where user equals to userId + 1
+        // Get all the decisionsList where user equals to (userId + 1)
         defaultDecisionsShouldNotBeFound("userId.equals=" + (userId + 1));
     }
 
     @Test
     @Transactional
-    public void getAllDecisionsByLeaveApplicationIsEqualToSomething() throws Exception {
-        // Get already existing entity
-        LeaveApplication leaveApplication = decisions.getLeaveApplication();
+    void getAllDecisionsByLeaveApplicationIsEqualToSomething() throws Exception {
+        // Initialize the database
+        decisionsRepository.saveAndFlush(decisions);
+        LeaveApplication leaveApplication = LeaveApplicationResourceIT.createEntity(em);
+        em.persist(leaveApplication);
+        em.flush();
+        decisions.setLeaveApplication(leaveApplication);
         decisionsRepository.saveAndFlush(decisions);
         Long leaveApplicationId = leaveApplication.getId();
 
         // Get all the decisionsList where leaveApplication equals to leaveApplicationId
         defaultDecisionsShouldBeFound("leaveApplicationId.equals=" + leaveApplicationId);
 
-        // Get all the decisionsList where leaveApplication equals to leaveApplicationId + 1
+        // Get all the decisionsList where leaveApplication equals to (leaveApplicationId + 1)
         defaultDecisionsShouldNotBeFound("leaveApplicationId.equals=" + (leaveApplicationId + 1));
     }
 
@@ -423,7 +431,7 @@ public class DecisionsResourceIT {
      */
     private void defaultDecisionsShouldBeFound(String filter) throws Exception {
         restDecisionsMockMvc
-            .perform(get("/api/decisions?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(decisions.getId().intValue())))
@@ -432,7 +440,7 @@ public class DecisionsResourceIT {
 
         // Check, that the count call also returns 1
         restDecisionsMockMvc
-            .perform(get("/api/decisions/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -443,7 +451,7 @@ public class DecisionsResourceIT {
      */
     private void defaultDecisionsShouldNotBeFound(String filter) throws Exception {
         restDecisionsMockMvc
-            .perform(get("/api/decisions?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -451,7 +459,7 @@ public class DecisionsResourceIT {
 
         // Check, that the count call also returns 0
         restDecisionsMockMvc
-            .perform(get("/api/decisions/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));
@@ -459,14 +467,14 @@ public class DecisionsResourceIT {
 
     @Test
     @Transactional
-    public void getNonExistingDecisions() throws Exception {
+    void getNonExistingDecisions() throws Exception {
         // Get the decisions
-        restDecisionsMockMvc.perform(get("/api/decisions/{id}", Long.MAX_VALUE)).andExpect(status().isNotFound());
+        restDecisionsMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    public void updateDecisions() throws Exception {
+    void putNewDecisions() throws Exception {
         // Initialize the database
         decisionsRepository.saveAndFlush(decisions);
 
@@ -481,7 +489,7 @@ public class DecisionsResourceIT {
 
         restDecisionsMockMvc
             .perform(
-                put("/api/decisions")
+                put(ENTITY_API_URL_ID, decisionsDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(decisionsDTO))
@@ -498,8 +506,9 @@ public class DecisionsResourceIT {
 
     @Test
     @Transactional
-    public void updateNonExistingDecisions() throws Exception {
+    void putNonExistingDecisions() throws Exception {
         int databaseSizeBeforeUpdate = decisionsRepository.findAll().size();
+        decisions.setId(count.incrementAndGet());
 
         // Create the Decisions
         DecisionsDTO decisionsDTO = decisionsMapper.toDto(decisions);
@@ -507,7 +516,7 @@ public class DecisionsResourceIT {
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restDecisionsMockMvc
             .perform(
-                put("/api/decisions")
+                put(ENTITY_API_URL_ID, decisionsDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(decisionsDTO))
@@ -521,7 +530,189 @@ public class DecisionsResourceIT {
 
     @Test
     @Transactional
-    public void deleteDecisions() throws Exception {
+    void putWithIdMismatchDecisions() throws Exception {
+        int databaseSizeBeforeUpdate = decisionsRepository.findAll().size();
+        decisions.setId(count.incrementAndGet());
+
+        // Create the Decisions
+        DecisionsDTO decisionsDTO = decisionsMapper.toDto(decisions);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restDecisionsMockMvc
+            .perform(
+                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(decisionsDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the Decisions in the database
+        List<Decisions> decisionsList = decisionsRepository.findAll();
+        assertThat(decisionsList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void putWithMissingIdPathParamDecisions() throws Exception {
+        int databaseSizeBeforeUpdate = decisionsRepository.findAll().size();
+        decisions.setId(count.incrementAndGet());
+
+        // Create the Decisions
+        DecisionsDTO decisionsDTO = decisionsMapper.toDto(decisions);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restDecisionsMockMvc
+            .perform(
+                put(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(decisionsDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the Decisions in the database
+        List<Decisions> decisionsList = decisionsRepository.findAll();
+        assertThat(decisionsList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void partialUpdateDecisionsWithPatch() throws Exception {
+        // Initialize the database
+        decisionsRepository.saveAndFlush(decisions);
+
+        int databaseSizeBeforeUpdate = decisionsRepository.findAll().size();
+
+        // Update the decisions using partial update
+        Decisions partialUpdatedDecisions = new Decisions();
+        partialUpdatedDecisions.setId(decisions.getId());
+
+        partialUpdatedDecisions.choice(UPDATED_CHOICE).decidedOn(UPDATED_DECIDED_ON);
+
+        restDecisionsMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedDecisions.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedDecisions))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the Decisions in the database
+        List<Decisions> decisionsList = decisionsRepository.findAll();
+        assertThat(decisionsList).hasSize(databaseSizeBeforeUpdate);
+        Decisions testDecisions = decisionsList.get(decisionsList.size() - 1);
+        assertThat(testDecisions.getChoice()).isEqualTo(UPDATED_CHOICE);
+        assertThat(testDecisions.getDecidedOn()).isEqualTo(UPDATED_DECIDED_ON);
+    }
+
+    @Test
+    @Transactional
+    void fullUpdateDecisionsWithPatch() throws Exception {
+        // Initialize the database
+        decisionsRepository.saveAndFlush(decisions);
+
+        int databaseSizeBeforeUpdate = decisionsRepository.findAll().size();
+
+        // Update the decisions using partial update
+        Decisions partialUpdatedDecisions = new Decisions();
+        partialUpdatedDecisions.setId(decisions.getId());
+
+        partialUpdatedDecisions.choice(UPDATED_CHOICE).decidedOn(UPDATED_DECIDED_ON);
+
+        restDecisionsMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedDecisions.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedDecisions))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the Decisions in the database
+        List<Decisions> decisionsList = decisionsRepository.findAll();
+        assertThat(decisionsList).hasSize(databaseSizeBeforeUpdate);
+        Decisions testDecisions = decisionsList.get(decisionsList.size() - 1);
+        assertThat(testDecisions.getChoice()).isEqualTo(UPDATED_CHOICE);
+        assertThat(testDecisions.getDecidedOn()).isEqualTo(UPDATED_DECIDED_ON);
+    }
+
+    @Test
+    @Transactional
+    void patchNonExistingDecisions() throws Exception {
+        int databaseSizeBeforeUpdate = decisionsRepository.findAll().size();
+        decisions.setId(count.incrementAndGet());
+
+        // Create the Decisions
+        DecisionsDTO decisionsDTO = decisionsMapper.toDto(decisions);
+
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
+        restDecisionsMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, decisionsDTO.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(decisionsDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the Decisions in the database
+        List<Decisions> decisionsList = decisionsRepository.findAll();
+        assertThat(decisionsList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithIdMismatchDecisions() throws Exception {
+        int databaseSizeBeforeUpdate = decisionsRepository.findAll().size();
+        decisions.setId(count.incrementAndGet());
+
+        // Create the Decisions
+        DecisionsDTO decisionsDTO = decisionsMapper.toDto(decisions);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restDecisionsMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(decisionsDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the Decisions in the database
+        List<Decisions> decisionsList = decisionsRepository.findAll();
+        assertThat(decisionsList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithMissingIdPathParamDecisions() throws Exception {
+        int databaseSizeBeforeUpdate = decisionsRepository.findAll().size();
+        decisions.setId(count.incrementAndGet());
+
+        // Create the Decisions
+        DecisionsDTO decisionsDTO = decisionsMapper.toDto(decisions);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restDecisionsMockMvc
+            .perform(
+                patch(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(decisionsDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the Decisions in the database
+        List<Decisions> decisionsList = decisionsRepository.findAll();
+        assertThat(decisionsList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void deleteDecisions() throws Exception {
         // Initialize the database
         decisionsRepository.saveAndFlush(decisions);
 
@@ -529,7 +720,7 @@ public class DecisionsResourceIT {
 
         // Delete the decisions
         restDecisionsMockMvc
-            .perform(delete("/api/decisions/{id}", decisions.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, decisions.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

@@ -6,6 +6,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static za.co.dearx.leave.web.rest.TestUtil.sameInstant;
+import static za.co.dearx.leave.web.rest.TestUtil.sameNumber;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -14,35 +15,35 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import za.co.dearx.leave.LeaveApplicationApp;
+import za.co.dearx.leave.IntegrationTest;
 import za.co.dearx.leave.domain.LeaveApplication;
 import za.co.dearx.leave.domain.LeaveStatus;
 import za.co.dearx.leave.domain.LeaveType;
 import za.co.dearx.leave.domain.Staff;
 import za.co.dearx.leave.repository.LeaveApplicationRepository;
-import za.co.dearx.leave.service.LeaveApplicationQueryService;
-import za.co.dearx.leave.service.LeaveApplicationService;
-import za.co.dearx.leave.service.dto.LeaveApplicationCriteria;
+import za.co.dearx.leave.service.criteria.LeaveApplicationCriteria;
 import za.co.dearx.leave.service.dto.LeaveApplicationDTO;
 import za.co.dearx.leave.service.mapper.LeaveApplicationMapper;
 
 /**
  * Integration tests for the {@link LeaveApplicationResource} REST controller.
  */
-@SpringBootTest(classes = LeaveApplicationApp.class)
+@IntegrationTest
 @AutoConfigureMockMvc
 @WithMockUser
-public class LeaveApplicationResourceIT {
+class LeaveApplicationResourceIT {
+
     private static final LocalDate DEFAULT_START_DATE = LocalDate.ofEpochDay(0L);
     private static final LocalDate UPDATED_START_DATE = LocalDate.now(ZoneId.systemDefault());
     private static final LocalDate SMALLER_START_DATE = LocalDate.ofEpochDay(-1L);
@@ -66,17 +67,17 @@ public class LeaveApplicationResourceIT {
     private static final Boolean DEFAULT_DELETED = false;
     private static final Boolean UPDATED_DELETED = true;
 
+    private static final String ENTITY_API_URL = "/api/leave-applications";
+    private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
+
+    private static Random random = new Random();
+    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
     @Autowired
     private LeaveApplicationRepository leaveApplicationRepository;
 
     @Autowired
     private LeaveApplicationMapper leaveApplicationMapper;
-
-    @Autowired
-    private LeaveApplicationService leaveApplicationService;
-
-    @Autowired
-    private LeaveApplicationQueryService leaveApplicationQueryService;
 
     @Autowired
     private EntityManager em;
@@ -167,13 +168,13 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void createLeaveApplication() throws Exception {
+    void createLeaveApplication() throws Exception {
         int databaseSizeBeforeCreate = leaveApplicationRepository.findAll().size();
         // Create the LeaveApplication
         LeaveApplicationDTO leaveApplicationDTO = leaveApplicationMapper.toDto(leaveApplication);
         restLeaveApplicationMockMvc
             .perform(
-                post("/api/leave-applications")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveApplicationDTO))
@@ -188,23 +189,23 @@ public class LeaveApplicationResourceIT {
         assertThat(testLeaveApplication.getEndDate()).isEqualTo(DEFAULT_END_DATE);
         assertThat(testLeaveApplication.getAppliedDate()).isEqualTo(DEFAULT_APPLIED_DATE);
         assertThat(testLeaveApplication.getUpdateDate()).isEqualTo(DEFAULT_UPDATE_DATE);
-        assertThat(testLeaveApplication.getDays()).isEqualTo(DEFAULT_DAYS);
-        assertThat(testLeaveApplication.isDeleted()).isEqualTo(DEFAULT_DELETED);
+        assertThat(testLeaveApplication.getDays()).isEqualByComparingTo(DEFAULT_DAYS);
+        assertThat(testLeaveApplication.getDeleted()).isEqualTo(DEFAULT_DELETED);
     }
 
     @Test
     @Transactional
-    public void createLeaveApplicationWithExistingId() throws Exception {
-        int databaseSizeBeforeCreate = leaveApplicationRepository.findAll().size();
-
+    void createLeaveApplicationWithExistingId() throws Exception {
         // Create the LeaveApplication with an existing ID
         leaveApplication.setId(1L);
         LeaveApplicationDTO leaveApplicationDTO = leaveApplicationMapper.toDto(leaveApplication);
 
+        int databaseSizeBeforeCreate = leaveApplicationRepository.findAll().size();
+
         // An entity with an existing ID cannot be created, so this API call must fail
         restLeaveApplicationMockMvc
             .perform(
-                post("/api/leave-applications")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveApplicationDTO))
@@ -218,7 +219,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void checkStartDateIsRequired() throws Exception {
+    void checkStartDateIsRequired() throws Exception {
         int databaseSizeBeforeTest = leaveApplicationRepository.findAll().size();
         // set the field null
         leaveApplication.setStartDate(null);
@@ -228,7 +229,7 @@ public class LeaveApplicationResourceIT {
 
         restLeaveApplicationMockMvc
             .perform(
-                post("/api/leave-applications")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveApplicationDTO))
@@ -241,7 +242,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void checkEndDateIsRequired() throws Exception {
+    void checkEndDateIsRequired() throws Exception {
         int databaseSizeBeforeTest = leaveApplicationRepository.findAll().size();
         // set the field null
         leaveApplication.setEndDate(null);
@@ -251,7 +252,7 @@ public class LeaveApplicationResourceIT {
 
         restLeaveApplicationMockMvc
             .perform(
-                post("/api/leave-applications")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveApplicationDTO))
@@ -264,7 +265,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void checkAppliedDateIsRequired() throws Exception {
+    void checkAppliedDateIsRequired() throws Exception {
         int databaseSizeBeforeTest = leaveApplicationRepository.findAll().size();
         // set the field null
         leaveApplication.setAppliedDate(null);
@@ -274,7 +275,7 @@ public class LeaveApplicationResourceIT {
 
         restLeaveApplicationMockMvc
             .perform(
-                post("/api/leave-applications")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveApplicationDTO))
@@ -287,7 +288,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void checkDaysIsRequired() throws Exception {
+    void checkDaysIsRequired() throws Exception {
         int databaseSizeBeforeTest = leaveApplicationRepository.findAll().size();
         // set the field null
         leaveApplication.setDays(null);
@@ -297,7 +298,7 @@ public class LeaveApplicationResourceIT {
 
         restLeaveApplicationMockMvc
             .perform(
-                post("/api/leave-applications")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveApplicationDTO))
@@ -310,7 +311,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void checkDeletedIsRequired() throws Exception {
+    void checkDeletedIsRequired() throws Exception {
         int databaseSizeBeforeTest = leaveApplicationRepository.findAll().size();
         // set the field null
         leaveApplication.setDeleted(null);
@@ -320,7 +321,7 @@ public class LeaveApplicationResourceIT {
 
         restLeaveApplicationMockMvc
             .perform(
-                post("/api/leave-applications")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveApplicationDTO))
@@ -333,13 +334,13 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplications() throws Exception {
+    void getAllLeaveApplications() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
         // Get all the leaveApplicationList
         restLeaveApplicationMockMvc
-            .perform(get("/api/leave-applications?sort=id,desc"))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(leaveApplication.getId().intValue())))
@@ -347,19 +348,19 @@ public class LeaveApplicationResourceIT {
             .andExpect(jsonPath("$.[*].endDate").value(hasItem(DEFAULT_END_DATE.toString())))
             .andExpect(jsonPath("$.[*].appliedDate").value(hasItem(sameInstant(DEFAULT_APPLIED_DATE))))
             .andExpect(jsonPath("$.[*].updateDate").value(hasItem(sameInstant(DEFAULT_UPDATE_DATE))))
-            .andExpect(jsonPath("$.[*].days").value(hasItem(DEFAULT_DAYS.intValue())))
+            .andExpect(jsonPath("$.[*].days").value(hasItem(sameNumber(DEFAULT_DAYS))))
             .andExpect(jsonPath("$.[*].deleted").value(hasItem(DEFAULT_DELETED.booleanValue())));
     }
 
     @Test
     @Transactional
-    public void getLeaveApplication() throws Exception {
+    void getLeaveApplication() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
         // Get the leaveApplication
         restLeaveApplicationMockMvc
-            .perform(get("/api/leave-applications/{id}", leaveApplication.getId()))
+            .perform(get(ENTITY_API_URL_ID, leaveApplication.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(leaveApplication.getId().intValue()))
@@ -367,13 +368,13 @@ public class LeaveApplicationResourceIT {
             .andExpect(jsonPath("$.endDate").value(DEFAULT_END_DATE.toString()))
             .andExpect(jsonPath("$.appliedDate").value(sameInstant(DEFAULT_APPLIED_DATE)))
             .andExpect(jsonPath("$.updateDate").value(sameInstant(DEFAULT_UPDATE_DATE)))
-            .andExpect(jsonPath("$.days").value(DEFAULT_DAYS.intValue()))
+            .andExpect(jsonPath("$.days").value(sameNumber(DEFAULT_DAYS)))
             .andExpect(jsonPath("$.deleted").value(DEFAULT_DELETED.booleanValue()));
     }
 
     @Test
     @Transactional
-    public void getLeaveApplicationsByIdFiltering() throws Exception {
+    void getLeaveApplicationsByIdFiltering() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -391,7 +392,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByStartDateIsEqualToSomething() throws Exception {
+    void getAllLeaveApplicationsByStartDateIsEqualToSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -404,7 +405,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByStartDateIsNotEqualToSomething() throws Exception {
+    void getAllLeaveApplicationsByStartDateIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -417,7 +418,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByStartDateIsInShouldWork() throws Exception {
+    void getAllLeaveApplicationsByStartDateIsInShouldWork() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -430,7 +431,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByStartDateIsNullOrNotNull() throws Exception {
+    void getAllLeaveApplicationsByStartDateIsNullOrNotNull() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -443,7 +444,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByStartDateIsGreaterThanOrEqualToSomething() throws Exception {
+    void getAllLeaveApplicationsByStartDateIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -456,7 +457,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByStartDateIsLessThanOrEqualToSomething() throws Exception {
+    void getAllLeaveApplicationsByStartDateIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -469,7 +470,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByStartDateIsLessThanSomething() throws Exception {
+    void getAllLeaveApplicationsByStartDateIsLessThanSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -482,7 +483,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByStartDateIsGreaterThanSomething() throws Exception {
+    void getAllLeaveApplicationsByStartDateIsGreaterThanSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -495,7 +496,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByEndDateIsEqualToSomething() throws Exception {
+    void getAllLeaveApplicationsByEndDateIsEqualToSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -508,7 +509,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByEndDateIsNotEqualToSomething() throws Exception {
+    void getAllLeaveApplicationsByEndDateIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -521,7 +522,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByEndDateIsInShouldWork() throws Exception {
+    void getAllLeaveApplicationsByEndDateIsInShouldWork() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -534,7 +535,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByEndDateIsNullOrNotNull() throws Exception {
+    void getAllLeaveApplicationsByEndDateIsNullOrNotNull() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -547,7 +548,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByEndDateIsGreaterThanOrEqualToSomething() throws Exception {
+    void getAllLeaveApplicationsByEndDateIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -560,7 +561,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByEndDateIsLessThanOrEqualToSomething() throws Exception {
+    void getAllLeaveApplicationsByEndDateIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -573,7 +574,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByEndDateIsLessThanSomething() throws Exception {
+    void getAllLeaveApplicationsByEndDateIsLessThanSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -586,7 +587,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByEndDateIsGreaterThanSomething() throws Exception {
+    void getAllLeaveApplicationsByEndDateIsGreaterThanSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -599,7 +600,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByAppliedDateIsEqualToSomething() throws Exception {
+    void getAllLeaveApplicationsByAppliedDateIsEqualToSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -612,7 +613,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByAppliedDateIsNotEqualToSomething() throws Exception {
+    void getAllLeaveApplicationsByAppliedDateIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -625,7 +626,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByAppliedDateIsInShouldWork() throws Exception {
+    void getAllLeaveApplicationsByAppliedDateIsInShouldWork() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -638,7 +639,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByAppliedDateIsNullOrNotNull() throws Exception {
+    void getAllLeaveApplicationsByAppliedDateIsNullOrNotNull() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -651,7 +652,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByAppliedDateIsGreaterThanOrEqualToSomething() throws Exception {
+    void getAllLeaveApplicationsByAppliedDateIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -664,7 +665,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByAppliedDateIsLessThanOrEqualToSomething() throws Exception {
+    void getAllLeaveApplicationsByAppliedDateIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -677,7 +678,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByAppliedDateIsLessThanSomething() throws Exception {
+    void getAllLeaveApplicationsByAppliedDateIsLessThanSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -690,7 +691,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByAppliedDateIsGreaterThanSomething() throws Exception {
+    void getAllLeaveApplicationsByAppliedDateIsGreaterThanSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -703,7 +704,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByUpdateDateIsEqualToSomething() throws Exception {
+    void getAllLeaveApplicationsByUpdateDateIsEqualToSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -716,7 +717,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByUpdateDateIsNotEqualToSomething() throws Exception {
+    void getAllLeaveApplicationsByUpdateDateIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -729,7 +730,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByUpdateDateIsInShouldWork() throws Exception {
+    void getAllLeaveApplicationsByUpdateDateIsInShouldWork() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -742,7 +743,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByUpdateDateIsNullOrNotNull() throws Exception {
+    void getAllLeaveApplicationsByUpdateDateIsNullOrNotNull() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -755,7 +756,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByUpdateDateIsGreaterThanOrEqualToSomething() throws Exception {
+    void getAllLeaveApplicationsByUpdateDateIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -768,7 +769,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByUpdateDateIsLessThanOrEqualToSomething() throws Exception {
+    void getAllLeaveApplicationsByUpdateDateIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -781,7 +782,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByUpdateDateIsLessThanSomething() throws Exception {
+    void getAllLeaveApplicationsByUpdateDateIsLessThanSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -794,7 +795,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByUpdateDateIsGreaterThanSomething() throws Exception {
+    void getAllLeaveApplicationsByUpdateDateIsGreaterThanSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -807,7 +808,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByDaysIsEqualToSomething() throws Exception {
+    void getAllLeaveApplicationsByDaysIsEqualToSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -820,7 +821,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByDaysIsNotEqualToSomething() throws Exception {
+    void getAllLeaveApplicationsByDaysIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -833,7 +834,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByDaysIsInShouldWork() throws Exception {
+    void getAllLeaveApplicationsByDaysIsInShouldWork() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -846,7 +847,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByDaysIsNullOrNotNull() throws Exception {
+    void getAllLeaveApplicationsByDaysIsNullOrNotNull() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -859,7 +860,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByDaysIsGreaterThanOrEqualToSomething() throws Exception {
+    void getAllLeaveApplicationsByDaysIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -872,7 +873,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByDaysIsLessThanOrEqualToSomething() throws Exception {
+    void getAllLeaveApplicationsByDaysIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -885,7 +886,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByDaysIsLessThanSomething() throws Exception {
+    void getAllLeaveApplicationsByDaysIsLessThanSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -898,7 +899,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByDaysIsGreaterThanSomething() throws Exception {
+    void getAllLeaveApplicationsByDaysIsGreaterThanSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -911,7 +912,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByDeletedIsEqualToSomething() throws Exception {
+    void getAllLeaveApplicationsByDeletedIsEqualToSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -924,7 +925,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByDeletedIsNotEqualToSomething() throws Exception {
+    void getAllLeaveApplicationsByDeletedIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -937,7 +938,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByDeletedIsInShouldWork() throws Exception {
+    void getAllLeaveApplicationsByDeletedIsInShouldWork() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -950,7 +951,7 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByDeletedIsNullOrNotNull() throws Exception {
+    void getAllLeaveApplicationsByDeletedIsNullOrNotNull() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -963,22 +964,26 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByLeaveTypeIsEqualToSomething() throws Exception {
-        // Get already existing entity
-        LeaveType leaveType = leaveApplication.getLeaveType();
+    void getAllLeaveApplicationsByLeaveTypeIsEqualToSomething() throws Exception {
+        // Initialize the database
+        leaveApplicationRepository.saveAndFlush(leaveApplication);
+        LeaveType leaveType = LeaveTypeResourceIT.createEntity(em);
+        em.persist(leaveType);
+        em.flush();
+        leaveApplication.setLeaveType(leaveType);
         leaveApplicationRepository.saveAndFlush(leaveApplication);
         Long leaveTypeId = leaveType.getId();
 
         // Get all the leaveApplicationList where leaveType equals to leaveTypeId
         defaultLeaveApplicationShouldBeFound("leaveTypeId.equals=" + leaveTypeId);
 
-        // Get all the leaveApplicationList where leaveType equals to leaveTypeId + 1
+        // Get all the leaveApplicationList where leaveType equals to (leaveTypeId + 1)
         defaultLeaveApplicationShouldNotBeFound("leaveTypeId.equals=" + (leaveTypeId + 1));
     }
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByLeaveStatusIsEqualToSomething() throws Exception {
+    void getAllLeaveApplicationsByLeaveStatusIsEqualToSomething() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
         LeaveStatus leaveStatus = LeaveStatusResourceIT.createEntity(em);
@@ -991,22 +996,26 @@ public class LeaveApplicationResourceIT {
         // Get all the leaveApplicationList where leaveStatus equals to leaveStatusId
         defaultLeaveApplicationShouldBeFound("leaveStatusId.equals=" + leaveStatusId);
 
-        // Get all the leaveApplicationList where leaveStatus equals to leaveStatusId + 1
+        // Get all the leaveApplicationList where leaveStatus equals to (leaveStatusId + 1)
         defaultLeaveApplicationShouldNotBeFound("leaveStatusId.equals=" + (leaveStatusId + 1));
     }
 
     @Test
     @Transactional
-    public void getAllLeaveApplicationsByStaffIsEqualToSomething() throws Exception {
-        // Get already existing entity
-        Staff staff = leaveApplication.getStaff();
+    void getAllLeaveApplicationsByStaffIsEqualToSomething() throws Exception {
+        // Initialize the database
+        leaveApplicationRepository.saveAndFlush(leaveApplication);
+        Staff staff = StaffResourceIT.createEntity(em);
+        em.persist(staff);
+        em.flush();
+        leaveApplication.setStaff(staff);
         leaveApplicationRepository.saveAndFlush(leaveApplication);
         Long staffId = staff.getId();
 
         // Get all the leaveApplicationList where staff equals to staffId
         defaultLeaveApplicationShouldBeFound("staffId.equals=" + staffId);
 
-        // Get all the leaveApplicationList where staff equals to staffId + 1
+        // Get all the leaveApplicationList where staff equals to (staffId + 1)
         defaultLeaveApplicationShouldNotBeFound("staffId.equals=" + (staffId + 1));
     }
 
@@ -1015,7 +1024,7 @@ public class LeaveApplicationResourceIT {
      */
     private void defaultLeaveApplicationShouldBeFound(String filter) throws Exception {
         restLeaveApplicationMockMvc
-            .perform(get("/api/leave-applications?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(leaveApplication.getId().intValue())))
@@ -1023,12 +1032,12 @@ public class LeaveApplicationResourceIT {
             .andExpect(jsonPath("$.[*].endDate").value(hasItem(DEFAULT_END_DATE.toString())))
             .andExpect(jsonPath("$.[*].appliedDate").value(hasItem(sameInstant(DEFAULT_APPLIED_DATE))))
             .andExpect(jsonPath("$.[*].updateDate").value(hasItem(sameInstant(DEFAULT_UPDATE_DATE))))
-            .andExpect(jsonPath("$.[*].days").value(hasItem(DEFAULT_DAYS.intValue())))
+            .andExpect(jsonPath("$.[*].days").value(hasItem(sameNumber(DEFAULT_DAYS))))
             .andExpect(jsonPath("$.[*].deleted").value(hasItem(DEFAULT_DELETED.booleanValue())));
 
         // Check, that the count call also returns 1
         restLeaveApplicationMockMvc
-            .perform(get("/api/leave-applications/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -1039,7 +1048,7 @@ public class LeaveApplicationResourceIT {
      */
     private void defaultLeaveApplicationShouldNotBeFound(String filter) throws Exception {
         restLeaveApplicationMockMvc
-            .perform(get("/api/leave-applications?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -1047,7 +1056,7 @@ public class LeaveApplicationResourceIT {
 
         // Check, that the count call also returns 0
         restLeaveApplicationMockMvc
-            .perform(get("/api/leave-applications/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));
@@ -1055,14 +1064,14 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void getNonExistingLeaveApplication() throws Exception {
+    void getNonExistingLeaveApplication() throws Exception {
         // Get the leaveApplication
-        restLeaveApplicationMockMvc.perform(get("/api/leave-applications/{id}", Long.MAX_VALUE)).andExpect(status().isNotFound());
+        restLeaveApplicationMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    public void updateLeaveApplication() throws Exception {
+    void putNewLeaveApplication() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -1083,7 +1092,7 @@ public class LeaveApplicationResourceIT {
 
         restLeaveApplicationMockMvc
             .perform(
-                put("/api/leave-applications")
+                put(ENTITY_API_URL_ID, leaveApplicationDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveApplicationDTO))
@@ -1099,13 +1108,14 @@ public class LeaveApplicationResourceIT {
         assertThat(testLeaveApplication.getAppliedDate()).isEqualTo(UPDATED_APPLIED_DATE);
         assertThat(testLeaveApplication.getUpdateDate()).isEqualTo(UPDATED_UPDATE_DATE);
         assertThat(testLeaveApplication.getDays()).isEqualTo(UPDATED_DAYS);
-        assertThat(testLeaveApplication.isDeleted()).isEqualTo(UPDATED_DELETED);
+        assertThat(testLeaveApplication.getDeleted()).isEqualTo(UPDATED_DELETED);
     }
 
     @Test
     @Transactional
-    public void updateNonExistingLeaveApplication() throws Exception {
+    void putNonExistingLeaveApplication() throws Exception {
         int databaseSizeBeforeUpdate = leaveApplicationRepository.findAll().size();
+        leaveApplication.setId(count.incrementAndGet());
 
         // Create the LeaveApplication
         LeaveApplicationDTO leaveApplicationDTO = leaveApplicationMapper.toDto(leaveApplication);
@@ -1113,7 +1123,7 @@ public class LeaveApplicationResourceIT {
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restLeaveApplicationMockMvc
             .perform(
-                put("/api/leave-applications")
+                put(ENTITY_API_URL_ID, leaveApplicationDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveApplicationDTO))
@@ -1127,7 +1137,207 @@ public class LeaveApplicationResourceIT {
 
     @Test
     @Transactional
-    public void deleteLeaveApplication() throws Exception {
+    void putWithIdMismatchLeaveApplication() throws Exception {
+        int databaseSizeBeforeUpdate = leaveApplicationRepository.findAll().size();
+        leaveApplication.setId(count.incrementAndGet());
+
+        // Create the LeaveApplication
+        LeaveApplicationDTO leaveApplicationDTO = leaveApplicationMapper.toDto(leaveApplication);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeaveApplicationMockMvc
+            .perform(
+                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(leaveApplicationDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the LeaveApplication in the database
+        List<LeaveApplication> leaveApplicationList = leaveApplicationRepository.findAll();
+        assertThat(leaveApplicationList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void putWithMissingIdPathParamLeaveApplication() throws Exception {
+        int databaseSizeBeforeUpdate = leaveApplicationRepository.findAll().size();
+        leaveApplication.setId(count.incrementAndGet());
+
+        // Create the LeaveApplication
+        LeaveApplicationDTO leaveApplicationDTO = leaveApplicationMapper.toDto(leaveApplication);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeaveApplicationMockMvc
+            .perform(
+                put(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(leaveApplicationDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the LeaveApplication in the database
+        List<LeaveApplication> leaveApplicationList = leaveApplicationRepository.findAll();
+        assertThat(leaveApplicationList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void partialUpdateLeaveApplicationWithPatch() throws Exception {
+        // Initialize the database
+        leaveApplicationRepository.saveAndFlush(leaveApplication);
+
+        int databaseSizeBeforeUpdate = leaveApplicationRepository.findAll().size();
+
+        // Update the leaveApplication using partial update
+        LeaveApplication partialUpdatedLeaveApplication = new LeaveApplication();
+        partialUpdatedLeaveApplication.setId(leaveApplication.getId());
+
+        partialUpdatedLeaveApplication
+            .startDate(UPDATED_START_DATE)
+            .endDate(UPDATED_END_DATE)
+            .appliedDate(UPDATED_APPLIED_DATE)
+            .days(UPDATED_DAYS);
+
+        restLeaveApplicationMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedLeaveApplication.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedLeaveApplication))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the LeaveApplication in the database
+        List<LeaveApplication> leaveApplicationList = leaveApplicationRepository.findAll();
+        assertThat(leaveApplicationList).hasSize(databaseSizeBeforeUpdate);
+        LeaveApplication testLeaveApplication = leaveApplicationList.get(leaveApplicationList.size() - 1);
+        assertThat(testLeaveApplication.getStartDate()).isEqualTo(UPDATED_START_DATE);
+        assertThat(testLeaveApplication.getEndDate()).isEqualTo(UPDATED_END_DATE);
+        assertThat(testLeaveApplication.getAppliedDate()).isEqualTo(UPDATED_APPLIED_DATE);
+        assertThat(testLeaveApplication.getUpdateDate()).isEqualTo(DEFAULT_UPDATE_DATE);
+        assertThat(testLeaveApplication.getDays()).isEqualByComparingTo(UPDATED_DAYS);
+        assertThat(testLeaveApplication.getDeleted()).isEqualTo(DEFAULT_DELETED);
+    }
+
+    @Test
+    @Transactional
+    void fullUpdateLeaveApplicationWithPatch() throws Exception {
+        // Initialize the database
+        leaveApplicationRepository.saveAndFlush(leaveApplication);
+
+        int databaseSizeBeforeUpdate = leaveApplicationRepository.findAll().size();
+
+        // Update the leaveApplication using partial update
+        LeaveApplication partialUpdatedLeaveApplication = new LeaveApplication();
+        partialUpdatedLeaveApplication.setId(leaveApplication.getId());
+
+        partialUpdatedLeaveApplication
+            .startDate(UPDATED_START_DATE)
+            .endDate(UPDATED_END_DATE)
+            .appliedDate(UPDATED_APPLIED_DATE)
+            .updateDate(UPDATED_UPDATE_DATE)
+            .days(UPDATED_DAYS)
+            .deleted(UPDATED_DELETED);
+
+        restLeaveApplicationMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedLeaveApplication.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedLeaveApplication))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the LeaveApplication in the database
+        List<LeaveApplication> leaveApplicationList = leaveApplicationRepository.findAll();
+        assertThat(leaveApplicationList).hasSize(databaseSizeBeforeUpdate);
+        LeaveApplication testLeaveApplication = leaveApplicationList.get(leaveApplicationList.size() - 1);
+        assertThat(testLeaveApplication.getStartDate()).isEqualTo(UPDATED_START_DATE);
+        assertThat(testLeaveApplication.getEndDate()).isEqualTo(UPDATED_END_DATE);
+        assertThat(testLeaveApplication.getAppliedDate()).isEqualTo(UPDATED_APPLIED_DATE);
+        assertThat(testLeaveApplication.getUpdateDate()).isEqualTo(UPDATED_UPDATE_DATE);
+        assertThat(testLeaveApplication.getDays()).isEqualByComparingTo(UPDATED_DAYS);
+        assertThat(testLeaveApplication.getDeleted()).isEqualTo(UPDATED_DELETED);
+    }
+
+    @Test
+    @Transactional
+    void patchNonExistingLeaveApplication() throws Exception {
+        int databaseSizeBeforeUpdate = leaveApplicationRepository.findAll().size();
+        leaveApplication.setId(count.incrementAndGet());
+
+        // Create the LeaveApplication
+        LeaveApplicationDTO leaveApplicationDTO = leaveApplicationMapper.toDto(leaveApplication);
+
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
+        restLeaveApplicationMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, leaveApplicationDTO.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(leaveApplicationDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the LeaveApplication in the database
+        List<LeaveApplication> leaveApplicationList = leaveApplicationRepository.findAll();
+        assertThat(leaveApplicationList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithIdMismatchLeaveApplication() throws Exception {
+        int databaseSizeBeforeUpdate = leaveApplicationRepository.findAll().size();
+        leaveApplication.setId(count.incrementAndGet());
+
+        // Create the LeaveApplication
+        LeaveApplicationDTO leaveApplicationDTO = leaveApplicationMapper.toDto(leaveApplication);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeaveApplicationMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(leaveApplicationDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the LeaveApplication in the database
+        List<LeaveApplication> leaveApplicationList = leaveApplicationRepository.findAll();
+        assertThat(leaveApplicationList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithMissingIdPathParamLeaveApplication() throws Exception {
+        int databaseSizeBeforeUpdate = leaveApplicationRepository.findAll().size();
+        leaveApplication.setId(count.incrementAndGet());
+
+        // Create the LeaveApplication
+        LeaveApplicationDTO leaveApplicationDTO = leaveApplicationMapper.toDto(leaveApplication);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeaveApplicationMockMvc
+            .perform(
+                patch(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(leaveApplicationDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the LeaveApplication in the database
+        List<LeaveApplication> leaveApplicationList = leaveApplicationRepository.findAll();
+        assertThat(leaveApplicationList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void deleteLeaveApplication() throws Exception {
         // Initialize the database
         leaveApplicationRepository.saveAndFlush(leaveApplication);
 
@@ -1135,7 +1345,7 @@ public class LeaveApplicationResourceIT {
 
         // Delete the leaveApplication
         restLeaveApplicationMockMvc
-            .perform(delete("/api/leave-applications/{id}", leaveApplication.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, leaveApplication.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

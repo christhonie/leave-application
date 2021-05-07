@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 import za.co.dearx.leave.domain.LeaveType;
 
 /**
- * Spring Data  repository for the LeaveType entity.
+ * Spring Data SQL repository for the LeaveType entity.
  */
 @SuppressWarnings("unused")
 @Repository

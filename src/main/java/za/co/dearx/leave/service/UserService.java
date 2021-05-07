@@ -1,6 +1,5 @@
 package za.co.dearx.leave.service;
 
-import io.github.jhipster.security.RandomUtil;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -15,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tech.jhipster.security.RandomUtil;
 import za.co.dearx.leave.config.Constants;
 import za.co.dearx.leave.domain.Authority;
 import za.co.dearx.leave.domain.User;
@@ -23,6 +23,7 @@ import za.co.dearx.leave.repository.PersistentTokenRepository;
 import za.co.dearx.leave.repository.UserRepository;
 import za.co.dearx.leave.security.AuthoritiesConstants;
 import za.co.dearx.leave.security.SecurityUtils;
+import za.co.dearx.leave.service.dto.AdminUserDTO;
 import za.co.dearx.leave.service.dto.UserDTO;
 
 /**
@@ -31,6 +32,7 @@ import za.co.dearx.leave.service.dto.UserDTO;
 @Service
 @Transactional
 public class UserService {
+
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
@@ -92,7 +94,7 @@ public class UserService {
     public Optional<User> requestPasswordReset(String mail) {
         return userRepository
             .findOneByEmailIgnoreCase(mail)
-            .filter(User::getActivated)
+            .filter(User::isActivated)
             .map(
                 user -> {
                     user.setResetKey(RandomUtil.generateResetKey());
@@ -103,7 +105,7 @@ public class UserService {
             );
     }
 
-    public User registerUser(UserDTO userDTO, String password) {
+    public User registerUser(AdminUserDTO userDTO, String password) {
         userRepository
             .findOneByLogin(userDTO.getLogin().toLowerCase())
             .ifPresent(
@@ -150,7 +152,7 @@ public class UserService {
     }
 
     private boolean removeNonActivatedUser(User existingUser) {
-        if (existingUser.getActivated()) {
+        if (existingUser.isActivated()) {
             return false;
         }
         userRepository.delete(existingUser);
@@ -159,7 +161,7 @@ public class UserService {
         return true;
     }
 
-    public User createUser(UserDTO userDTO) {
+    public User createUser(AdminUserDTO userDTO) {
         User user = new User();
         user.setLogin(userDTO.getLogin().toLowerCase());
         user.setFirstName(userDTO.getFirstName());
@@ -200,7 +202,7 @@ public class UserService {
      * @param userDTO user to update.
      * @return updated user.
      */
-    public Optional<UserDTO> updateUser(UserDTO userDTO) {
+    public Optional<AdminUserDTO> updateUser(AdminUserDTO userDTO) {
         return Optional
             .of(userRepository.findById(userDTO.getId()))
             .filter(Optional::isPresent)
@@ -231,7 +233,7 @@ public class UserService {
                     return user;
                 }
             )
-            .map(UserDTO::new);
+            .map(AdminUserDTO::new);
     }
 
     public void deleteUser(String login) {
@@ -294,8 +296,13 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<UserDTO> getAllManagedUsers(Pageable pageable) {
-        return userRepository.findAllByLoginNot(pageable, Constants.ANONYMOUS_USER).map(UserDTO::new);
+    public Page<AdminUserDTO> getAllManagedUsers(Pageable pageable) {
+        return userRepository.findAll(pageable).map(AdminUserDTO::new);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<UserDTO> getAllPublicUsers(Pageable pageable) {
+        return userRepository.findAllByIdNotNullAndActivatedIsTrue(pageable).map(UserDTO::new);
     }
 
     @Transactional(readOnly = true)

@@ -2,22 +2,22 @@ package za.co.dearx.leave.service.dto;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Objects;
 import javax.validation.constraints.*;
 
 /**
  * A DTO for the {@link za.co.dearx.leave.domain.EntitlementValue} entity.
  */
 public class EntitlementValueDTO implements Serializable {
+
     private Long id;
 
     @NotNull
     private BigDecimal entitlementValue;
 
-    private Long entitlementId;
+    private LeaveEntitlementDTO entitlement;
 
-    private Long staffId;
-
-    private String staffName;
+    private StaffDTO staff;
 
     public Long getId() {
         return id;
@@ -35,28 +35,20 @@ public class EntitlementValueDTO implements Serializable {
         this.entitlementValue = entitlementValue;
     }
 
-    public Long getEntitlementId() {
-        return entitlementId;
+    public LeaveEntitlementDTO getEntitlement() {
+        return entitlement;
     }
 
-    public void setEntitlementId(Long leaveEntitlementId) {
-        this.entitlementId = leaveEntitlementId;
+    public void setEntitlement(LeaveEntitlementDTO entitlement) {
+        this.entitlement = entitlement;
     }
 
-    public Long getStaffId() {
-        return staffId;
+    public StaffDTO getStaff() {
+        return staff;
     }
 
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
-    }
-
-    public String getStaffName() {
-        return staffName;
-    }
-
-    public void setStaffName(String staffName) {
-        this.staffName = staffName;
+    public void setStaff(StaffDTO staff) {
+        this.staff = staff;
     }
 
     @Override
@@ -68,12 +60,16 @@ public class EntitlementValueDTO implements Serializable {
             return false;
         }
 
-        return id != null && id.equals(((EntitlementValueDTO) o).id);
+        EntitlementValueDTO entitlementValueDTO = (EntitlementValueDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, entitlementValueDTO.id);
     }
 
     @Override
     public int hashCode() {
-        return 31;
+        return Objects.hash(this.id);
     }
 
     // prettier-ignore
@@ -82,9 +78,8 @@ public class EntitlementValueDTO implements Serializable {
         return "EntitlementValueDTO{" +
             "id=" + getId() +
             ", entitlementValue=" + getEntitlementValue() +
-            ", entitlementId=" + getEntitlementId() +
-            ", staffId=" + getStaffId() +
-            ", staffName='" + getStaffName() + "'" +
+            ", entitlement=" + getEntitlement() +
+            ", staff=" + getStaff() +
             "}";
     }
 }

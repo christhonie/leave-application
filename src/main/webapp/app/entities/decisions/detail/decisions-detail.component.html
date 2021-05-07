@@ -1,0 +1,52 @@
+<div class="row justify-content-center">
+  <div class="col-8">
+    <div *ngIf="decisions">
+      <h2 data-cy="decisionsDetailsHeading"><span jhiTranslate="leaveApplicationApp.decisions.detail.title">Decisions</span></h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dd>
+          <span>{{ decisions.id }}</span>
+        </dd>
+        <dt><span jhiTranslate="leaveApplicationApp.decisions.choice">Choice</span></dt>
+        <dd>
+          <span jhiTranslate="{{ 'leaveApplicationApp.DecisionChoice.' + decisions.choice }}">{{ decisions.choice }}</span>
+        </dd>
+        <dt><span jhiTranslate="leaveApplicationApp.decisions.decidedOn">Decided On</span></dt>
+        <dd>
+          <span>{{ decisions.decidedOn | formatMediumDatetime }}</span>
+        </dd>
+        <dt><span jhiTranslate="leaveApplicationApp.decisions.comment">Comment</span></dt>
+        <dd>
+          <div *ngIf="decisions.comment">
+            <a [routerLink]="['/comment', decisions.comment?.id, 'view']">{{ decisions.comment?.comment }}</a>
+          </div>
+        </dd>
+        <dt><span jhiTranslate="leaveApplicationApp.decisions.user">User</span></dt>
+        <dd>
+          <span>{{ decisions.user?.login }}</span>
+        </dd>
+        <dt><span jhiTranslate="leaveApplicationApp.decisions.leaveApplication">Leave Application</span></dt>
+        <dd>
+          <div *ngIf="decisions.leaveApplication">
+            <a [routerLink]="['/leave-application', decisions.leaveApplication?.id, 'view']">{{ decisions.leaveApplication?.id }}</a>
+          </div>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+      </button>
+
+      <button type="button" [routerLink]="['/decisions', decisions.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+      </button>
+    </div>
+  </div>
+</div>

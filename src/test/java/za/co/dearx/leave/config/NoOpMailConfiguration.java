@@ -10,6 +10,7 @@ import za.co.dearx.leave.service.MailService;
 
 @Configuration
 public class NoOpMailConfiguration {
+
     private final MailService mockMailService;
 
     public NoOpMailConfiguration() {

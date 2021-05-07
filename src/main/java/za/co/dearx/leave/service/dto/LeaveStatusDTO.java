@@ -1,12 +1,14 @@
 package za.co.dearx.leave.service.dto;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.validation.constraints.*;
 
 /**
  * A DTO for the {@link za.co.dearx.leave.domain.LeaveStatus} entity.
  */
 public class LeaveStatusDTO implements Serializable {
+
     private Long id;
 
     @NotNull
@@ -49,12 +51,16 @@ public class LeaveStatusDTO implements Serializable {
             return false;
         }
 
-        return id != null && id.equals(((LeaveStatusDTO) o).id);
+        LeaveStatusDTO leaveStatusDTO = (LeaveStatusDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, leaveStatusDTO.id);
     }
 
     @Override
     public int hashCode() {
-        return 31;
+        return Objects.hash(this.id);
     }
 
     // prettier-ignore

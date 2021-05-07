@@ -5,10 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import za.co.dearx.leave.web.rest.TestUtil;
 
-public class LeaveStatusTest {
+class LeaveStatusTest {
 
     @Test
-    public void equalsVerifier() throws Exception {
+    void equalsVerifier() throws Exception {
         TestUtil.equalsVerifier(LeaveStatus.class);
         LeaveStatus leaveStatus1 = new LeaveStatus();
         leaveStatus1.setId(1L);

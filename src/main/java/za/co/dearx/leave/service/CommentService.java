@@ -18,6 +18,7 @@ import za.co.dearx.leave.service.mapper.CommentMapper;
 @Service
 @Transactional
 public class CommentService {
+
     private final Logger log = LoggerFactory.getLogger(CommentService.class);
 
     private final CommentRepository commentRepository;
@@ -40,6 +41,27 @@ public class CommentService {
         Comment comment = commentMapper.toEntity(commentDTO);
         comment = commentRepository.save(comment);
         return commentMapper.toDto(comment);
+    }
+
+    /**
+     * Partially update a comment.
+     *
+     * @param commentDTO the entity to update partially.
+     * @return the persisted entity.
+     */
+    public Optional<CommentDTO> partialUpdate(CommentDTO commentDTO) {
+        log.debug("Request to partially update Comment : {}", commentDTO);
+
+        return commentRepository
+            .findById(commentDTO.getId())
+            .map(
+                existingComment -> {
+                    commentMapper.partialUpdate(existingComment, commentDTO);
+                    return existingComment;
+                }
+            )
+            .map(commentRepository::save)
+            .map(commentMapper::toDto);
     }
 
     /**

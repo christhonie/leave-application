@@ -13,6 +13,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "leave_status")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class LeaveStatus implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -37,8 +38,13 @@ public class LeaveStatus implements Serializable {
         this.id = id;
     }
 
+    public LeaveStatus id(Long id) {
+        this.id = id;
+        return this;
+    }
+
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public LeaveStatus name(String name) {
@@ -51,7 +57,7 @@ public class LeaveStatus implements Serializable {
     }
 
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     public LeaveStatus description(String description) {
@@ -78,7 +84,8 @@ public class LeaveStatus implements Serializable {
 
     @Override
     public int hashCode() {
-        return 31;
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        return getClass().hashCode();
     }
 
     // prettier-ignore

@@ -17,6 +17,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "staff")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Staff implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -60,16 +61,12 @@ public class Staff implements Serializable {
     private String gender;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = "staff", allowSetters = true)
     private User user;
 
     @ManyToMany
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JoinTable(
-        name = "staff_team",
-        joinColumns = @JoinColumn(name = "staff_id", referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id")
-    )
+    @JoinTable(name = "rel_staff__team", joinColumns = @JoinColumn(name = "staff_id"), inverseJoinColumns = @JoinColumn(name = "team_id"))
+    @JsonIgnoreProperties(value = { "manager", "members" }, allowSetters = true)
     private Set<Team> teams = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -81,8 +78,13 @@ public class Staff implements Serializable {
         this.id = id;
     }
 
+    public Staff id(Long id) {
+        this.id = id;
+        return this;
+    }
+
     public String getPosition() {
-        return position;
+        return this.position;
     }
 
     public Staff position(String position) {
@@ -95,7 +97,7 @@ public class Staff implements Serializable {
     }
 
     public String getEmployeeID() {
-        return employeeID;
+        return this.employeeID;
     }
 
     public Staff employeeID(String employeeID) {
@@ -108,7 +110,7 @@ public class Staff implements Serializable {
     }
 
     public LocalDate getStartDate() {
-        return startDate;
+        return this.startDate;
     }
 
     public Staff startDate(LocalDate startDate) {
@@ -128,7 +130,7 @@ public class Staff implements Serializable {
     }
 
     public String getFirstName() {
-        return firstName;
+        return this.firstName;
     }
 
     public Staff firstName(String firstName) {
@@ -141,7 +143,7 @@ public class Staff implements Serializable {
     }
 
     public String getLastName() {
-        return lastName;
+        return this.lastName;
     }
 
     public Staff lastName(String lastName) {
@@ -154,7 +156,7 @@ public class Staff implements Serializable {
     }
 
     public String getEmail() {
-        return email;
+        return this.email;
     }
 
     public Staff email(String email) {
@@ -167,7 +169,7 @@ public class Staff implements Serializable {
     }
 
     public String getContractNumber() {
-        return contractNumber;
+        return this.contractNumber;
     }
 
     public Staff contractNumber(String contractNumber) {
@@ -180,7 +182,7 @@ public class Staff implements Serializable {
     }
 
     public String getGender() {
-        return gender;
+        return this.gender;
     }
 
     public Staff gender(String gender) {
@@ -193,11 +195,11 @@ public class Staff implements Serializable {
     }
 
     public User getUser() {
-        return user;
+        return this.user;
     }
 
     public Staff user(User user) {
-        this.user = user;
+        this.setUser(user);
         return this;
     }
 
@@ -206,11 +208,11 @@ public class Staff implements Serializable {
     }
 
     public Set<Team> getTeams() {
-        return teams;
+        return this.teams;
     }
 
     public Staff teams(Set<Team> teams) {
-        this.teams = teams;
+        this.setTeams(teams);
         return this;
     }
 
@@ -245,7 +247,8 @@ public class Staff implements Serializable {
 
     @Override
     public int hashCode() {
-        return 31;
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        return getClass().hashCode();
     }
 
     // prettier-ignore

@@ -4,12 +4,14 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import javax.validation.constraints.*;
 
 /**
  * A DTO for the {@link za.co.dearx.leave.domain.LeaveApplication} entity.
  */
 public class LeaveApplicationDTO implements Serializable {
+
     private Long id;
 
     @NotNull
@@ -29,17 +31,11 @@ public class LeaveApplicationDTO implements Serializable {
     @NotNull
     private Boolean deleted;
 
-    private Long leaveTypeId;
+    private LeaveTypeDTO leaveType;
 
-    private String leaveTypeName;
+    private LeaveStatusDTO leaveStatus;
 
-    private Long leaveStatusId;
-
-    private String leaveStatusName;
-
-    private Long staffId;
-
-    private String staffName;
+    private StaffDTO staff;
 
     public Long getId() {
         return id;
@@ -89,7 +85,7 @@ public class LeaveApplicationDTO implements Serializable {
         this.days = days;
     }
 
-    public Boolean isDeleted() {
+    public Boolean getDeleted() {
         return deleted;
     }
 
@@ -97,52 +93,28 @@ public class LeaveApplicationDTO implements Serializable {
         this.deleted = deleted;
     }
 
-    public Long getLeaveTypeId() {
-        return leaveTypeId;
+    public LeaveTypeDTO getLeaveType() {
+        return leaveType;
     }
 
-    public void setLeaveTypeId(Long leaveTypeId) {
-        this.leaveTypeId = leaveTypeId;
+    public void setLeaveType(LeaveTypeDTO leaveType) {
+        this.leaveType = leaveType;
     }
 
-    public String getLeaveTypeName() {
-        return leaveTypeName;
+    public LeaveStatusDTO getLeaveStatus() {
+        return leaveStatus;
     }
 
-    public void setLeaveTypeName(String leaveTypeName) {
-        this.leaveTypeName = leaveTypeName;
+    public void setLeaveStatus(LeaveStatusDTO leaveStatus) {
+        this.leaveStatus = leaveStatus;
     }
 
-    public Long getLeaveStatusId() {
-        return leaveStatusId;
+    public StaffDTO getStaff() {
+        return staff;
     }
 
-    public void setLeaveStatusId(Long leaveStatusId) {
-        this.leaveStatusId = leaveStatusId;
-    }
-
-    public String getLeaveStatusName() {
-        return leaveStatusName;
-    }
-
-    public void setLeaveStatusName(String leaveStatusName) {
-        this.leaveStatusName = leaveStatusName;
-    }
-
-    public Long getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
-    }
-
-    public String getStaffName() {
-        return staffName;
-    }
-
-    public void setStaffName(String staffName) {
-        this.staffName = staffName;
+    public void setStaff(StaffDTO staff) {
+        this.staff = staff;
     }
 
     @Override
@@ -154,12 +126,16 @@ public class LeaveApplicationDTO implements Serializable {
             return false;
         }
 
-        return id != null && id.equals(((LeaveApplicationDTO) o).id);
+        LeaveApplicationDTO leaveApplicationDTO = (LeaveApplicationDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, leaveApplicationDTO.id);
     }
 
     @Override
     public int hashCode() {
-        return 31;
+        return Objects.hash(this.id);
     }
 
     // prettier-ignore
@@ -172,13 +148,10 @@ public class LeaveApplicationDTO implements Serializable {
             ", appliedDate='" + getAppliedDate() + "'" +
             ", updateDate='" + getUpdateDate() + "'" +
             ", days=" + getDays() +
-            ", deleted='" + isDeleted() + "'" +
-            ", leaveTypeId=" + getLeaveTypeId() +
-            ", leaveTypeName='" + getLeaveTypeName() + "'" +
-            ", leaveStatusId=" + getLeaveStatusId() +
-            ", leaveStatusName='" + getLeaveStatusName() + "'" +
-            ", staffId=" + getStaffId() +
-            ", staffName='" + getStaffName() + "'" +
+            ", deleted='" + getDeleted() + "'" +
+            ", leaveType=" + getLeaveType() +
+            ", leaveStatus=" + getLeaveStatus() +
+            ", staff=" + getStaff() +
             "}";
     }
 }

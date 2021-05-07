@@ -9,21 +9,7 @@ import za.co.dearx.leave.service.dto.EntitlementValueDTO;
  */
 @Mapper(componentModel = "spring", uses = { LeaveEntitlementMapper.class, StaffMapper.class })
 public interface EntitlementValueMapper extends EntityMapper<EntitlementValueDTO, EntitlementValue> {
-    @Mapping(source = "entitlement.id", target = "entitlementId")
-    @Mapping(source = "staff.id", target = "staffId")
-    @Mapping(source = "staff.name", target = "staffName")
-    EntitlementValueDTO toDto(EntitlementValue entitlementValue);
-
-    @Mapping(source = "entitlementId", target = "entitlement")
-    @Mapping(source = "staffId", target = "staff")
-    EntitlementValue toEntity(EntitlementValueDTO entitlementValueDTO);
-
-    default EntitlementValue fromId(Long id) {
-        if (id == null) {
-            return null;
-        }
-        EntitlementValue entitlementValue = new EntitlementValue();
-        entitlementValue.setId(id);
-        return entitlementValue;
-    }
+    @Mapping(target = "entitlement", source = "entitlement", qualifiedByName = "id")
+    @Mapping(target = "staff", source = "staff", qualifiedByName = "name")
+    EntitlementValueDTO toDto(EntitlementValue s);
 }

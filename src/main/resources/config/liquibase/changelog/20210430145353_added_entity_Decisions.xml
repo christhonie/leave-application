@@ -3,27 +3,25 @@
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
     xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.9.xsd
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd
                         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
-
-        <property name="autoIncrement" value="true"/>
 
     <!--
         Added the entity Decisions.
     -->
     <changeSet id="20210430145353-1" author="jhipster">
         <createTable tableName="decisions">
-            <column name="id" type="bigint" autoIncrement="${autoIncrement}">
+            <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="choice" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
-            <column name="decided_on" type="datetime">
+            <column name="decided_on" type="${datetimeType}">
                 <constraints nullable="false" />
             </column>
             <column name="comment_id" type="bigint">
-                <constraints unique="true" nullable="true" uniqueConstraintName="ux_decisions_comment_id" />
+                <constraints nullable="true" unique="true" uniqueConstraintName="ux_decisions__comment_id" />
             </column>
             <column name="user_id" type="bigint">
                 <constraints nullable="false" />
@@ -33,12 +31,9 @@
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
-        <dropDefaultValue tableName="decisions" columnName="decided_on" columnDataType="datetime"/>
+        <dropDefaultValue tableName="decisions" columnName="decided_on" columnDataType="${datetimeType}"/>
     </changeSet>
 
-    <changeSet id="20210430145353-1-relations" author="jhipster">
-
-    </changeSet>
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
 
     <!--
@@ -56,11 +51,10 @@
                   tableName="decisions">
             <column name="id" type="numeric"/>
             <column name="choice" type="string"/>
-            <column name="decided_on" type="datetime"/>
+            <column name="decided_on" type="${datetimeType}"/>
             <column name="user_id" type="numeric"/>
             <column name="leave_application_id" type="numeric"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>
-
 </databaseChangeLog>

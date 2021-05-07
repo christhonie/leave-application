@@ -3,6 +3,7 @@
     "leaveEntitlement": {
       "home": {
         "title": "Leave Entitlements",
+        "refreshListLabel": "Refresh list",
         "createLabel": "Create a new Leave Entitlement",
         "createOrEditLabel": "Create or edit a Leave Entitlement",
         "notFound": "No Leave Entitlements found"
@@ -16,6 +17,7 @@
       "detail": {
         "title": "Leave Entitlement"
       },
+      "id": "ID",
       "entitlementDate": "Entitlement Date",
       "days": "Days",
       "leaveType": "Leave Type",

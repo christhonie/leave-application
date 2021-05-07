@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import za.co.dearx.leave.domain.Team;
 
 /**
- * Spring Data  repository for the Team entity.
+ * Spring Data SQL repository for the Team entity.
  */
 @SuppressWarnings("unused")
 @Repository

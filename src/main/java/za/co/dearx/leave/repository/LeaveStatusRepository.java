@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import za.co.dearx.leave.domain.LeaveStatus;
 
 /**
- * Spring Data  repository for the LeaveStatus entity.
+ * Spring Data SQL repository for the LeaveStatus entity.
  */
 @Repository
 public interface LeaveStatusRepository extends JpaRepository<LeaveStatus, Long>, JpaSpecificationExecutor<LeaveStatus> {

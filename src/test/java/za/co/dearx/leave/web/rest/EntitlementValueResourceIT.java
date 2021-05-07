@@ -5,52 +5,53 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static za.co.dearx.leave.web.rest.TestUtil.sameNumber;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import za.co.dearx.leave.LeaveApplicationApp;
+import za.co.dearx.leave.IntegrationTest;
 import za.co.dearx.leave.domain.EntitlementValue;
 import za.co.dearx.leave.domain.LeaveEntitlement;
 import za.co.dearx.leave.domain.Staff;
 import za.co.dearx.leave.repository.EntitlementValueRepository;
-import za.co.dearx.leave.service.EntitlementValueQueryService;
-import za.co.dearx.leave.service.EntitlementValueService;
-import za.co.dearx.leave.service.dto.EntitlementValueCriteria;
+import za.co.dearx.leave.service.criteria.EntitlementValueCriteria;
 import za.co.dearx.leave.service.dto.EntitlementValueDTO;
 import za.co.dearx.leave.service.mapper.EntitlementValueMapper;
 
 /**
  * Integration tests for the {@link EntitlementValueResource} REST controller.
  */
-@SpringBootTest(classes = LeaveApplicationApp.class)
+@IntegrationTest
 @AutoConfigureMockMvc
 @WithMockUser
-public class EntitlementValueResourceIT {
+class EntitlementValueResourceIT {
+
     private static final BigDecimal DEFAULT_ENTITLEMENT_VALUE = new BigDecimal(1);
     private static final BigDecimal UPDATED_ENTITLEMENT_VALUE = new BigDecimal(2);
     private static final BigDecimal SMALLER_ENTITLEMENT_VALUE = new BigDecimal(1 - 1);
+
+    private static final String ENTITY_API_URL = "/api/entitlement-values";
+    private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
+
+    private static Random random = new Random();
+    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
 
     @Autowired
     private EntitlementValueRepository entitlementValueRepository;
 
     @Autowired
     private EntitlementValueMapper entitlementValueMapper;
-
-    @Autowired
-    private EntitlementValueService entitlementValueService;
-
-    @Autowired
-    private EntitlementValueQueryService entitlementValueQueryService;
 
     @Autowired
     private EntityManager em;
@@ -129,13 +130,13 @@ public class EntitlementValueResourceIT {
 
     @Test
     @Transactional
-    public void createEntitlementValue() throws Exception {
+    void createEntitlementValue() throws Exception {
         int databaseSizeBeforeCreate = entitlementValueRepository.findAll().size();
         // Create the EntitlementValue
         EntitlementValueDTO entitlementValueDTO = entitlementValueMapper.toDto(entitlementValue);
         restEntitlementValueMockMvc
             .perform(
-                post("/api/entitlement-values")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(entitlementValueDTO))
@@ -146,22 +147,22 @@ public class EntitlementValueResourceIT {
         List<EntitlementValue> entitlementValueList = entitlementValueRepository.findAll();
         assertThat(entitlementValueList).hasSize(databaseSizeBeforeCreate + 1);
         EntitlementValue testEntitlementValue = entitlementValueList.get(entitlementValueList.size() - 1);
-        assertThat(testEntitlementValue.getEntitlementValue()).isEqualTo(DEFAULT_ENTITLEMENT_VALUE);
+        assertThat(testEntitlementValue.getEntitlementValue()).isEqualByComparingTo(DEFAULT_ENTITLEMENT_VALUE);
     }
 
     @Test
     @Transactional
-    public void createEntitlementValueWithExistingId() throws Exception {
-        int databaseSizeBeforeCreate = entitlementValueRepository.findAll().size();
-
+    void createEntitlementValueWithExistingId() throws Exception {
         // Create the EntitlementValue with an existing ID
         entitlementValue.setId(1L);
         EntitlementValueDTO entitlementValueDTO = entitlementValueMapper.toDto(entitlementValue);
 
+        int databaseSizeBeforeCreate = entitlementValueRepository.findAll().size();
+
         // An entity with an existing ID cannot be created, so this API call must fail
         restEntitlementValueMockMvc
             .perform(
-                post("/api/entitlement-values")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(entitlementValueDTO))
@@ -175,7 +176,7 @@ public class EntitlementValueResourceIT {
 
     @Test
     @Transactional
-    public void checkEntitlementValueIsRequired() throws Exception {
+    void checkEntitlementValueIsRequired() throws Exception {
         int databaseSizeBeforeTest = entitlementValueRepository.findAll().size();
         // set the field null
         entitlementValue.setEntitlementValue(null);
@@ -185,7 +186,7 @@ public class EntitlementValueResourceIT {
 
         restEntitlementValueMockMvc
             .perform(
-                post("/api/entitlement-values")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(entitlementValueDTO))
@@ -198,37 +199,37 @@ public class EntitlementValueResourceIT {
 
     @Test
     @Transactional
-    public void getAllEntitlementValues() throws Exception {
+    void getAllEntitlementValues() throws Exception {
         // Initialize the database
         entitlementValueRepository.saveAndFlush(entitlementValue);
 
         // Get all the entitlementValueList
         restEntitlementValueMockMvc
-            .perform(get("/api/entitlement-values?sort=id,desc"))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(entitlementValue.getId().intValue())))
-            .andExpect(jsonPath("$.[*].entitlementValue").value(hasItem(DEFAULT_ENTITLEMENT_VALUE.intValue())));
+            .andExpect(jsonPath("$.[*].entitlementValue").value(hasItem(sameNumber(DEFAULT_ENTITLEMENT_VALUE))));
     }
 
     @Test
     @Transactional
-    public void getEntitlementValue() throws Exception {
+    void getEntitlementValue() throws Exception {
         // Initialize the database
         entitlementValueRepository.saveAndFlush(entitlementValue);
 
         // Get the entitlementValue
         restEntitlementValueMockMvc
-            .perform(get("/api/entitlement-values/{id}", entitlementValue.getId()))
+            .perform(get(ENTITY_API_URL_ID, entitlementValue.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(entitlementValue.getId().intValue()))
-            .andExpect(jsonPath("$.entitlementValue").value(DEFAULT_ENTITLEMENT_VALUE.intValue()));
+            .andExpect(jsonPath("$.entitlementValue").value(sameNumber(DEFAULT_ENTITLEMENT_VALUE)));
     }
 
     @Test
     @Transactional
-    public void getEntitlementValuesByIdFiltering() throws Exception {
+    void getEntitlementValuesByIdFiltering() throws Exception {
         // Initialize the database
         entitlementValueRepository.saveAndFlush(entitlementValue);
 
@@ -246,7 +247,7 @@ public class EntitlementValueResourceIT {
 
     @Test
     @Transactional
-    public void getAllEntitlementValuesByEntitlementValueIsEqualToSomething() throws Exception {
+    void getAllEntitlementValuesByEntitlementValueIsEqualToSomething() throws Exception {
         // Initialize the database
         entitlementValueRepository.saveAndFlush(entitlementValue);
 
@@ -259,7 +260,7 @@ public class EntitlementValueResourceIT {
 
     @Test
     @Transactional
-    public void getAllEntitlementValuesByEntitlementValueIsNotEqualToSomething() throws Exception {
+    void getAllEntitlementValuesByEntitlementValueIsNotEqualToSomething() throws Exception {
         // Initialize the database
         entitlementValueRepository.saveAndFlush(entitlementValue);
 
@@ -272,7 +273,7 @@ public class EntitlementValueResourceIT {
 
     @Test
     @Transactional
-    public void getAllEntitlementValuesByEntitlementValueIsInShouldWork() throws Exception {
+    void getAllEntitlementValuesByEntitlementValueIsInShouldWork() throws Exception {
         // Initialize the database
         entitlementValueRepository.saveAndFlush(entitlementValue);
 
@@ -285,7 +286,7 @@ public class EntitlementValueResourceIT {
 
     @Test
     @Transactional
-    public void getAllEntitlementValuesByEntitlementValueIsNullOrNotNull() throws Exception {
+    void getAllEntitlementValuesByEntitlementValueIsNullOrNotNull() throws Exception {
         // Initialize the database
         entitlementValueRepository.saveAndFlush(entitlementValue);
 
@@ -298,7 +299,7 @@ public class EntitlementValueResourceIT {
 
     @Test
     @Transactional
-    public void getAllEntitlementValuesByEntitlementValueIsGreaterThanOrEqualToSomething() throws Exception {
+    void getAllEntitlementValuesByEntitlementValueIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
         entitlementValueRepository.saveAndFlush(entitlementValue);
 
@@ -311,7 +312,7 @@ public class EntitlementValueResourceIT {
 
     @Test
     @Transactional
-    public void getAllEntitlementValuesByEntitlementValueIsLessThanOrEqualToSomething() throws Exception {
+    void getAllEntitlementValuesByEntitlementValueIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
         entitlementValueRepository.saveAndFlush(entitlementValue);
 
@@ -324,7 +325,7 @@ public class EntitlementValueResourceIT {
 
     @Test
     @Transactional
-    public void getAllEntitlementValuesByEntitlementValueIsLessThanSomething() throws Exception {
+    void getAllEntitlementValuesByEntitlementValueIsLessThanSomething() throws Exception {
         // Initialize the database
         entitlementValueRepository.saveAndFlush(entitlementValue);
 
@@ -337,7 +338,7 @@ public class EntitlementValueResourceIT {
 
     @Test
     @Transactional
-    public void getAllEntitlementValuesByEntitlementValueIsGreaterThanSomething() throws Exception {
+    void getAllEntitlementValuesByEntitlementValueIsGreaterThanSomething() throws Exception {
         // Initialize the database
         entitlementValueRepository.saveAndFlush(entitlementValue);
 
@@ -350,7 +351,7 @@ public class EntitlementValueResourceIT {
 
     @Test
     @Transactional
-    public void getAllEntitlementValuesByEntitlementIsEqualToSomething() throws Exception {
+    void getAllEntitlementValuesByEntitlementIsEqualToSomething() throws Exception {
         // Get already existing entity
         LeaveEntitlement entitlement = entitlementValue.getEntitlement();
         entitlementValueRepository.saveAndFlush(entitlementValue);
@@ -359,13 +360,13 @@ public class EntitlementValueResourceIT {
         // Get all the entitlementValueList where entitlement equals to entitlementId
         defaultEntitlementValueShouldBeFound("entitlementId.equals=" + entitlementId);
 
-        // Get all the entitlementValueList where entitlement equals to entitlementId + 1
+        // Get all the entitlementValueList where entitlement equals to (entitlementId + 1)
         defaultEntitlementValueShouldNotBeFound("entitlementId.equals=" + (entitlementId + 1));
     }
 
     @Test
     @Transactional
-    public void getAllEntitlementValuesByStaffIsEqualToSomething() throws Exception {
+    void getAllEntitlementValuesByStaffIsEqualToSomething() throws Exception {
         // Get already existing entity
         Staff staff = entitlementValue.getStaff();
         entitlementValueRepository.saveAndFlush(entitlementValue);
@@ -374,7 +375,7 @@ public class EntitlementValueResourceIT {
         // Get all the entitlementValueList where staff equals to staffId
         defaultEntitlementValueShouldBeFound("staffId.equals=" + staffId);
 
-        // Get all the entitlementValueList where staff equals to staffId + 1
+        // Get all the entitlementValueList where staff equals to (staffId + 1)
         defaultEntitlementValueShouldNotBeFound("staffId.equals=" + (staffId + 1));
     }
 
@@ -383,15 +384,15 @@ public class EntitlementValueResourceIT {
      */
     private void defaultEntitlementValueShouldBeFound(String filter) throws Exception {
         restEntitlementValueMockMvc
-            .perform(get("/api/entitlement-values?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(entitlementValue.getId().intValue())))
-            .andExpect(jsonPath("$.[*].entitlementValue").value(hasItem(DEFAULT_ENTITLEMENT_VALUE.intValue())));
+            .andExpect(jsonPath("$.[*].entitlementValue").value(hasItem(sameNumber(DEFAULT_ENTITLEMENT_VALUE))));
 
         // Check, that the count call also returns 1
         restEntitlementValueMockMvc
-            .perform(get("/api/entitlement-values/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -402,7 +403,7 @@ public class EntitlementValueResourceIT {
      */
     private void defaultEntitlementValueShouldNotBeFound(String filter) throws Exception {
         restEntitlementValueMockMvc
-            .perform(get("/api/entitlement-values?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -410,7 +411,7 @@ public class EntitlementValueResourceIT {
 
         // Check, that the count call also returns 0
         restEntitlementValueMockMvc
-            .perform(get("/api/entitlement-values/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));
@@ -418,14 +419,14 @@ public class EntitlementValueResourceIT {
 
     @Test
     @Transactional
-    public void getNonExistingEntitlementValue() throws Exception {
+    void getNonExistingEntitlementValue() throws Exception {
         // Get the entitlementValue
-        restEntitlementValueMockMvc.perform(get("/api/entitlement-values/{id}", Long.MAX_VALUE)).andExpect(status().isNotFound());
+        restEntitlementValueMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    public void updateEntitlementValue() throws Exception {
+    void putNewEntitlementValue() throws Exception {
         // Initialize the database
         entitlementValueRepository.saveAndFlush(entitlementValue);
 
@@ -440,7 +441,7 @@ public class EntitlementValueResourceIT {
 
         restEntitlementValueMockMvc
             .perform(
-                put("/api/entitlement-values")
+                put(ENTITY_API_URL_ID, entitlementValueDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(entitlementValueDTO))
@@ -456,8 +457,9 @@ public class EntitlementValueResourceIT {
 
     @Test
     @Transactional
-    public void updateNonExistingEntitlementValue() throws Exception {
+    void putNonExistingEntitlementValue() throws Exception {
         int databaseSizeBeforeUpdate = entitlementValueRepository.findAll().size();
+        entitlementValue.setId(count.incrementAndGet());
 
         // Create the EntitlementValue
         EntitlementValueDTO entitlementValueDTO = entitlementValueMapper.toDto(entitlementValue);
@@ -465,7 +467,7 @@ public class EntitlementValueResourceIT {
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restEntitlementValueMockMvc
             .perform(
-                put("/api/entitlement-values")
+                put(ENTITY_API_URL_ID, entitlementValueDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(entitlementValueDTO))
@@ -479,7 +481,185 @@ public class EntitlementValueResourceIT {
 
     @Test
     @Transactional
-    public void deleteEntitlementValue() throws Exception {
+    void putWithIdMismatchEntitlementValue() throws Exception {
+        int databaseSizeBeforeUpdate = entitlementValueRepository.findAll().size();
+        entitlementValue.setId(count.incrementAndGet());
+
+        // Create the EntitlementValue
+        EntitlementValueDTO entitlementValueDTO = entitlementValueMapper.toDto(entitlementValue);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restEntitlementValueMockMvc
+            .perform(
+                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(entitlementValueDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the EntitlementValue in the database
+        List<EntitlementValue> entitlementValueList = entitlementValueRepository.findAll();
+        assertThat(entitlementValueList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void putWithMissingIdPathParamEntitlementValue() throws Exception {
+        int databaseSizeBeforeUpdate = entitlementValueRepository.findAll().size();
+        entitlementValue.setId(count.incrementAndGet());
+
+        // Create the EntitlementValue
+        EntitlementValueDTO entitlementValueDTO = entitlementValueMapper.toDto(entitlementValue);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restEntitlementValueMockMvc
+            .perform(
+                put(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(entitlementValueDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the EntitlementValue in the database
+        List<EntitlementValue> entitlementValueList = entitlementValueRepository.findAll();
+        assertThat(entitlementValueList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void partialUpdateEntitlementValueWithPatch() throws Exception {
+        // Initialize the database
+        entitlementValueRepository.saveAndFlush(entitlementValue);
+
+        int databaseSizeBeforeUpdate = entitlementValueRepository.findAll().size();
+
+        // Update the entitlementValue using partial update
+        EntitlementValue partialUpdatedEntitlementValue = new EntitlementValue();
+        partialUpdatedEntitlementValue.setId(entitlementValue.getId());
+
+        restEntitlementValueMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedEntitlementValue.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedEntitlementValue))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the EntitlementValue in the database
+        List<EntitlementValue> entitlementValueList = entitlementValueRepository.findAll();
+        assertThat(entitlementValueList).hasSize(databaseSizeBeforeUpdate);
+        EntitlementValue testEntitlementValue = entitlementValueList.get(entitlementValueList.size() - 1);
+        assertThat(testEntitlementValue.getEntitlementValue()).isEqualByComparingTo(DEFAULT_ENTITLEMENT_VALUE);
+    }
+
+    @Test
+    @Transactional
+    void fullUpdateEntitlementValueWithPatch() throws Exception {
+        // Initialize the database
+        entitlementValueRepository.saveAndFlush(entitlementValue);
+
+        int databaseSizeBeforeUpdate = entitlementValueRepository.findAll().size();
+
+        // Update the entitlementValue using partial update
+        EntitlementValue partialUpdatedEntitlementValue = new EntitlementValue();
+        partialUpdatedEntitlementValue.setId(entitlementValue.getId());
+
+        partialUpdatedEntitlementValue.entitlementValue(UPDATED_ENTITLEMENT_VALUE);
+
+        restEntitlementValueMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedEntitlementValue.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedEntitlementValue))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the EntitlementValue in the database
+        List<EntitlementValue> entitlementValueList = entitlementValueRepository.findAll();
+        assertThat(entitlementValueList).hasSize(databaseSizeBeforeUpdate);
+        EntitlementValue testEntitlementValue = entitlementValueList.get(entitlementValueList.size() - 1);
+        assertThat(testEntitlementValue.getEntitlementValue()).isEqualByComparingTo(UPDATED_ENTITLEMENT_VALUE);
+    }
+
+    @Test
+    @Transactional
+    void patchNonExistingEntitlementValue() throws Exception {
+        int databaseSizeBeforeUpdate = entitlementValueRepository.findAll().size();
+        entitlementValue.setId(count.incrementAndGet());
+
+        // Create the EntitlementValue
+        EntitlementValueDTO entitlementValueDTO = entitlementValueMapper.toDto(entitlementValue);
+
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
+        restEntitlementValueMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, entitlementValueDTO.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(entitlementValueDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the EntitlementValue in the database
+        List<EntitlementValue> entitlementValueList = entitlementValueRepository.findAll();
+        assertThat(entitlementValueList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithIdMismatchEntitlementValue() throws Exception {
+        int databaseSizeBeforeUpdate = entitlementValueRepository.findAll().size();
+        entitlementValue.setId(count.incrementAndGet());
+
+        // Create the EntitlementValue
+        EntitlementValueDTO entitlementValueDTO = entitlementValueMapper.toDto(entitlementValue);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restEntitlementValueMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(entitlementValueDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the EntitlementValue in the database
+        List<EntitlementValue> entitlementValueList = entitlementValueRepository.findAll();
+        assertThat(entitlementValueList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithMissingIdPathParamEntitlementValue() throws Exception {
+        int databaseSizeBeforeUpdate = entitlementValueRepository.findAll().size();
+        entitlementValue.setId(count.incrementAndGet());
+
+        // Create the EntitlementValue
+        EntitlementValueDTO entitlementValueDTO = entitlementValueMapper.toDto(entitlementValue);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restEntitlementValueMockMvc
+            .perform(
+                patch(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(entitlementValueDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the EntitlementValue in the database
+        List<EntitlementValue> entitlementValueList = entitlementValueRepository.findAll();
+        assertThat(entitlementValueList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void deleteEntitlementValue() throws Exception {
         // Initialize the database
         entitlementValueRepository.saveAndFlush(entitlementValue);
 
@@ -487,7 +667,7 @@ public class EntitlementValueResourceIT {
 
         // Delete the entitlementValue
         restEntitlementValueMockMvc
-            .perform(delete("/api/entitlement-values/{id}", entitlementValue.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, entitlementValue.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

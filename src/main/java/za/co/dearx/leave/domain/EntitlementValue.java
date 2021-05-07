@@ -1,5 +1,6 @@
 package za.co.dearx.leave.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import javax.persistence.*;
@@ -14,6 +15,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "entitlement_value")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class EntitlementValue implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -24,11 +26,13 @@ public class EntitlementValue implements Serializable {
     @Column(name = "entitlement_value", precision = 21, scale = 2, nullable = false)
     private BigDecimal entitlementValue;
 
+    @JsonIgnoreProperties(value = { "leaveType", "staff" }, allowSetters = true)
     @OneToOne(optional = false)
     @NotNull
     @JoinColumn(unique = true)
     private LeaveEntitlement entitlement;
 
+    @JsonIgnoreProperties(value = { "user", "teams" }, allowSetters = true)
     @OneToOne(optional = false)
     @NotNull
     @JoinColumn(unique = true)
@@ -43,8 +47,13 @@ public class EntitlementValue implements Serializable {
         this.id = id;
     }
 
+    public EntitlementValue id(Long id) {
+        this.id = id;
+        return this;
+    }
+
     public BigDecimal getEntitlementValue() {
-        return entitlementValue;
+        return this.entitlementValue;
     }
 
     public EntitlementValue entitlementValue(BigDecimal entitlementValue) {
@@ -57,11 +66,11 @@ public class EntitlementValue implements Serializable {
     }
 
     public LeaveEntitlement getEntitlement() {
-        return entitlement;
+        return this.entitlement;
     }
 
     public EntitlementValue entitlement(LeaveEntitlement leaveEntitlement) {
-        this.entitlement = leaveEntitlement;
+        this.setEntitlement(leaveEntitlement);
         return this;
     }
 
@@ -70,11 +79,11 @@ public class EntitlementValue implements Serializable {
     }
 
     public Staff getStaff() {
-        return staff;
+        return this.staff;
     }
 
     public EntitlementValue staff(Staff staff) {
-        this.staff = staff;
+        this.setStaff(staff);
         return this;
     }
 
@@ -97,7 +106,8 @@ public class EntitlementValue implements Serializable {
 
     @Override
     public int hashCode() {
-        return 31;
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        return getClass().hashCode();
     }
 
     // prettier-ignore

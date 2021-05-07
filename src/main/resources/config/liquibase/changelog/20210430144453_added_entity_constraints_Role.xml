@@ -2,23 +2,22 @@
 <databaseChangeLog
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.9.xsd">
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
     <!--
         Added the constraints for entity Role.
     -->
     <changeSet id="20210430144453-2" author="jhipster">
-        
+
         <addForeignKeyConstraint baseColumnNames="role_id"
-                                 baseTableName="role_user"
-                                 constraintName="fk_role_user_role_id"
+                                 baseTableName="rel_role__user"
+                                 constraintName="fk_rel_role__user__role_id"
                                  referencedColumnNames="id"
                                  referencedTableName="role"/>
 
         <addForeignKeyConstraint baseColumnNames="user_id"
-                                 baseTableName="role_user"
-                                 constraintName="fk_role_user_user_id"
+                                 baseTableName="rel_role__user"
+                                 constraintName="fk_rel_role__user__user_id"
                                  referencedColumnNames="id"
                                  referencedTableName="jhi_user"/>
-        
     </changeSet>
 </databaseChangeLog>

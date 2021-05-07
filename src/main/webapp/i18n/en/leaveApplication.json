@@ -3,6 +3,7 @@
     "leaveApplication": {
       "home": {
         "title": "Leave Applications",
+        "refreshListLabel": "Refresh list",
         "createLabel": "Create a new Leave Application",
         "createOrEditLabel": "Create or edit a Leave Application",
         "notFound": "No Leave Applications found"
@@ -16,6 +17,7 @@
       "detail": {
         "title": "Leave Application"
       },
+      "id": "ID",
       "startDate": "Start Date",
       "endDate": "End Date",
       "appliedDate": "Applied Date",
