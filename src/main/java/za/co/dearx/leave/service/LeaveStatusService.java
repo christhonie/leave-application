@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import za.co.dearx.leave.domain.LeaveStatus;
 import za.co.dearx.leave.repository.LeaveStatusRepository;
 import za.co.dearx.leave.service.dto.LeaveStatusDTO;
+import za.co.dearx.leave.service.exception.NotFoundException;
 import za.co.dearx.leave.service.mapper.LeaveStatusMapper;
 
 /**
@@ -76,8 +77,13 @@ public class LeaveStatusService {
         leaveStatusRepository.deleteById(id);
     }
 
-    public static LeaveStatus getDraft() {
-        // TODO Find a way to return the default Draft state
-        return null;
+    public Optional<LeaveStatus> findEntityByName(String statusString) {
+        if (statusString == null || statusString.isEmpty()) return Optional.empty();
+
+        return leaveStatusRepository.findByName(statusString);
+    }
+
+    public LeaveStatus getDraft() throws NotFoundException {
+        return findEntityByName("Draft").orElseThrow(() -> new NotFoundException("LeaveStatus", "Draft status not found"));
     }
 }

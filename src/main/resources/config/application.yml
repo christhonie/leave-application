@@ -163,3 +163,16 @@ jhipster:
 # ===================================================================
 
 # application:
+camunda.bpm:
+  enabled: true
+  webapp:
+    application-path: /camunda
+    index-redirect-enabled: false
+  database:
+    table-prefix:
+  admin-user:
+    id: demo
+    password: demo
+    firstName: Demo
+  filter:
+    create: All tasks

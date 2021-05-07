@@ -22,6 +22,7 @@ import za.co.dearx.leave.service.LeaveApplicationQueryService;
 import za.co.dearx.leave.service.LeaveApplicationService;
 import za.co.dearx.leave.service.dto.LeaveApplicationCriteria;
 import za.co.dearx.leave.service.dto.LeaveApplicationDTO;
+import za.co.dearx.leave.service.exception.ValidationException;
 import za.co.dearx.leave.web.rest.errors.BadRequestAlertException;
 
 /**
@@ -63,11 +64,16 @@ public class LeaveApplicationResource {
         if (leaveApplicationDTO.getId() != null) {
             throw new BadRequestAlertException("A new leaveApplication cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        LeaveApplicationDTO result = leaveApplicationService.create(leaveApplicationDTO);
-        return ResponseEntity
-            .created(new URI("/api/leave-applications/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        LeaveApplicationDTO result;
+        try {
+            result = leaveApplicationService.create(leaveApplicationDTO);
+            return ResponseEntity
+                .created(new URI("/api/leave-applications/" + result.getId()))
+                .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+                .body(result);
+        } catch (ValidationException e) {
+            return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).build();
+        }
     }
 
     /**
@@ -81,7 +87,12 @@ public class LeaveApplicationResource {
     public ResponseEntity<LeaveApplicationDTO> saveLeaveApplication(@Valid @RequestBody LeaveApplicationDTO leaveApplicationDTO)
         throws URISyntaxException {
         log.debug("REST request to save LeaveApplication during leave process: {}", leaveApplicationDTO);
-        LeaveApplicationDTO result = leaveApplicationService.save(leaveApplicationDTO);
+        LeaveApplicationDTO result;
+        try {
+            result = leaveApplicationService.save(leaveApplicationDTO);
+        } catch (ValidationException e) {
+            throw new BadRequestAlertException("Invalid data", ENTITY_NAME, "validation");
+        }
         return ResponseEntity
             .created(new URI("/api/leave-applications/save" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -99,8 +110,13 @@ public class LeaveApplicationResource {
     public ResponseEntity<LeaveApplicationDTO> submitLeaveApplication(@Valid @RequestBody LeaveApplicationDTO leaveApplicationDTO)
         throws URISyntaxException {
         log.debug("REST request to submit LeaveApplication during leave process: {}", leaveApplicationDTO);
-        LeaveApplicationDTO result = leaveApplicationService.save(leaveApplicationDTO);
         //TODO Either set created or updated response
+        LeaveApplicationDTO result;
+        try {
+            result = leaveApplicationService.save(leaveApplicationDTO);
+        } catch (ValidationException e) {
+            throw new BadRequestAlertException("Invalid data", ENTITY_NAME, "validation");
+        }
         return ResponseEntity
             .created(new URI("/api/leave-applications/submit" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -123,7 +139,12 @@ public class LeaveApplicationResource {
         if (leaveApplicationDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        LeaveApplicationDTO result = leaveApplicationService.create(leaveApplicationDTO);
+        LeaveApplicationDTO result;
+        try {
+            result = leaveApplicationService.save(leaveApplicationDTO);
+        } catch (ValidationException e) {
+            throw new BadRequestAlertException("Invalid data", ENTITY_NAME, "validation");
+        }
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, leaveApplicationDTO.getId().toString()))

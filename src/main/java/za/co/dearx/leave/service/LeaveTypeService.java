@@ -75,4 +75,16 @@ public class LeaveTypeService {
         log.debug("Request to delete LeaveType : {}", id);
         leaveTypeRepository.deleteById(id);
     }
+
+    /**
+     * Get one leaveType by id.
+     *
+     * @param id the id of the entity.
+     * @return the entity.
+     */
+    @Transactional(readOnly = true)
+    public Optional<LeaveType> findEntityById(Long id) {
+        log.debug("Request to get LeaveType entity by ID: {}", id);
+        return leaveTypeRepository.findById(id);
+    }
 }
