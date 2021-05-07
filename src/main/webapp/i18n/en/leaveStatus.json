@@ -3,6 +3,7 @@
     "leaveStatus": {
       "home": {
         "title": "Leave Statuses",
+        "refreshListLabel": "Refresh list",
         "createLabel": "Create a new Leave Status",
         "createOrEditLabel": "Create or edit a Leave Status",
         "notFound": "No Leave Statuses found"
@@ -16,6 +17,7 @@
       "detail": {
         "title": "Leave Status"
       },
+      "id": "ID",
       "name": "Name",
       "description": "Description"
     }

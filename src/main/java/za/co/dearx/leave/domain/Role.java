@@ -15,6 +15,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "role")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Role implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -28,11 +29,7 @@ public class Role implements Serializable {
 
     @ManyToMany
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JoinTable(
-        name = "role_user",
-        joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
-    )
+    @JoinTable(name = "rel_role__user", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> users = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -44,8 +41,13 @@ public class Role implements Serializable {
         this.id = id;
     }
 
+    public Role id(Long id) {
+        this.id = id;
+        return this;
+    }
+
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public Role name(String name) {
@@ -58,11 +60,11 @@ public class Role implements Serializable {
     }
 
     public Set<User> getUsers() {
-        return users;
+        return this.users;
     }
 
     public Role users(Set<User> users) {
-        this.users = users;
+        this.setUsers(users);
         return this;
     }
 
@@ -95,7 +97,8 @@ public class Role implements Serializable {
 
     @Override
     public int hashCode() {
-        return 31;
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        return getClass().hashCode();
     }
 
     // prettier-ignore

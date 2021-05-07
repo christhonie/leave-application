@@ -3,6 +3,7 @@
     "leaveType": {
       "home": {
         "title": "Leave Types",
+        "refreshListLabel": "Refresh list",
         "createLabel": "Create a new Leave Type",
         "createOrEditLabel": "Create or edit a Leave Type",
         "notFound": "No Leave Types found"
@@ -16,6 +17,7 @@
       "detail": {
         "title": "Leave Type"
       },
+      "id": "ID",
       "name": "Name",
       "description": "Description",
       "processName": "Process Name"

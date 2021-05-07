@@ -7,48 +7,48 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import za.co.dearx.leave.LeaveApplicationApp;
+import za.co.dearx.leave.IntegrationTest;
 import za.co.dearx.leave.domain.Comment;
 import za.co.dearx.leave.domain.LeaveApplication;
 import za.co.dearx.leave.domain.User;
 import za.co.dearx.leave.repository.CommentRepository;
-import za.co.dearx.leave.service.CommentQueryService;
-import za.co.dearx.leave.service.CommentService;
-import za.co.dearx.leave.service.dto.CommentCriteria;
+import za.co.dearx.leave.service.criteria.CommentCriteria;
 import za.co.dearx.leave.service.dto.CommentDTO;
 import za.co.dearx.leave.service.mapper.CommentMapper;
 
 /**
  * Integration tests for the {@link CommentResource} REST controller.
  */
-@SpringBootTest(classes = LeaveApplicationApp.class)
+@IntegrationTest
 @AutoConfigureMockMvc
 @WithMockUser
-public class CommentResourceIT {
+class CommentResourceIT {
+
     private static final String DEFAULT_COMMENT = "AAAAAAAAAA";
     private static final String UPDATED_COMMENT = "BBBBBBBBBB";
+
+    private static final String ENTITY_API_URL = "/api/comments";
+    private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
+
+    private static Random random = new Random();
+    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
 
     @Autowired
     private CommentRepository commentRepository;
 
     @Autowired
     private CommentMapper commentMapper;
-
-    @Autowired
-    private CommentService commentService;
-
-    @Autowired
-    private CommentQueryService commentQueryService;
 
     @Autowired
     private EntityManager em;
@@ -117,13 +117,13 @@ public class CommentResourceIT {
 
     @Test
     @Transactional
-    public void createComment() throws Exception {
+    void createComment() throws Exception {
         int databaseSizeBeforeCreate = commentRepository.findAll().size();
         // Create the Comment
         CommentDTO commentDTO = commentMapper.toDto(comment);
         restCommentMockMvc
             .perform(
-                post("/api/comments")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(commentDTO))
@@ -139,17 +139,17 @@ public class CommentResourceIT {
 
     @Test
     @Transactional
-    public void createCommentWithExistingId() throws Exception {
-        int databaseSizeBeforeCreate = commentRepository.findAll().size();
-
+    void createCommentWithExistingId() throws Exception {
         // Create the Comment with an existing ID
         comment.setId(1L);
         CommentDTO commentDTO = commentMapper.toDto(comment);
 
+        int databaseSizeBeforeCreate = commentRepository.findAll().size();
+
         // An entity with an existing ID cannot be created, so this API call must fail
         restCommentMockMvc
             .perform(
-                post("/api/comments")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(commentDTO))
@@ -163,7 +163,7 @@ public class CommentResourceIT {
 
     @Test
     @Transactional
-    public void checkCommentIsRequired() throws Exception {
+    void checkCommentIsRequired() throws Exception {
         int databaseSizeBeforeTest = commentRepository.findAll().size();
         // set the field null
         comment.setComment(null);
@@ -173,7 +173,7 @@ public class CommentResourceIT {
 
         restCommentMockMvc
             .perform(
-                post("/api/comments")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(commentDTO))
@@ -186,13 +186,13 @@ public class CommentResourceIT {
 
     @Test
     @Transactional
-    public void getAllComments() throws Exception {
+    void getAllComments() throws Exception {
         // Initialize the database
         commentRepository.saveAndFlush(comment);
 
         // Get all the commentList
         restCommentMockMvc
-            .perform(get("/api/comments?sort=id,desc"))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(comment.getId().intValue())))
@@ -201,13 +201,13 @@ public class CommentResourceIT {
 
     @Test
     @Transactional
-    public void getComment() throws Exception {
+    void getComment() throws Exception {
         // Initialize the database
         commentRepository.saveAndFlush(comment);
 
         // Get the comment
         restCommentMockMvc
-            .perform(get("/api/comments/{id}", comment.getId()))
+            .perform(get(ENTITY_API_URL_ID, comment.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(comment.getId().intValue()))
@@ -216,7 +216,7 @@ public class CommentResourceIT {
 
     @Test
     @Transactional
-    public void getCommentsByIdFiltering() throws Exception {
+    void getCommentsByIdFiltering() throws Exception {
         // Initialize the database
         commentRepository.saveAndFlush(comment);
 
@@ -234,7 +234,7 @@ public class CommentResourceIT {
 
     @Test
     @Transactional
-    public void getAllCommentsByCommentIsEqualToSomething() throws Exception {
+    void getAllCommentsByCommentIsEqualToSomething() throws Exception {
         // Initialize the database
         commentRepository.saveAndFlush(comment);
 
@@ -247,7 +247,7 @@ public class CommentResourceIT {
 
     @Test
     @Transactional
-    public void getAllCommentsByCommentIsNotEqualToSomething() throws Exception {
+    void getAllCommentsByCommentIsNotEqualToSomething() throws Exception {
         // Initialize the database
         commentRepository.saveAndFlush(comment);
 
@@ -260,7 +260,7 @@ public class CommentResourceIT {
 
     @Test
     @Transactional
-    public void getAllCommentsByCommentIsInShouldWork() throws Exception {
+    void getAllCommentsByCommentIsInShouldWork() throws Exception {
         // Initialize the database
         commentRepository.saveAndFlush(comment);
 
@@ -273,7 +273,7 @@ public class CommentResourceIT {
 
     @Test
     @Transactional
-    public void getAllCommentsByCommentIsNullOrNotNull() throws Exception {
+    void getAllCommentsByCommentIsNullOrNotNull() throws Exception {
         // Initialize the database
         commentRepository.saveAndFlush(comment);
 
@@ -286,7 +286,7 @@ public class CommentResourceIT {
 
     @Test
     @Transactional
-    public void getAllCommentsByCommentContainsSomething() throws Exception {
+    void getAllCommentsByCommentContainsSomething() throws Exception {
         // Initialize the database
         commentRepository.saveAndFlush(comment);
 
@@ -299,7 +299,7 @@ public class CommentResourceIT {
 
     @Test
     @Transactional
-    public void getAllCommentsByCommentNotContainsSomething() throws Exception {
+    void getAllCommentsByCommentNotContainsSomething() throws Exception {
         // Initialize the database
         commentRepository.saveAndFlush(comment);
 
@@ -312,31 +312,39 @@ public class CommentResourceIT {
 
     @Test
     @Transactional
-    public void getAllCommentsByLeaveApplicationIsEqualToSomething() throws Exception {
-        // Get already existing entity
-        LeaveApplication leaveApplication = comment.getLeaveApplication();
+    void getAllCommentsByLeaveApplicationIsEqualToSomething() throws Exception {
+        // Initialize the database
+        commentRepository.saveAndFlush(comment);
+        LeaveApplication leaveApplication = LeaveApplicationResourceIT.createEntity(em);
+        em.persist(leaveApplication);
+        em.flush();
+        comment.setLeaveApplication(leaveApplication);
         commentRepository.saveAndFlush(comment);
         Long leaveApplicationId = leaveApplication.getId();
 
         // Get all the commentList where leaveApplication equals to leaveApplicationId
         defaultCommentShouldBeFound("leaveApplicationId.equals=" + leaveApplicationId);
 
-        // Get all the commentList where leaveApplication equals to leaveApplicationId + 1
+        // Get all the commentList where leaveApplication equals to (leaveApplicationId + 1)
         defaultCommentShouldNotBeFound("leaveApplicationId.equals=" + (leaveApplicationId + 1));
     }
 
     @Test
     @Transactional
-    public void getAllCommentsByUserIsEqualToSomething() throws Exception {
-        // Get already existing entity
-        User user = comment.getUser();
+    void getAllCommentsByUserIsEqualToSomething() throws Exception {
+        // Initialize the database
+        commentRepository.saveAndFlush(comment);
+        User user = UserResourceIT.createEntity(em);
+        em.persist(user);
+        em.flush();
+        comment.setUser(user);
         commentRepository.saveAndFlush(comment);
         Long userId = user.getId();
 
         // Get all the commentList where user equals to userId
         defaultCommentShouldBeFound("userId.equals=" + userId);
 
-        // Get all the commentList where user equals to userId + 1
+        // Get all the commentList where user equals to (userId + 1)
         defaultCommentShouldNotBeFound("userId.equals=" + (userId + 1));
     }
 
@@ -345,7 +353,7 @@ public class CommentResourceIT {
      */
     private void defaultCommentShouldBeFound(String filter) throws Exception {
         restCommentMockMvc
-            .perform(get("/api/comments?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(comment.getId().intValue())))
@@ -353,7 +361,7 @@ public class CommentResourceIT {
 
         // Check, that the count call also returns 1
         restCommentMockMvc
-            .perform(get("/api/comments/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -364,7 +372,7 @@ public class CommentResourceIT {
      */
     private void defaultCommentShouldNotBeFound(String filter) throws Exception {
         restCommentMockMvc
-            .perform(get("/api/comments?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -372,7 +380,7 @@ public class CommentResourceIT {
 
         // Check, that the count call also returns 0
         restCommentMockMvc
-            .perform(get("/api/comments/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));
@@ -380,14 +388,14 @@ public class CommentResourceIT {
 
     @Test
     @Transactional
-    public void getNonExistingComment() throws Exception {
+    void getNonExistingComment() throws Exception {
         // Get the comment
-        restCommentMockMvc.perform(get("/api/comments/{id}", Long.MAX_VALUE)).andExpect(status().isNotFound());
+        restCommentMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    public void updateComment() throws Exception {
+    void putNewComment() throws Exception {
         // Initialize the database
         commentRepository.saveAndFlush(comment);
 
@@ -402,7 +410,7 @@ public class CommentResourceIT {
 
         restCommentMockMvc
             .perform(
-                put("/api/comments")
+                put(ENTITY_API_URL_ID, commentDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(commentDTO))
@@ -418,8 +426,9 @@ public class CommentResourceIT {
 
     @Test
     @Transactional
-    public void updateNonExistingComment() throws Exception {
+    void putNonExistingComment() throws Exception {
         int databaseSizeBeforeUpdate = commentRepository.findAll().size();
+        comment.setId(count.incrementAndGet());
 
         // Create the Comment
         CommentDTO commentDTO = commentMapper.toDto(comment);
@@ -427,7 +436,7 @@ public class CommentResourceIT {
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restCommentMockMvc
             .perform(
-                put("/api/comments")
+                put(ENTITY_API_URL_ID, commentDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(commentDTO))
@@ -441,7 +450,187 @@ public class CommentResourceIT {
 
     @Test
     @Transactional
-    public void deleteComment() throws Exception {
+    void putWithIdMismatchComment() throws Exception {
+        int databaseSizeBeforeUpdate = commentRepository.findAll().size();
+        comment.setId(count.incrementAndGet());
+
+        // Create the Comment
+        CommentDTO commentDTO = commentMapper.toDto(comment);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restCommentMockMvc
+            .perform(
+                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(commentDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the Comment in the database
+        List<Comment> commentList = commentRepository.findAll();
+        assertThat(commentList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void putWithMissingIdPathParamComment() throws Exception {
+        int databaseSizeBeforeUpdate = commentRepository.findAll().size();
+        comment.setId(count.incrementAndGet());
+
+        // Create the Comment
+        CommentDTO commentDTO = commentMapper.toDto(comment);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restCommentMockMvc
+            .perform(
+                put(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(commentDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the Comment in the database
+        List<Comment> commentList = commentRepository.findAll();
+        assertThat(commentList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void partialUpdateCommentWithPatch() throws Exception {
+        // Initialize the database
+        commentRepository.saveAndFlush(comment);
+
+        int databaseSizeBeforeUpdate = commentRepository.findAll().size();
+
+        // Update the comment using partial update
+        Comment partialUpdatedComment = new Comment();
+        partialUpdatedComment.setId(comment.getId());
+
+        partialUpdatedComment.comment(UPDATED_COMMENT);
+
+        restCommentMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedComment.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedComment))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the Comment in the database
+        List<Comment> commentList = commentRepository.findAll();
+        assertThat(commentList).hasSize(databaseSizeBeforeUpdate);
+        Comment testComment = commentList.get(commentList.size() - 1);
+        assertThat(testComment.getComment()).isEqualTo(UPDATED_COMMENT);
+    }
+
+    @Test
+    @Transactional
+    void fullUpdateCommentWithPatch() throws Exception {
+        // Initialize the database
+        commentRepository.saveAndFlush(comment);
+
+        int databaseSizeBeforeUpdate = commentRepository.findAll().size();
+
+        // Update the comment using partial update
+        Comment partialUpdatedComment = new Comment();
+        partialUpdatedComment.setId(comment.getId());
+
+        partialUpdatedComment.comment(UPDATED_COMMENT);
+
+        restCommentMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedComment.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedComment))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the Comment in the database
+        List<Comment> commentList = commentRepository.findAll();
+        assertThat(commentList).hasSize(databaseSizeBeforeUpdate);
+        Comment testComment = commentList.get(commentList.size() - 1);
+        assertThat(testComment.getComment()).isEqualTo(UPDATED_COMMENT);
+    }
+
+    @Test
+    @Transactional
+    void patchNonExistingComment() throws Exception {
+        int databaseSizeBeforeUpdate = commentRepository.findAll().size();
+        comment.setId(count.incrementAndGet());
+
+        // Create the Comment
+        CommentDTO commentDTO = commentMapper.toDto(comment);
+
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
+        restCommentMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, commentDTO.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(commentDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the Comment in the database
+        List<Comment> commentList = commentRepository.findAll();
+        assertThat(commentList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithIdMismatchComment() throws Exception {
+        int databaseSizeBeforeUpdate = commentRepository.findAll().size();
+        comment.setId(count.incrementAndGet());
+
+        // Create the Comment
+        CommentDTO commentDTO = commentMapper.toDto(comment);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restCommentMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(commentDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the Comment in the database
+        List<Comment> commentList = commentRepository.findAll();
+        assertThat(commentList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithMissingIdPathParamComment() throws Exception {
+        int databaseSizeBeforeUpdate = commentRepository.findAll().size();
+        comment.setId(count.incrementAndGet());
+
+        // Create the Comment
+        CommentDTO commentDTO = commentMapper.toDto(comment);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restCommentMockMvc
+            .perform(
+                patch(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(commentDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the Comment in the database
+        List<Comment> commentList = commentRepository.findAll();
+        assertThat(commentList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void deleteComment() throws Exception {
         // Initialize the database
         commentRepository.saveAndFlush(comment);
 
@@ -449,7 +638,7 @@ public class CommentResourceIT {
 
         // Delete the comment
         restCommentMockMvc
-            .perform(delete("/api/comments/{id}", comment.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, comment.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

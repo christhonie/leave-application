@@ -2,23 +2,22 @@
 <databaseChangeLog
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.9.xsd">
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
     <!--
         Added the constraints for entity EntitlementValue.
     -->
     <changeSet id="20210430145053-2" author="jhipster">
-        
+
         <addForeignKeyConstraint baseColumnNames="entitlement_id"
                                  baseTableName="entitlement_value"
-                                 constraintName="fk_entitlement_value_entitlement_id"
+                                 constraintName="fk_entitlement_value__entitlement_id"
                                  referencedColumnNames="id"
                                  referencedTableName="leave_entitlement"/>
 
         <addForeignKeyConstraint baseColumnNames="staff_id"
                                  baseTableName="entitlement_value"
-                                 constraintName="fk_entitlement_value_staff_id"
+                                 constraintName="fk_entitlement_value__staff_id"
                                  referencedColumnNames="id"
                                  referencedTableName="staff"/>
-
     </changeSet>
 </databaseChangeLog>

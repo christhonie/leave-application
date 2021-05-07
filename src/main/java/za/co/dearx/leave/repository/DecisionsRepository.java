@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import za.co.dearx.leave.domain.Decisions;
 
 /**
- * Spring Data  repository for the Decisions entity.
+ * Spring Data SQL repository for the Decisions entity.
  */
 @SuppressWarnings("unused")
 @Repository

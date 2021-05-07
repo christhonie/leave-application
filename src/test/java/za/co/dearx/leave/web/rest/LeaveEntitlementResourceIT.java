@@ -5,39 +5,40 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static za.co.dearx.leave.web.rest.TestUtil.sameNumber;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import za.co.dearx.leave.LeaveApplicationApp;
+import za.co.dearx.leave.IntegrationTest;
 import za.co.dearx.leave.domain.LeaveEntitlement;
 import za.co.dearx.leave.domain.LeaveType;
 import za.co.dearx.leave.domain.Staff;
 import za.co.dearx.leave.repository.LeaveEntitlementRepository;
-import za.co.dearx.leave.service.LeaveEntitlementQueryService;
-import za.co.dearx.leave.service.LeaveEntitlementService;
-import za.co.dearx.leave.service.dto.LeaveEntitlementCriteria;
+import za.co.dearx.leave.service.criteria.LeaveEntitlementCriteria;
 import za.co.dearx.leave.service.dto.LeaveEntitlementDTO;
 import za.co.dearx.leave.service.mapper.LeaveEntitlementMapper;
 
 /**
  * Integration tests for the {@link LeaveEntitlementResource} REST controller.
  */
-@SpringBootTest(classes = LeaveApplicationApp.class)
+@IntegrationTest
 @AutoConfigureMockMvc
 @WithMockUser
-public class LeaveEntitlementResourceIT {
+class LeaveEntitlementResourceIT {
+
     private static final LocalDate DEFAULT_ENTITLEMENT_DATE = LocalDate.ofEpochDay(0L);
     private static final LocalDate UPDATED_ENTITLEMENT_DATE = LocalDate.now(ZoneId.systemDefault());
     private static final LocalDate SMALLER_ENTITLEMENT_DATE = LocalDate.ofEpochDay(-1L);
@@ -46,17 +47,17 @@ public class LeaveEntitlementResourceIT {
     private static final BigDecimal UPDATED_DAYS = new BigDecimal(2);
     private static final BigDecimal SMALLER_DAYS = new BigDecimal(1 - 1);
 
+    private static final String ENTITY_API_URL = "/api/leave-entitlements";
+    private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
+
+    private static Random random = new Random();
+    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
     @Autowired
     private LeaveEntitlementRepository leaveEntitlementRepository;
 
     @Autowired
     private LeaveEntitlementMapper leaveEntitlementMapper;
-
-    @Autowired
-    private LeaveEntitlementService leaveEntitlementService;
-
-    @Autowired
-    private LeaveEntitlementQueryService leaveEntitlementQueryService;
 
     @Autowired
     private EntityManager em;
@@ -135,13 +136,13 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void createLeaveEntitlement() throws Exception {
+    void createLeaveEntitlement() throws Exception {
         int databaseSizeBeforeCreate = leaveEntitlementRepository.findAll().size();
         // Create the LeaveEntitlement
         LeaveEntitlementDTO leaveEntitlementDTO = leaveEntitlementMapper.toDto(leaveEntitlement);
         restLeaveEntitlementMockMvc
             .perform(
-                post("/api/leave-entitlements")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveEntitlementDTO))
@@ -153,22 +154,22 @@ public class LeaveEntitlementResourceIT {
         assertThat(leaveEntitlementList).hasSize(databaseSizeBeforeCreate + 1);
         LeaveEntitlement testLeaveEntitlement = leaveEntitlementList.get(leaveEntitlementList.size() - 1);
         assertThat(testLeaveEntitlement.getEntitlementDate()).isEqualTo(DEFAULT_ENTITLEMENT_DATE);
-        assertThat(testLeaveEntitlement.getDays()).isEqualTo(DEFAULT_DAYS);
+        assertThat(testLeaveEntitlement.getDays()).isEqualByComparingTo(DEFAULT_DAYS);
     }
 
     @Test
     @Transactional
-    public void createLeaveEntitlementWithExistingId() throws Exception {
-        int databaseSizeBeforeCreate = leaveEntitlementRepository.findAll().size();
-
+    void createLeaveEntitlementWithExistingId() throws Exception {
         // Create the LeaveEntitlement with an existing ID
         leaveEntitlement.setId(1L);
         LeaveEntitlementDTO leaveEntitlementDTO = leaveEntitlementMapper.toDto(leaveEntitlement);
 
+        int databaseSizeBeforeCreate = leaveEntitlementRepository.findAll().size();
+
         // An entity with an existing ID cannot be created, so this API call must fail
         restLeaveEntitlementMockMvc
             .perform(
-                post("/api/leave-entitlements")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveEntitlementDTO))
@@ -182,7 +183,7 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void checkEntitlementDateIsRequired() throws Exception {
+    void checkEntitlementDateIsRequired() throws Exception {
         int databaseSizeBeforeTest = leaveEntitlementRepository.findAll().size();
         // set the field null
         leaveEntitlement.setEntitlementDate(null);
@@ -192,7 +193,7 @@ public class LeaveEntitlementResourceIT {
 
         restLeaveEntitlementMockMvc
             .perform(
-                post("/api/leave-entitlements")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveEntitlementDTO))
@@ -205,7 +206,7 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void checkDaysIsRequired() throws Exception {
+    void checkDaysIsRequired() throws Exception {
         int databaseSizeBeforeTest = leaveEntitlementRepository.findAll().size();
         // set the field null
         leaveEntitlement.setDays(null);
@@ -215,7 +216,7 @@ public class LeaveEntitlementResourceIT {
 
         restLeaveEntitlementMockMvc
             .perform(
-                post("/api/leave-entitlements")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveEntitlementDTO))
@@ -228,39 +229,39 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveEntitlements() throws Exception {
+    void getAllLeaveEntitlements() throws Exception {
         // Initialize the database
         leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
 
         // Get all the leaveEntitlementList
         restLeaveEntitlementMockMvc
-            .perform(get("/api/leave-entitlements?sort=id,desc"))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(leaveEntitlement.getId().intValue())))
             .andExpect(jsonPath("$.[*].entitlementDate").value(hasItem(DEFAULT_ENTITLEMENT_DATE.toString())))
-            .andExpect(jsonPath("$.[*].days").value(hasItem(DEFAULT_DAYS.intValue())));
+            .andExpect(jsonPath("$.[*].days").value(hasItem(sameNumber(DEFAULT_DAYS))));
     }
 
     @Test
     @Transactional
-    public void getLeaveEntitlement() throws Exception {
+    void getLeaveEntitlement() throws Exception {
         // Initialize the database
         leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
 
         // Get the leaveEntitlement
         restLeaveEntitlementMockMvc
-            .perform(get("/api/leave-entitlements/{id}", leaveEntitlement.getId()))
+            .perform(get(ENTITY_API_URL_ID, leaveEntitlement.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(leaveEntitlement.getId().intValue()))
             .andExpect(jsonPath("$.entitlementDate").value(DEFAULT_ENTITLEMENT_DATE.toString()))
-            .andExpect(jsonPath("$.days").value(DEFAULT_DAYS.intValue()));
+            .andExpect(jsonPath("$.days").value(sameNumber(DEFAULT_DAYS)));
     }
 
     @Test
     @Transactional
-    public void getLeaveEntitlementsByIdFiltering() throws Exception {
+    void getLeaveEntitlementsByIdFiltering() throws Exception {
         // Initialize the database
         leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
 
@@ -278,7 +279,7 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveEntitlementsByEntitlementDateIsEqualToSomething() throws Exception {
+    void getAllLeaveEntitlementsByEntitlementDateIsEqualToSomething() throws Exception {
         // Initialize the database
         leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
 
@@ -291,7 +292,7 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveEntitlementsByEntitlementDateIsNotEqualToSomething() throws Exception {
+    void getAllLeaveEntitlementsByEntitlementDateIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
 
@@ -304,7 +305,7 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveEntitlementsByEntitlementDateIsInShouldWork() throws Exception {
+    void getAllLeaveEntitlementsByEntitlementDateIsInShouldWork() throws Exception {
         // Initialize the database
         leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
 
@@ -317,7 +318,7 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveEntitlementsByEntitlementDateIsNullOrNotNull() throws Exception {
+    void getAllLeaveEntitlementsByEntitlementDateIsNullOrNotNull() throws Exception {
         // Initialize the database
         leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
 
@@ -330,7 +331,7 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveEntitlementsByEntitlementDateIsGreaterThanOrEqualToSomething() throws Exception {
+    void getAllLeaveEntitlementsByEntitlementDateIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
         leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
 
@@ -343,7 +344,7 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveEntitlementsByEntitlementDateIsLessThanOrEqualToSomething() throws Exception {
+    void getAllLeaveEntitlementsByEntitlementDateIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
         leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
 
@@ -356,7 +357,7 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveEntitlementsByEntitlementDateIsLessThanSomething() throws Exception {
+    void getAllLeaveEntitlementsByEntitlementDateIsLessThanSomething() throws Exception {
         // Initialize the database
         leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
 
@@ -369,7 +370,7 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveEntitlementsByEntitlementDateIsGreaterThanSomething() throws Exception {
+    void getAllLeaveEntitlementsByEntitlementDateIsGreaterThanSomething() throws Exception {
         // Initialize the database
         leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
 
@@ -382,7 +383,7 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveEntitlementsByDaysIsEqualToSomething() throws Exception {
+    void getAllLeaveEntitlementsByDaysIsEqualToSomething() throws Exception {
         // Initialize the database
         leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
 
@@ -395,7 +396,7 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveEntitlementsByDaysIsNotEqualToSomething() throws Exception {
+    void getAllLeaveEntitlementsByDaysIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
 
@@ -408,7 +409,7 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveEntitlementsByDaysIsInShouldWork() throws Exception {
+    void getAllLeaveEntitlementsByDaysIsInShouldWork() throws Exception {
         // Initialize the database
         leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
 
@@ -421,7 +422,7 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveEntitlementsByDaysIsNullOrNotNull() throws Exception {
+    void getAllLeaveEntitlementsByDaysIsNullOrNotNull() throws Exception {
         // Initialize the database
         leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
 
@@ -434,7 +435,7 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveEntitlementsByDaysIsGreaterThanOrEqualToSomething() throws Exception {
+    void getAllLeaveEntitlementsByDaysIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
         leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
 
@@ -447,7 +448,7 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveEntitlementsByDaysIsLessThanOrEqualToSomething() throws Exception {
+    void getAllLeaveEntitlementsByDaysIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
         leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
 
@@ -460,7 +461,7 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveEntitlementsByDaysIsLessThanSomething() throws Exception {
+    void getAllLeaveEntitlementsByDaysIsLessThanSomething() throws Exception {
         // Initialize the database
         leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
 
@@ -473,7 +474,7 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveEntitlementsByDaysIsGreaterThanSomething() throws Exception {
+    void getAllLeaveEntitlementsByDaysIsGreaterThanSomething() throws Exception {
         // Initialize the database
         leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
 
@@ -486,31 +487,39 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveEntitlementsByLeaveTypeIsEqualToSomething() throws Exception {
-        // Get already existing entity
-        LeaveType leaveType = leaveEntitlement.getLeaveType();
+    void getAllLeaveEntitlementsByLeaveTypeIsEqualToSomething() throws Exception {
+        // Initialize the database
+        leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
+        LeaveType leaveType = LeaveTypeResourceIT.createEntity(em);
+        em.persist(leaveType);
+        em.flush();
+        leaveEntitlement.setLeaveType(leaveType);
         leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
         Long leaveTypeId = leaveType.getId();
 
         // Get all the leaveEntitlementList where leaveType equals to leaveTypeId
         defaultLeaveEntitlementShouldBeFound("leaveTypeId.equals=" + leaveTypeId);
 
-        // Get all the leaveEntitlementList where leaveType equals to leaveTypeId + 1
+        // Get all the leaveEntitlementList where leaveType equals to (leaveTypeId + 1)
         defaultLeaveEntitlementShouldNotBeFound("leaveTypeId.equals=" + (leaveTypeId + 1));
     }
 
     @Test
     @Transactional
-    public void getAllLeaveEntitlementsByStaffIsEqualToSomething() throws Exception {
-        // Get already existing entity
-        Staff staff = leaveEntitlement.getStaff();
+    void getAllLeaveEntitlementsByStaffIsEqualToSomething() throws Exception {
+        // Initialize the database
+        leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
+        Staff staff = StaffResourceIT.createEntity(em);
+        em.persist(staff);
+        em.flush();
+        leaveEntitlement.setStaff(staff);
         leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
         Long staffId = staff.getId();
 
         // Get all the leaveEntitlementList where staff equals to staffId
         defaultLeaveEntitlementShouldBeFound("staffId.equals=" + staffId);
 
-        // Get all the leaveEntitlementList where staff equals to staffId + 1
+        // Get all the leaveEntitlementList where staff equals to (staffId + 1)
         defaultLeaveEntitlementShouldNotBeFound("staffId.equals=" + (staffId + 1));
     }
 
@@ -519,16 +528,16 @@ public class LeaveEntitlementResourceIT {
      */
     private void defaultLeaveEntitlementShouldBeFound(String filter) throws Exception {
         restLeaveEntitlementMockMvc
-            .perform(get("/api/leave-entitlements?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(leaveEntitlement.getId().intValue())))
             .andExpect(jsonPath("$.[*].entitlementDate").value(hasItem(DEFAULT_ENTITLEMENT_DATE.toString())))
-            .andExpect(jsonPath("$.[*].days").value(hasItem(DEFAULT_DAYS.intValue())));
+            .andExpect(jsonPath("$.[*].days").value(hasItem(sameNumber(DEFAULT_DAYS))));
 
         // Check, that the count call also returns 1
         restLeaveEntitlementMockMvc
-            .perform(get("/api/leave-entitlements/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -539,7 +548,7 @@ public class LeaveEntitlementResourceIT {
      */
     private void defaultLeaveEntitlementShouldNotBeFound(String filter) throws Exception {
         restLeaveEntitlementMockMvc
-            .perform(get("/api/leave-entitlements?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -547,7 +556,7 @@ public class LeaveEntitlementResourceIT {
 
         // Check, that the count call also returns 0
         restLeaveEntitlementMockMvc
-            .perform(get("/api/leave-entitlements/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));
@@ -555,14 +564,14 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void getNonExistingLeaveEntitlement() throws Exception {
+    void getNonExistingLeaveEntitlement() throws Exception {
         // Get the leaveEntitlement
-        restLeaveEntitlementMockMvc.perform(get("/api/leave-entitlements/{id}", Long.MAX_VALUE)).andExpect(status().isNotFound());
+        restLeaveEntitlementMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    public void updateLeaveEntitlement() throws Exception {
+    void putNewLeaveEntitlement() throws Exception {
         // Initialize the database
         leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
 
@@ -577,7 +586,7 @@ public class LeaveEntitlementResourceIT {
 
         restLeaveEntitlementMockMvc
             .perform(
-                put("/api/leave-entitlements")
+                put(ENTITY_API_URL_ID, leaveEntitlementDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveEntitlementDTO))
@@ -594,8 +603,9 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void updateNonExistingLeaveEntitlement() throws Exception {
+    void putNonExistingLeaveEntitlement() throws Exception {
         int databaseSizeBeforeUpdate = leaveEntitlementRepository.findAll().size();
+        leaveEntitlement.setId(count.incrementAndGet());
 
         // Create the LeaveEntitlement
         LeaveEntitlementDTO leaveEntitlementDTO = leaveEntitlementMapper.toDto(leaveEntitlement);
@@ -603,7 +613,7 @@ public class LeaveEntitlementResourceIT {
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restLeaveEntitlementMockMvc
             .perform(
-                put("/api/leave-entitlements")
+                put(ENTITY_API_URL_ID, leaveEntitlementDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveEntitlementDTO))
@@ -617,7 +627,189 @@ public class LeaveEntitlementResourceIT {
 
     @Test
     @Transactional
-    public void deleteLeaveEntitlement() throws Exception {
+    void putWithIdMismatchLeaveEntitlement() throws Exception {
+        int databaseSizeBeforeUpdate = leaveEntitlementRepository.findAll().size();
+        leaveEntitlement.setId(count.incrementAndGet());
+
+        // Create the LeaveEntitlement
+        LeaveEntitlementDTO leaveEntitlementDTO = leaveEntitlementMapper.toDto(leaveEntitlement);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeaveEntitlementMockMvc
+            .perform(
+                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(leaveEntitlementDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the LeaveEntitlement in the database
+        List<LeaveEntitlement> leaveEntitlementList = leaveEntitlementRepository.findAll();
+        assertThat(leaveEntitlementList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void putWithMissingIdPathParamLeaveEntitlement() throws Exception {
+        int databaseSizeBeforeUpdate = leaveEntitlementRepository.findAll().size();
+        leaveEntitlement.setId(count.incrementAndGet());
+
+        // Create the LeaveEntitlement
+        LeaveEntitlementDTO leaveEntitlementDTO = leaveEntitlementMapper.toDto(leaveEntitlement);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeaveEntitlementMockMvc
+            .perform(
+                put(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(leaveEntitlementDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the LeaveEntitlement in the database
+        List<LeaveEntitlement> leaveEntitlementList = leaveEntitlementRepository.findAll();
+        assertThat(leaveEntitlementList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void partialUpdateLeaveEntitlementWithPatch() throws Exception {
+        // Initialize the database
+        leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
+
+        int databaseSizeBeforeUpdate = leaveEntitlementRepository.findAll().size();
+
+        // Update the leaveEntitlement using partial update
+        LeaveEntitlement partialUpdatedLeaveEntitlement = new LeaveEntitlement();
+        partialUpdatedLeaveEntitlement.setId(leaveEntitlement.getId());
+
+        partialUpdatedLeaveEntitlement.entitlementDate(UPDATED_ENTITLEMENT_DATE).days(UPDATED_DAYS);
+
+        restLeaveEntitlementMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedLeaveEntitlement.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedLeaveEntitlement))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the LeaveEntitlement in the database
+        List<LeaveEntitlement> leaveEntitlementList = leaveEntitlementRepository.findAll();
+        assertThat(leaveEntitlementList).hasSize(databaseSizeBeforeUpdate);
+        LeaveEntitlement testLeaveEntitlement = leaveEntitlementList.get(leaveEntitlementList.size() - 1);
+        assertThat(testLeaveEntitlement.getEntitlementDate()).isEqualTo(UPDATED_ENTITLEMENT_DATE);
+        assertThat(testLeaveEntitlement.getDays()).isEqualByComparingTo(UPDATED_DAYS);
+    }
+
+    @Test
+    @Transactional
+    void fullUpdateLeaveEntitlementWithPatch() throws Exception {
+        // Initialize the database
+        leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
+
+        int databaseSizeBeforeUpdate = leaveEntitlementRepository.findAll().size();
+
+        // Update the leaveEntitlement using partial update
+        LeaveEntitlement partialUpdatedLeaveEntitlement = new LeaveEntitlement();
+        partialUpdatedLeaveEntitlement.setId(leaveEntitlement.getId());
+
+        partialUpdatedLeaveEntitlement.entitlementDate(UPDATED_ENTITLEMENT_DATE).days(UPDATED_DAYS);
+
+        restLeaveEntitlementMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedLeaveEntitlement.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedLeaveEntitlement))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the LeaveEntitlement in the database
+        List<LeaveEntitlement> leaveEntitlementList = leaveEntitlementRepository.findAll();
+        assertThat(leaveEntitlementList).hasSize(databaseSizeBeforeUpdate);
+        LeaveEntitlement testLeaveEntitlement = leaveEntitlementList.get(leaveEntitlementList.size() - 1);
+        assertThat(testLeaveEntitlement.getEntitlementDate()).isEqualTo(UPDATED_ENTITLEMENT_DATE);
+        assertThat(testLeaveEntitlement.getDays()).isEqualByComparingTo(UPDATED_DAYS);
+    }
+
+    @Test
+    @Transactional
+    void patchNonExistingLeaveEntitlement() throws Exception {
+        int databaseSizeBeforeUpdate = leaveEntitlementRepository.findAll().size();
+        leaveEntitlement.setId(count.incrementAndGet());
+
+        // Create the LeaveEntitlement
+        LeaveEntitlementDTO leaveEntitlementDTO = leaveEntitlementMapper.toDto(leaveEntitlement);
+
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
+        restLeaveEntitlementMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, leaveEntitlementDTO.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(leaveEntitlementDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the LeaveEntitlement in the database
+        List<LeaveEntitlement> leaveEntitlementList = leaveEntitlementRepository.findAll();
+        assertThat(leaveEntitlementList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithIdMismatchLeaveEntitlement() throws Exception {
+        int databaseSizeBeforeUpdate = leaveEntitlementRepository.findAll().size();
+        leaveEntitlement.setId(count.incrementAndGet());
+
+        // Create the LeaveEntitlement
+        LeaveEntitlementDTO leaveEntitlementDTO = leaveEntitlementMapper.toDto(leaveEntitlement);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeaveEntitlementMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(leaveEntitlementDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the LeaveEntitlement in the database
+        List<LeaveEntitlement> leaveEntitlementList = leaveEntitlementRepository.findAll();
+        assertThat(leaveEntitlementList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithMissingIdPathParamLeaveEntitlement() throws Exception {
+        int databaseSizeBeforeUpdate = leaveEntitlementRepository.findAll().size();
+        leaveEntitlement.setId(count.incrementAndGet());
+
+        // Create the LeaveEntitlement
+        LeaveEntitlementDTO leaveEntitlementDTO = leaveEntitlementMapper.toDto(leaveEntitlement);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeaveEntitlementMockMvc
+            .perform(
+                patch(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(leaveEntitlementDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the LeaveEntitlement in the database
+        List<LeaveEntitlement> leaveEntitlementList = leaveEntitlementRepository.findAll();
+        assertThat(leaveEntitlementList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void deleteLeaveEntitlement() throws Exception {
         // Initialize the database
         leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
 
@@ -625,7 +817,7 @@ public class LeaveEntitlementResourceIT {
 
         // Delete the leaveEntitlement
         restLeaveEntitlementMockMvc
-            .perform(delete("/api/leave-entitlements/{id}", leaveEntitlement.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, leaveEntitlement.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

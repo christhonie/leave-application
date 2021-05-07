@@ -11,6 +11,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,32 +21,31 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import za.co.dearx.leave.LeaveApplicationApp;
+import za.co.dearx.leave.IntegrationTest;
 import za.co.dearx.leave.domain.Staff;
 import za.co.dearx.leave.domain.Team;
 import za.co.dearx.leave.domain.User;
 import za.co.dearx.leave.repository.StaffRepository;
-import za.co.dearx.leave.service.StaffQueryService;
 import za.co.dearx.leave.service.StaffService;
-import za.co.dearx.leave.service.dto.StaffCriteria;
+import za.co.dearx.leave.service.criteria.StaffCriteria;
 import za.co.dearx.leave.service.dto.StaffDTO;
 import za.co.dearx.leave.service.mapper.StaffMapper;
 
 /**
  * Integration tests for the {@link StaffResource} REST controller.
  */
-@SpringBootTest(classes = LeaveApplicationApp.class)
+@IntegrationTest
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 @WithMockUser
-public class StaffResourceIT {
+class StaffResourceIT {
+
     private static final String DEFAULT_POSITION = "AAAAAAAAAA";
     private static final String UPDATED_POSITION = "BBBBBBBBBB";
 
@@ -73,6 +74,12 @@ public class StaffResourceIT {
     private static final String DEFAULT_GENDER = "AA";
     private static final String UPDATED_GENDER = "BB";
 
+    private static final String ENTITY_API_URL = "/api/staff";
+    private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
+
+    private static Random random = new Random();
+    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
     @Autowired
     private StaffRepository staffRepository;
 
@@ -84,12 +91,6 @@ public class StaffResourceIT {
 
     @Mock
     private StaffService staffServiceMock;
-
-    @Autowired
-    private StaffService staffService;
-
-    @Autowired
-    private StaffQueryService staffQueryService;
 
     @Autowired
     private EntityManager em;
@@ -146,13 +147,16 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void createStaff() throws Exception {
+    void createStaff() throws Exception {
         int databaseSizeBeforeCreate = staffRepository.findAll().size();
         // Create the Staff
         StaffDTO staffDTO = staffMapper.toDto(staff);
         restStaffMockMvc
             .perform(
-                post("/api/staff").with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(staffDTO))
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(staffDTO))
             )
             .andExpect(status().isCreated());
 
@@ -173,17 +177,20 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void createStaffWithExistingId() throws Exception {
-        int databaseSizeBeforeCreate = staffRepository.findAll().size();
-
+    void createStaffWithExistingId() throws Exception {
         // Create the Staff with an existing ID
         staff.setId(1L);
         StaffDTO staffDTO = staffMapper.toDto(staff);
 
+        int databaseSizeBeforeCreate = staffRepository.findAll().size();
+
         // An entity with an existing ID cannot be created, so this API call must fail
         restStaffMockMvc
             .perform(
-                post("/api/staff").with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(staffDTO))
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(staffDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -194,7 +201,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void checkEmployeeIDIsRequired() throws Exception {
+    void checkEmployeeIDIsRequired() throws Exception {
         int databaseSizeBeforeTest = staffRepository.findAll().size();
         // set the field null
         staff.setEmployeeID(null);
@@ -204,7 +211,10 @@ public class StaffResourceIT {
 
         restStaffMockMvc
             .perform(
-                post("/api/staff").with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(staffDTO))
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(staffDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -214,7 +224,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void checkStartDateIsRequired() throws Exception {
+    void checkStartDateIsRequired() throws Exception {
         int databaseSizeBeforeTest = staffRepository.findAll().size();
         // set the field null
         staff.setStartDate(null);
@@ -224,7 +234,10 @@ public class StaffResourceIT {
 
         restStaffMockMvc
             .perform(
-                post("/api/staff").with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(staffDTO))
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(staffDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -234,7 +247,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void checkFirstNameIsRequired() throws Exception {
+    void checkFirstNameIsRequired() throws Exception {
         int databaseSizeBeforeTest = staffRepository.findAll().size();
         // set the field null
         staff.setFirstName(null);
@@ -244,7 +257,10 @@ public class StaffResourceIT {
 
         restStaffMockMvc
             .perform(
-                post("/api/staff").with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(staffDTO))
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(staffDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -254,7 +270,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void checkLastNameIsRequired() throws Exception {
+    void checkLastNameIsRequired() throws Exception {
         int databaseSizeBeforeTest = staffRepository.findAll().size();
         // set the field null
         staff.setLastName(null);
@@ -264,7 +280,10 @@ public class StaffResourceIT {
 
         restStaffMockMvc
             .perform(
-                post("/api/staff").with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(staffDTO))
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(staffDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -274,7 +293,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void checkGenderIsRequired() throws Exception {
+    void checkGenderIsRequired() throws Exception {
         int databaseSizeBeforeTest = staffRepository.findAll().size();
         // set the field null
         staff.setGender(null);
@@ -284,7 +303,10 @@ public class StaffResourceIT {
 
         restStaffMockMvc
             .perform(
-                post("/api/staff").with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(staffDTO))
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(staffDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -294,13 +316,13 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaff() throws Exception {
+    void getAllStaff() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
         // Get all the staffList
         restStaffMockMvc
-            .perform(get("/api/staff?sort=id,desc"))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(staff.getId().intValue())))
@@ -316,32 +338,32 @@ public class StaffResourceIT {
     }
 
     @SuppressWarnings({ "unchecked" })
-    public void getAllStaffWithEagerRelationshipsIsEnabled() throws Exception {
+    void getAllStaffWithEagerRelationshipsIsEnabled() throws Exception {
         when(staffServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
 
-        restStaffMockMvc.perform(get("/api/staff?eagerload=true")).andExpect(status().isOk());
+        restStaffMockMvc.perform(get(ENTITY_API_URL + "?eagerload=true")).andExpect(status().isOk());
 
         verify(staffServiceMock, times(1)).findAllWithEagerRelationships(any());
     }
 
     @SuppressWarnings({ "unchecked" })
-    public void getAllStaffWithEagerRelationshipsIsNotEnabled() throws Exception {
+    void getAllStaffWithEagerRelationshipsIsNotEnabled() throws Exception {
         when(staffServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
 
-        restStaffMockMvc.perform(get("/api/staff?eagerload=true")).andExpect(status().isOk());
+        restStaffMockMvc.perform(get(ENTITY_API_URL + "?eagerload=true")).andExpect(status().isOk());
 
         verify(staffServiceMock, times(1)).findAllWithEagerRelationships(any());
     }
 
     @Test
     @Transactional
-    public void getStaff() throws Exception {
+    void getStaff() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
         // Get the staff
         restStaffMockMvc
-            .perform(get("/api/staff/{id}", staff.getId()))
+            .perform(get(ENTITY_API_URL_ID, staff.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(staff.getId().intValue()))
@@ -358,7 +380,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getStaffByIdFiltering() throws Exception {
+    void getStaffByIdFiltering() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -376,7 +398,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByPositionIsEqualToSomething() throws Exception {
+    void getAllStaffByPositionIsEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -389,7 +411,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByPositionIsNotEqualToSomething() throws Exception {
+    void getAllStaffByPositionIsNotEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -402,7 +424,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByPositionIsInShouldWork() throws Exception {
+    void getAllStaffByPositionIsInShouldWork() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -415,7 +437,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByPositionIsNullOrNotNull() throws Exception {
+    void getAllStaffByPositionIsNullOrNotNull() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -428,7 +450,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByPositionContainsSomething() throws Exception {
+    void getAllStaffByPositionContainsSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -441,7 +463,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByPositionNotContainsSomething() throws Exception {
+    void getAllStaffByPositionNotContainsSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -454,7 +476,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByEmployeeIDIsEqualToSomething() throws Exception {
+    void getAllStaffByEmployeeIDIsEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -467,7 +489,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByEmployeeIDIsNotEqualToSomething() throws Exception {
+    void getAllStaffByEmployeeIDIsNotEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -480,7 +502,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByEmployeeIDIsInShouldWork() throws Exception {
+    void getAllStaffByEmployeeIDIsInShouldWork() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -493,7 +515,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByEmployeeIDIsNullOrNotNull() throws Exception {
+    void getAllStaffByEmployeeIDIsNullOrNotNull() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -506,7 +528,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByEmployeeIDContainsSomething() throws Exception {
+    void getAllStaffByEmployeeIDContainsSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -519,7 +541,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByEmployeeIDNotContainsSomething() throws Exception {
+    void getAllStaffByEmployeeIDNotContainsSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -532,7 +554,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByStartDateIsEqualToSomething() throws Exception {
+    void getAllStaffByStartDateIsEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -545,7 +567,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByStartDateIsNotEqualToSomething() throws Exception {
+    void getAllStaffByStartDateIsNotEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -558,7 +580,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByStartDateIsInShouldWork() throws Exception {
+    void getAllStaffByStartDateIsInShouldWork() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -571,7 +593,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByStartDateIsNullOrNotNull() throws Exception {
+    void getAllStaffByStartDateIsNullOrNotNull() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -584,7 +606,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByStartDateIsGreaterThanOrEqualToSomething() throws Exception {
+    void getAllStaffByStartDateIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -597,7 +619,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByStartDateIsLessThanOrEqualToSomething() throws Exception {
+    void getAllStaffByStartDateIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -610,7 +632,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByStartDateIsLessThanSomething() throws Exception {
+    void getAllStaffByStartDateIsLessThanSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -623,7 +645,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByStartDateIsGreaterThanSomething() throws Exception {
+    void getAllStaffByStartDateIsGreaterThanSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -636,7 +658,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByNameIsEqualToSomething() throws Exception {
+    void getAllStaffByNameIsEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -649,7 +671,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByNameIsNotEqualToSomething() throws Exception {
+    void getAllStaffByNameIsNotEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -662,7 +684,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByNameIsInShouldWork() throws Exception {
+    void getAllStaffByNameIsInShouldWork() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -675,7 +697,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByNameIsNullOrNotNull() throws Exception {
+    void getAllStaffByNameIsNullOrNotNull() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -688,7 +710,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByNameContainsSomething() throws Exception {
+    void getAllStaffByNameContainsSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -701,7 +723,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByNameNotContainsSomething() throws Exception {
+    void getAllStaffByNameNotContainsSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -714,7 +736,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByFirstNameIsEqualToSomething() throws Exception {
+    void getAllStaffByFirstNameIsEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -727,7 +749,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByFirstNameIsNotEqualToSomething() throws Exception {
+    void getAllStaffByFirstNameIsNotEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -740,7 +762,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByFirstNameIsInShouldWork() throws Exception {
+    void getAllStaffByFirstNameIsInShouldWork() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -753,7 +775,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByFirstNameIsNullOrNotNull() throws Exception {
+    void getAllStaffByFirstNameIsNullOrNotNull() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -766,7 +788,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByFirstNameContainsSomething() throws Exception {
+    void getAllStaffByFirstNameContainsSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -779,7 +801,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByFirstNameNotContainsSomething() throws Exception {
+    void getAllStaffByFirstNameNotContainsSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -792,7 +814,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByLastNameIsEqualToSomething() throws Exception {
+    void getAllStaffByLastNameIsEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -805,7 +827,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByLastNameIsNotEqualToSomething() throws Exception {
+    void getAllStaffByLastNameIsNotEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -818,7 +840,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByLastNameIsInShouldWork() throws Exception {
+    void getAllStaffByLastNameIsInShouldWork() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -831,7 +853,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByLastNameIsNullOrNotNull() throws Exception {
+    void getAllStaffByLastNameIsNullOrNotNull() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -844,7 +866,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByLastNameContainsSomething() throws Exception {
+    void getAllStaffByLastNameContainsSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -857,7 +879,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByLastNameNotContainsSomething() throws Exception {
+    void getAllStaffByLastNameNotContainsSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -870,7 +892,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByEmailIsEqualToSomething() throws Exception {
+    void getAllStaffByEmailIsEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -883,7 +905,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByEmailIsNotEqualToSomething() throws Exception {
+    void getAllStaffByEmailIsNotEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -896,7 +918,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByEmailIsInShouldWork() throws Exception {
+    void getAllStaffByEmailIsInShouldWork() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -909,7 +931,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByEmailIsNullOrNotNull() throws Exception {
+    void getAllStaffByEmailIsNullOrNotNull() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -922,7 +944,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByEmailContainsSomething() throws Exception {
+    void getAllStaffByEmailContainsSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -935,7 +957,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByEmailNotContainsSomething() throws Exception {
+    void getAllStaffByEmailNotContainsSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -948,7 +970,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByContractNumberIsEqualToSomething() throws Exception {
+    void getAllStaffByContractNumberIsEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -961,7 +983,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByContractNumberIsNotEqualToSomething() throws Exception {
+    void getAllStaffByContractNumberIsNotEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -974,7 +996,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByContractNumberIsInShouldWork() throws Exception {
+    void getAllStaffByContractNumberIsInShouldWork() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -987,7 +1009,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByContractNumberIsNullOrNotNull() throws Exception {
+    void getAllStaffByContractNumberIsNullOrNotNull() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -1000,7 +1022,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByContractNumberContainsSomething() throws Exception {
+    void getAllStaffByContractNumberContainsSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -1013,7 +1035,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByContractNumberNotContainsSomething() throws Exception {
+    void getAllStaffByContractNumberNotContainsSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -1026,7 +1048,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByGenderIsEqualToSomething() throws Exception {
+    void getAllStaffByGenderIsEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -1039,7 +1061,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByGenderIsNotEqualToSomething() throws Exception {
+    void getAllStaffByGenderIsNotEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -1052,7 +1074,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByGenderIsInShouldWork() throws Exception {
+    void getAllStaffByGenderIsInShouldWork() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -1065,7 +1087,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByGenderIsNullOrNotNull() throws Exception {
+    void getAllStaffByGenderIsNullOrNotNull() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -1078,7 +1100,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByGenderContainsSomething() throws Exception {
+    void getAllStaffByGenderContainsSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -1091,7 +1113,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByGenderNotContainsSomething() throws Exception {
+    void getAllStaffByGenderNotContainsSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -1104,7 +1126,7 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByUserIsEqualToSomething() throws Exception {
+    void getAllStaffByUserIsEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
         User user = UserResourceIT.createEntity(em);
@@ -1117,13 +1139,13 @@ public class StaffResourceIT {
         // Get all the staffList where user equals to userId
         defaultStaffShouldBeFound("userId.equals=" + userId);
 
-        // Get all the staffList where user equals to userId + 1
+        // Get all the staffList where user equals to (userId + 1)
         defaultStaffShouldNotBeFound("userId.equals=" + (userId + 1));
     }
 
     @Test
     @Transactional
-    public void getAllStaffByTeamIsEqualToSomething() throws Exception {
+    void getAllStaffByTeamIsEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
         Team team = TeamResourceIT.createEntity(em);
@@ -1136,7 +1158,7 @@ public class StaffResourceIT {
         // Get all the staffList where team equals to teamId
         defaultStaffShouldBeFound("teamId.equals=" + teamId);
 
-        // Get all the staffList where team equals to teamId + 1
+        // Get all the staffList where team equals to (teamId + 1)
         defaultStaffShouldNotBeFound("teamId.equals=" + (teamId + 1));
     }
 
@@ -1145,7 +1167,7 @@ public class StaffResourceIT {
      */
     private void defaultStaffShouldBeFound(String filter) throws Exception {
         restStaffMockMvc
-            .perform(get("/api/staff?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(staff.getId().intValue())))
@@ -1161,7 +1183,7 @@ public class StaffResourceIT {
 
         // Check, that the count call also returns 1
         restStaffMockMvc
-            .perform(get("/api/staff/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -1172,7 +1194,7 @@ public class StaffResourceIT {
      */
     private void defaultStaffShouldNotBeFound(String filter) throws Exception {
         restStaffMockMvc
-            .perform(get("/api/staff?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -1180,7 +1202,7 @@ public class StaffResourceIT {
 
         // Check, that the count call also returns 0
         restStaffMockMvc
-            .perform(get("/api/staff/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));
@@ -1188,14 +1210,14 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getNonExistingStaff() throws Exception {
+    void getNonExistingStaff() throws Exception {
         // Get the staff
-        restStaffMockMvc.perform(get("/api/staff/{id}", Long.MAX_VALUE)).andExpect(status().isNotFound());
+        restStaffMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    public void updateStaff() throws Exception {
+    void putNewStaff() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -1219,7 +1241,10 @@ public class StaffResourceIT {
 
         restStaffMockMvc
             .perform(
-                put("/api/staff").with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(staffDTO))
+                put(ENTITY_API_URL_ID, staffDTO.getId())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(staffDTO))
             )
             .andExpect(status().isOk());
 
@@ -1240,8 +1265,9 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void updateNonExistingStaff() throws Exception {
+    void putNonExistingStaff() throws Exception {
         int databaseSizeBeforeUpdate = staffRepository.findAll().size();
+        staff.setId(count.incrementAndGet());
 
         // Create the Staff
         StaffDTO staffDTO = staffMapper.toDto(staff);
@@ -1249,7 +1275,10 @@ public class StaffResourceIT {
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restStaffMockMvc
             .perform(
-                put("/api/staff").with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(staffDTO))
+                put(ENTITY_API_URL_ID, staffDTO.getId())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(staffDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -1260,7 +1289,212 @@ public class StaffResourceIT {
 
     @Test
     @Transactional
-    public void deleteStaff() throws Exception {
+    void putWithIdMismatchStaff() throws Exception {
+        int databaseSizeBeforeUpdate = staffRepository.findAll().size();
+        staff.setId(count.incrementAndGet());
+
+        // Create the Staff
+        StaffDTO staffDTO = staffMapper.toDto(staff);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restStaffMockMvc
+            .perform(
+                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(staffDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the Staff in the database
+        List<Staff> staffList = staffRepository.findAll();
+        assertThat(staffList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void putWithMissingIdPathParamStaff() throws Exception {
+        int databaseSizeBeforeUpdate = staffRepository.findAll().size();
+        staff.setId(count.incrementAndGet());
+
+        // Create the Staff
+        StaffDTO staffDTO = staffMapper.toDto(staff);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restStaffMockMvc
+            .perform(
+                put(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(staffDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the Staff in the database
+        List<Staff> staffList = staffRepository.findAll();
+        assertThat(staffList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void partialUpdateStaffWithPatch() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        int databaseSizeBeforeUpdate = staffRepository.findAll().size();
+
+        // Update the staff using partial update
+        Staff partialUpdatedStaff = new Staff();
+        partialUpdatedStaff.setId(staff.getId());
+
+        partialUpdatedStaff.position(UPDATED_POSITION).startDate(UPDATED_START_DATE);
+
+        restStaffMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedStaff.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedStaff))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the Staff in the database
+        List<Staff> staffList = staffRepository.findAll();
+        assertThat(staffList).hasSize(databaseSizeBeforeUpdate);
+        Staff testStaff = staffList.get(staffList.size() - 1);
+        assertThat(testStaff.getPosition()).isEqualTo(UPDATED_POSITION);
+        assertThat(testStaff.getEmployeeID()).isEqualTo(DEFAULT_EMPLOYEE_ID);
+        assertThat(testStaff.getStartDate()).isEqualTo(UPDATED_START_DATE);
+        assertThat(testStaff.getName()).isEqualTo(DEFAULT_NAME);
+        assertThat(testStaff.getFirstName()).isEqualTo(DEFAULT_FIRST_NAME);
+        assertThat(testStaff.getLastName()).isEqualTo(DEFAULT_LAST_NAME);
+        assertThat(testStaff.getEmail()).isEqualTo(DEFAULT_EMAIL);
+        assertThat(testStaff.getContractNumber()).isEqualTo(DEFAULT_CONTRACT_NUMBER);
+        assertThat(testStaff.getGender()).isEqualTo(DEFAULT_GENDER);
+    }
+
+    @Test
+    @Transactional
+    void fullUpdateStaffWithPatch() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        int databaseSizeBeforeUpdate = staffRepository.findAll().size();
+
+        // Update the staff using partial update
+        Staff partialUpdatedStaff = new Staff();
+        partialUpdatedStaff.setId(staff.getId());
+
+        partialUpdatedStaff
+            .position(UPDATED_POSITION)
+            .employeeID(UPDATED_EMPLOYEE_ID)
+            .startDate(UPDATED_START_DATE)
+            .name(UPDATED_NAME)
+            .firstName(UPDATED_FIRST_NAME)
+            .lastName(UPDATED_LAST_NAME)
+            .email(UPDATED_EMAIL)
+            .contractNumber(UPDATED_CONTRACT_NUMBER)
+            .gender(UPDATED_GENDER);
+
+        restStaffMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedStaff.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedStaff))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the Staff in the database
+        List<Staff> staffList = staffRepository.findAll();
+        assertThat(staffList).hasSize(databaseSizeBeforeUpdate);
+        Staff testStaff = staffList.get(staffList.size() - 1);
+        assertThat(testStaff.getPosition()).isEqualTo(UPDATED_POSITION);
+        assertThat(testStaff.getEmployeeID()).isEqualTo(UPDATED_EMPLOYEE_ID);
+        assertThat(testStaff.getStartDate()).isEqualTo(UPDATED_START_DATE);
+        assertThat(testStaff.getName()).isEqualTo(UPDATED_NAME);
+        assertThat(testStaff.getFirstName()).isEqualTo(UPDATED_FIRST_NAME);
+        assertThat(testStaff.getLastName()).isEqualTo(UPDATED_LAST_NAME);
+        assertThat(testStaff.getEmail()).isEqualTo(UPDATED_EMAIL);
+        assertThat(testStaff.getContractNumber()).isEqualTo(UPDATED_CONTRACT_NUMBER);
+        assertThat(testStaff.getGender()).isEqualTo(UPDATED_GENDER);
+    }
+
+    @Test
+    @Transactional
+    void patchNonExistingStaff() throws Exception {
+        int databaseSizeBeforeUpdate = staffRepository.findAll().size();
+        staff.setId(count.incrementAndGet());
+
+        // Create the Staff
+        StaffDTO staffDTO = staffMapper.toDto(staff);
+
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
+        restStaffMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, staffDTO.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(staffDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the Staff in the database
+        List<Staff> staffList = staffRepository.findAll();
+        assertThat(staffList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithIdMismatchStaff() throws Exception {
+        int databaseSizeBeforeUpdate = staffRepository.findAll().size();
+        staff.setId(count.incrementAndGet());
+
+        // Create the Staff
+        StaffDTO staffDTO = staffMapper.toDto(staff);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restStaffMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(staffDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the Staff in the database
+        List<Staff> staffList = staffRepository.findAll();
+        assertThat(staffList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithMissingIdPathParamStaff() throws Exception {
+        int databaseSizeBeforeUpdate = staffRepository.findAll().size();
+        staff.setId(count.incrementAndGet());
+
+        // Create the Staff
+        StaffDTO staffDTO = staffMapper.toDto(staff);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restStaffMockMvc
+            .perform(
+                patch(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(staffDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the Staff in the database
+        List<Staff> staffList = staffRepository.findAll();
+        assertThat(staffList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void deleteStaff() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -1268,7 +1502,7 @@ public class StaffResourceIT {
 
         // Delete the staff
         restStaffMockMvc
-            .perform(delete("/api/staff/{id}", staff.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, staff.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

@@ -18,6 +18,7 @@ import za.co.dearx.leave.service.mapper.LeaveTypeMapper;
 @Service
 @Transactional
 public class LeaveTypeService {
+
     private final Logger log = LoggerFactory.getLogger(LeaveTypeService.class);
 
     private final LeaveTypeRepository leaveTypeRepository;
@@ -40,6 +41,27 @@ public class LeaveTypeService {
         LeaveType leaveType = leaveTypeMapper.toEntity(leaveTypeDTO);
         leaveType = leaveTypeRepository.save(leaveType);
         return leaveTypeMapper.toDto(leaveType);
+    }
+
+    /**
+     * Partially update a leaveType.
+     *
+     * @param leaveTypeDTO the entity to update partially.
+     * @return the persisted entity.
+     */
+    public Optional<LeaveTypeDTO> partialUpdate(LeaveTypeDTO leaveTypeDTO) {
+        log.debug("Request to partially update LeaveType : {}", leaveTypeDTO);
+
+        return leaveTypeRepository
+            .findById(leaveTypeDTO.getId())
+            .map(
+                existingLeaveType -> {
+                    leaveTypeMapper.partialUpdate(existingLeaveType, leaveTypeDTO);
+                    return existingLeaveType;
+                }
+            )
+            .map(leaveTypeRepository::save)
+            .map(leaveTypeMapper::toDto);
     }
 
     /**

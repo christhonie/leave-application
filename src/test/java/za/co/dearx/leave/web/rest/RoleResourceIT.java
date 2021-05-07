@@ -9,6 +9,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,33 +19,38 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import za.co.dearx.leave.LeaveApplicationApp;
+import za.co.dearx.leave.IntegrationTest;
 import za.co.dearx.leave.domain.Role;
 import za.co.dearx.leave.domain.User;
 import za.co.dearx.leave.repository.RoleRepository;
-import za.co.dearx.leave.service.RoleQueryService;
 import za.co.dearx.leave.service.RoleService;
-import za.co.dearx.leave.service.dto.RoleCriteria;
+import za.co.dearx.leave.service.criteria.RoleCriteria;
 import za.co.dearx.leave.service.dto.RoleDTO;
 import za.co.dearx.leave.service.mapper.RoleMapper;
 
 /**
  * Integration tests for the {@link RoleResource} REST controller.
  */
-@SpringBootTest(classes = LeaveApplicationApp.class)
+@IntegrationTest
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 @WithMockUser
-public class RoleResourceIT {
+class RoleResourceIT {
+
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
+
+    private static final String ENTITY_API_URL = "/api/roles";
+    private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
+
+    private static Random random = new Random();
+    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
 
     @Autowired
     private RoleRepository roleRepository;
@@ -56,12 +63,6 @@ public class RoleResourceIT {
 
     @Mock
     private RoleService roleServiceMock;
-
-    @Autowired
-    private RoleService roleService;
-
-    @Autowired
-    private RoleQueryService roleQueryService;
 
     @Autowired
     private EntityManager em;
@@ -100,13 +101,16 @@ public class RoleResourceIT {
 
     @Test
     @Transactional
-    public void createRole() throws Exception {
+    void createRole() throws Exception {
         int databaseSizeBeforeCreate = roleRepository.findAll().size();
         // Create the Role
         RoleDTO roleDTO = roleMapper.toDto(role);
         restRoleMockMvc
             .perform(
-                post("/api/roles").with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(roleDTO))
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(roleDTO))
             )
             .andExpect(status().isCreated());
 
@@ -119,17 +123,20 @@ public class RoleResourceIT {
 
     @Test
     @Transactional
-    public void createRoleWithExistingId() throws Exception {
-        int databaseSizeBeforeCreate = roleRepository.findAll().size();
-
+    void createRoleWithExistingId() throws Exception {
         // Create the Role with an existing ID
         role.setId(1L);
         RoleDTO roleDTO = roleMapper.toDto(role);
 
+        int databaseSizeBeforeCreate = roleRepository.findAll().size();
+
         // An entity with an existing ID cannot be created, so this API call must fail
         restRoleMockMvc
             .perform(
-                post("/api/roles").with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(roleDTO))
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(roleDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -140,7 +147,7 @@ public class RoleResourceIT {
 
     @Test
     @Transactional
-    public void checkNameIsRequired() throws Exception {
+    void checkNameIsRequired() throws Exception {
         int databaseSizeBeforeTest = roleRepository.findAll().size();
         // set the field null
         role.setName(null);
@@ -150,7 +157,10 @@ public class RoleResourceIT {
 
         restRoleMockMvc
             .perform(
-                post("/api/roles").with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(roleDTO))
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(roleDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -160,13 +170,13 @@ public class RoleResourceIT {
 
     @Test
     @Transactional
-    public void getAllRoles() throws Exception {
+    void getAllRoles() throws Exception {
         // Initialize the database
         roleRepository.saveAndFlush(role);
 
         // Get all the roleList
         restRoleMockMvc
-            .perform(get("/api/roles?sort=id,desc"))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(role.getId().intValue())))
@@ -174,32 +184,32 @@ public class RoleResourceIT {
     }
 
     @SuppressWarnings({ "unchecked" })
-    public void getAllRolesWithEagerRelationshipsIsEnabled() throws Exception {
+    void getAllRolesWithEagerRelationshipsIsEnabled() throws Exception {
         when(roleServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
 
-        restRoleMockMvc.perform(get("/api/roles?eagerload=true")).andExpect(status().isOk());
+        restRoleMockMvc.perform(get(ENTITY_API_URL + "?eagerload=true")).andExpect(status().isOk());
 
         verify(roleServiceMock, times(1)).findAllWithEagerRelationships(any());
     }
 
     @SuppressWarnings({ "unchecked" })
-    public void getAllRolesWithEagerRelationshipsIsNotEnabled() throws Exception {
+    void getAllRolesWithEagerRelationshipsIsNotEnabled() throws Exception {
         when(roleServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
 
-        restRoleMockMvc.perform(get("/api/roles?eagerload=true")).andExpect(status().isOk());
+        restRoleMockMvc.perform(get(ENTITY_API_URL + "?eagerload=true")).andExpect(status().isOk());
 
         verify(roleServiceMock, times(1)).findAllWithEagerRelationships(any());
     }
 
     @Test
     @Transactional
-    public void getRole() throws Exception {
+    void getRole() throws Exception {
         // Initialize the database
         roleRepository.saveAndFlush(role);
 
         // Get the role
         restRoleMockMvc
-            .perform(get("/api/roles/{id}", role.getId()))
+            .perform(get(ENTITY_API_URL_ID, role.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(role.getId().intValue()))
@@ -208,7 +218,7 @@ public class RoleResourceIT {
 
     @Test
     @Transactional
-    public void getRolesByIdFiltering() throws Exception {
+    void getRolesByIdFiltering() throws Exception {
         // Initialize the database
         roleRepository.saveAndFlush(role);
 
@@ -226,7 +236,7 @@ public class RoleResourceIT {
 
     @Test
     @Transactional
-    public void getAllRolesByNameIsEqualToSomething() throws Exception {
+    void getAllRolesByNameIsEqualToSomething() throws Exception {
         // Initialize the database
         roleRepository.saveAndFlush(role);
 
@@ -239,7 +249,7 @@ public class RoleResourceIT {
 
     @Test
     @Transactional
-    public void getAllRolesByNameIsNotEqualToSomething() throws Exception {
+    void getAllRolesByNameIsNotEqualToSomething() throws Exception {
         // Initialize the database
         roleRepository.saveAndFlush(role);
 
@@ -252,7 +262,7 @@ public class RoleResourceIT {
 
     @Test
     @Transactional
-    public void getAllRolesByNameIsInShouldWork() throws Exception {
+    void getAllRolesByNameIsInShouldWork() throws Exception {
         // Initialize the database
         roleRepository.saveAndFlush(role);
 
@@ -265,7 +275,7 @@ public class RoleResourceIT {
 
     @Test
     @Transactional
-    public void getAllRolesByNameIsNullOrNotNull() throws Exception {
+    void getAllRolesByNameIsNullOrNotNull() throws Exception {
         // Initialize the database
         roleRepository.saveAndFlush(role);
 
@@ -278,7 +288,7 @@ public class RoleResourceIT {
 
     @Test
     @Transactional
-    public void getAllRolesByNameContainsSomething() throws Exception {
+    void getAllRolesByNameContainsSomething() throws Exception {
         // Initialize the database
         roleRepository.saveAndFlush(role);
 
@@ -291,7 +301,7 @@ public class RoleResourceIT {
 
     @Test
     @Transactional
-    public void getAllRolesByNameNotContainsSomething() throws Exception {
+    void getAllRolesByNameNotContainsSomething() throws Exception {
         // Initialize the database
         roleRepository.saveAndFlush(role);
 
@@ -304,7 +314,7 @@ public class RoleResourceIT {
 
     @Test
     @Transactional
-    public void getAllRolesByUserIsEqualToSomething() throws Exception {
+    void getAllRolesByUserIsEqualToSomething() throws Exception {
         // Initialize the database
         roleRepository.saveAndFlush(role);
         User user = UserResourceIT.createEntity(em);
@@ -317,7 +327,7 @@ public class RoleResourceIT {
         // Get all the roleList where user equals to userId
         defaultRoleShouldBeFound("userId.equals=" + userId);
 
-        // Get all the roleList where user equals to userId + 1
+        // Get all the roleList where user equals to (userId + 1)
         defaultRoleShouldNotBeFound("userId.equals=" + (userId + 1));
     }
 
@@ -326,7 +336,7 @@ public class RoleResourceIT {
      */
     private void defaultRoleShouldBeFound(String filter) throws Exception {
         restRoleMockMvc
-            .perform(get("/api/roles?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(role.getId().intValue())))
@@ -334,7 +344,7 @@ public class RoleResourceIT {
 
         // Check, that the count call also returns 1
         restRoleMockMvc
-            .perform(get("/api/roles/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -345,7 +355,7 @@ public class RoleResourceIT {
      */
     private void defaultRoleShouldNotBeFound(String filter) throws Exception {
         restRoleMockMvc
-            .perform(get("/api/roles?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -353,7 +363,7 @@ public class RoleResourceIT {
 
         // Check, that the count call also returns 0
         restRoleMockMvc
-            .perform(get("/api/roles/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));
@@ -361,14 +371,14 @@ public class RoleResourceIT {
 
     @Test
     @Transactional
-    public void getNonExistingRole() throws Exception {
+    void getNonExistingRole() throws Exception {
         // Get the role
-        restRoleMockMvc.perform(get("/api/roles/{id}", Long.MAX_VALUE)).andExpect(status().isNotFound());
+        restRoleMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    public void updateRole() throws Exception {
+    void putNewRole() throws Exception {
         // Initialize the database
         roleRepository.saveAndFlush(role);
 
@@ -383,7 +393,10 @@ public class RoleResourceIT {
 
         restRoleMockMvc
             .perform(
-                put("/api/roles").with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(roleDTO))
+                put(ENTITY_API_URL_ID, roleDTO.getId())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(roleDTO))
             )
             .andExpect(status().isOk());
 
@@ -396,8 +409,9 @@ public class RoleResourceIT {
 
     @Test
     @Transactional
-    public void updateNonExistingRole() throws Exception {
+    void putNonExistingRole() throws Exception {
         int databaseSizeBeforeUpdate = roleRepository.findAll().size();
+        role.setId(count.incrementAndGet());
 
         // Create the Role
         RoleDTO roleDTO = roleMapper.toDto(role);
@@ -405,7 +419,10 @@ public class RoleResourceIT {
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restRoleMockMvc
             .perform(
-                put("/api/roles").with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(roleDTO))
+                put(ENTITY_API_URL_ID, roleDTO.getId())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(roleDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -416,7 +433,184 @@ public class RoleResourceIT {
 
     @Test
     @Transactional
-    public void deleteRole() throws Exception {
+    void putWithIdMismatchRole() throws Exception {
+        int databaseSizeBeforeUpdate = roleRepository.findAll().size();
+        role.setId(count.incrementAndGet());
+
+        // Create the Role
+        RoleDTO roleDTO = roleMapper.toDto(role);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restRoleMockMvc
+            .perform(
+                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(roleDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the Role in the database
+        List<Role> roleList = roleRepository.findAll();
+        assertThat(roleList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void putWithMissingIdPathParamRole() throws Exception {
+        int databaseSizeBeforeUpdate = roleRepository.findAll().size();
+        role.setId(count.incrementAndGet());
+
+        // Create the Role
+        RoleDTO roleDTO = roleMapper.toDto(role);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restRoleMockMvc
+            .perform(
+                put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(roleDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the Role in the database
+        List<Role> roleList = roleRepository.findAll();
+        assertThat(roleList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void partialUpdateRoleWithPatch() throws Exception {
+        // Initialize the database
+        roleRepository.saveAndFlush(role);
+
+        int databaseSizeBeforeUpdate = roleRepository.findAll().size();
+
+        // Update the role using partial update
+        Role partialUpdatedRole = new Role();
+        partialUpdatedRole.setId(role.getId());
+
+        partialUpdatedRole.name(UPDATED_NAME);
+
+        restRoleMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedRole.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedRole))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the Role in the database
+        List<Role> roleList = roleRepository.findAll();
+        assertThat(roleList).hasSize(databaseSizeBeforeUpdate);
+        Role testRole = roleList.get(roleList.size() - 1);
+        assertThat(testRole.getName()).isEqualTo(UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void fullUpdateRoleWithPatch() throws Exception {
+        // Initialize the database
+        roleRepository.saveAndFlush(role);
+
+        int databaseSizeBeforeUpdate = roleRepository.findAll().size();
+
+        // Update the role using partial update
+        Role partialUpdatedRole = new Role();
+        partialUpdatedRole.setId(role.getId());
+
+        partialUpdatedRole.name(UPDATED_NAME);
+
+        restRoleMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedRole.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedRole))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the Role in the database
+        List<Role> roleList = roleRepository.findAll();
+        assertThat(roleList).hasSize(databaseSizeBeforeUpdate);
+        Role testRole = roleList.get(roleList.size() - 1);
+        assertThat(testRole.getName()).isEqualTo(UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void patchNonExistingRole() throws Exception {
+        int databaseSizeBeforeUpdate = roleRepository.findAll().size();
+        role.setId(count.incrementAndGet());
+
+        // Create the Role
+        RoleDTO roleDTO = roleMapper.toDto(role);
+
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
+        restRoleMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, roleDTO.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(roleDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the Role in the database
+        List<Role> roleList = roleRepository.findAll();
+        assertThat(roleList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithIdMismatchRole() throws Exception {
+        int databaseSizeBeforeUpdate = roleRepository.findAll().size();
+        role.setId(count.incrementAndGet());
+
+        // Create the Role
+        RoleDTO roleDTO = roleMapper.toDto(role);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restRoleMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(roleDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the Role in the database
+        List<Role> roleList = roleRepository.findAll();
+        assertThat(roleList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithMissingIdPathParamRole() throws Exception {
+        int databaseSizeBeforeUpdate = roleRepository.findAll().size();
+        role.setId(count.incrementAndGet());
+
+        // Create the Role
+        RoleDTO roleDTO = roleMapper.toDto(role);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restRoleMockMvc
+            .perform(
+                patch(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(roleDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the Role in the database
+        List<Role> roleList = roleRepository.findAll();
+        assertThat(roleList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void deleteRole() throws Exception {
         // Initialize the database
         roleRepository.saveAndFlush(role);
 
@@ -424,7 +618,7 @@ public class RoleResourceIT {
 
         // Delete the role
         restRoleMockMvc
-            .perform(delete("/api/roles/{id}", role.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, role.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

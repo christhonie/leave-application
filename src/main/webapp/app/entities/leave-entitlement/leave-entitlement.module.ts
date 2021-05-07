@@ -1,15 +1,14 @@
 import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
 
-import { LeaveApplicationSharedModule } from 'app/shared/shared.module';
-import { LeaveEntitlementComponent } from './leave-entitlement.component';
-import { LeaveEntitlementDetailComponent } from './leave-entitlement-detail.component';
-import { LeaveEntitlementUpdateComponent } from './leave-entitlement-update.component';
-import { LeaveEntitlementDeleteDialogComponent } from './leave-entitlement-delete-dialog.component';
-import { leaveEntitlementRoute } from './leave-entitlement.route';
+import { SharedModule } from 'app/shared/shared.module';
+import { LeaveEntitlementComponent } from './list/leave-entitlement.component';
+import { LeaveEntitlementDetailComponent } from './detail/leave-entitlement-detail.component';
+import { LeaveEntitlementUpdateComponent } from './update/leave-entitlement-update.component';
+import { LeaveEntitlementDeleteDialogComponent } from './delete/leave-entitlement-delete-dialog.component';
+import { LeaveEntitlementRoutingModule } from './route/leave-entitlement-routing.module';
 
 @NgModule({
-  imports: [LeaveApplicationSharedModule, RouterModule.forChild(leaveEntitlementRoute)],
+  imports: [SharedModule, LeaveEntitlementRoutingModule],
   declarations: [
     LeaveEntitlementComponent,
     LeaveEntitlementDetailComponent,
@@ -18,4 +17,4 @@ import { leaveEntitlementRoute } from './leave-entitlement.route';
   ],
   entryComponents: [LeaveEntitlementDeleteDialogComponent],
 })
-export class LeaveApplicationLeaveEntitlementModule {}
+export class LeaveEntitlementModule {}

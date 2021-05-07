@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import za.co.dearx.leave.domain.Comment;
 
 /**
- * Spring Data  repository for the Comment entity.
+ * Spring Data SQL repository for the Comment entity.
  */
 @SuppressWarnings("unused")
 @Repository

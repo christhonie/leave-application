@@ -3,6 +3,7 @@
     "decisions": {
       "home": {
         "title": "Decisions",
+        "refreshListLabel": "Refresh list",
         "createLabel": "Create a new Decisions",
         "createOrEditLabel": "Create or edit a Decisions",
         "notFound": "No Decisions found"
@@ -16,6 +17,7 @@
       "detail": {
         "title": "Decisions"
       },
+      "id": "ID",
       "choice": "Choice",
       "decidedOn": "Decided On",
       "comment": "Comment",

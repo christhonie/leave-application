@@ -18,6 +18,7 @@ import za.co.dearx.leave.service.mapper.LeaveStatusMapper;
 @Service
 @Transactional
 public class LeaveStatusService {
+
     private final Logger log = LoggerFactory.getLogger(LeaveStatusService.class);
 
     private final LeaveStatusRepository leaveStatusRepository;
@@ -40,6 +41,27 @@ public class LeaveStatusService {
         LeaveStatus leaveStatus = leaveStatusMapper.toEntity(leaveStatusDTO);
         leaveStatus = leaveStatusRepository.save(leaveStatus);
         return leaveStatusMapper.toDto(leaveStatus);
+    }
+
+    /**
+     * Partially update a leaveStatus.
+     *
+     * @param leaveStatusDTO the entity to update partially.
+     * @return the persisted entity.
+     */
+    public Optional<LeaveStatusDTO> partialUpdate(LeaveStatusDTO leaveStatusDTO) {
+        log.debug("Request to partially update LeaveStatus : {}", leaveStatusDTO);
+
+        return leaveStatusRepository
+            .findById(leaveStatusDTO.getId())
+            .map(
+                existingLeaveStatus -> {
+                    leaveStatusMapper.partialUpdate(existingLeaveStatus, leaveStatusDTO);
+                    return existingLeaveStatus;
+                }
+            )
+            .map(leaveStatusRepository::save)
+            .map(leaveStatusMapper::toDto);
     }
 
     /**

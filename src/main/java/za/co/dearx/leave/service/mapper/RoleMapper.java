@@ -9,13 +9,9 @@ import za.co.dearx.leave.service.dto.RoleDTO;
  */
 @Mapper(componentModel = "spring", uses = { UserMapper.class })
 public interface RoleMapper extends EntityMapper<RoleDTO, Role> {
+    @Mapping(target = "users", source = "users", qualifiedByName = "loginSet")
+    RoleDTO toDto(Role s);
+
     @Mapping(target = "removeUser", ignore = true)
-    default Role fromId(Long id) {
-        if (id == null) {
-            return null;
-        }
-        Role role = new Role();
-        role.setId(id);
-        return role;
-    }
+    Role toEntity(RoleDTO roleDTO);
 }

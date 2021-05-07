@@ -7,32 +7,32 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import za.co.dearx.leave.LeaveApplicationApp;
+import za.co.dearx.leave.IntegrationTest;
 import za.co.dearx.leave.domain.LeaveType;
 import za.co.dearx.leave.repository.LeaveTypeRepository;
-import za.co.dearx.leave.service.LeaveTypeQueryService;
-import za.co.dearx.leave.service.LeaveTypeService;
-import za.co.dearx.leave.service.dto.LeaveTypeCriteria;
+import za.co.dearx.leave.service.criteria.LeaveTypeCriteria;
 import za.co.dearx.leave.service.dto.LeaveTypeDTO;
 import za.co.dearx.leave.service.mapper.LeaveTypeMapper;
 
 /**
  * Integration tests for the {@link LeaveTypeResource} REST controller.
  */
-@SpringBootTest(classes = LeaveApplicationApp.class)
+@IntegrationTest
 @AutoConfigureMockMvc
 @WithMockUser
-public class LeaveTypeResourceIT {
+class LeaveTypeResourceIT {
+
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
 
@@ -42,17 +42,17 @@ public class LeaveTypeResourceIT {
     private static final String DEFAULT_PROCESS_NAME = "AAAAAAAAAA";
     private static final String UPDATED_PROCESS_NAME = "BBBBBBBBBB";
 
+    private static final String ENTITY_API_URL = "/api/leave-types";
+    private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
+
+    private static Random random = new Random();
+    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
     @Autowired
     private LeaveTypeRepository leaveTypeRepository;
 
     @Autowired
     private LeaveTypeMapper leaveTypeMapper;
-
-    @Autowired
-    private LeaveTypeService leaveTypeService;
-
-    @Autowired
-    private LeaveTypeQueryService leaveTypeQueryService;
 
     @Autowired
     private EntityManager em;
@@ -91,13 +91,13 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void createLeaveType() throws Exception {
+    void createLeaveType() throws Exception {
         int databaseSizeBeforeCreate = leaveTypeRepository.findAll().size();
         // Create the LeaveType
         LeaveTypeDTO leaveTypeDTO = leaveTypeMapper.toDto(leaveType);
         restLeaveTypeMockMvc
             .perform(
-                post("/api/leave-types")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveTypeDTO))
@@ -115,17 +115,17 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void createLeaveTypeWithExistingId() throws Exception {
-        int databaseSizeBeforeCreate = leaveTypeRepository.findAll().size();
-
+    void createLeaveTypeWithExistingId() throws Exception {
         // Create the LeaveType with an existing ID
         leaveType.setId(1L);
         LeaveTypeDTO leaveTypeDTO = leaveTypeMapper.toDto(leaveType);
 
+        int databaseSizeBeforeCreate = leaveTypeRepository.findAll().size();
+
         // An entity with an existing ID cannot be created, so this API call must fail
         restLeaveTypeMockMvc
             .perform(
-                post("/api/leave-types")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveTypeDTO))
@@ -139,7 +139,7 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void checkNameIsRequired() throws Exception {
+    void checkNameIsRequired() throws Exception {
         int databaseSizeBeforeTest = leaveTypeRepository.findAll().size();
         // set the field null
         leaveType.setName(null);
@@ -149,7 +149,7 @@ public class LeaveTypeResourceIT {
 
         restLeaveTypeMockMvc
             .perform(
-                post("/api/leave-types")
+                post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveTypeDTO))
@@ -162,13 +162,13 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveTypes() throws Exception {
+    void getAllLeaveTypes() throws Exception {
         // Initialize the database
         leaveTypeRepository.saveAndFlush(leaveType);
 
         // Get all the leaveTypeList
         restLeaveTypeMockMvc
-            .perform(get("/api/leave-types?sort=id,desc"))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(leaveType.getId().intValue())))
@@ -179,13 +179,13 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void getLeaveType() throws Exception {
+    void getLeaveType() throws Exception {
         // Initialize the database
         leaveTypeRepository.saveAndFlush(leaveType);
 
         // Get the leaveType
         restLeaveTypeMockMvc
-            .perform(get("/api/leave-types/{id}", leaveType.getId()))
+            .perform(get(ENTITY_API_URL_ID, leaveType.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(leaveType.getId().intValue()))
@@ -196,7 +196,7 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void getLeaveTypesByIdFiltering() throws Exception {
+    void getLeaveTypesByIdFiltering() throws Exception {
         // Initialize the database
         leaveTypeRepository.saveAndFlush(leaveType);
 
@@ -214,7 +214,7 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveTypesByNameIsEqualToSomething() throws Exception {
+    void getAllLeaveTypesByNameIsEqualToSomething() throws Exception {
         // Initialize the database
         leaveTypeRepository.saveAndFlush(leaveType);
 
@@ -227,7 +227,7 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveTypesByNameIsNotEqualToSomething() throws Exception {
+    void getAllLeaveTypesByNameIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leaveTypeRepository.saveAndFlush(leaveType);
 
@@ -240,7 +240,7 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveTypesByNameIsInShouldWork() throws Exception {
+    void getAllLeaveTypesByNameIsInShouldWork() throws Exception {
         // Initialize the database
         leaveTypeRepository.saveAndFlush(leaveType);
 
@@ -253,7 +253,7 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveTypesByNameIsNullOrNotNull() throws Exception {
+    void getAllLeaveTypesByNameIsNullOrNotNull() throws Exception {
         // Initialize the database
         leaveTypeRepository.saveAndFlush(leaveType);
 
@@ -266,7 +266,7 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveTypesByNameContainsSomething() throws Exception {
+    void getAllLeaveTypesByNameContainsSomething() throws Exception {
         // Initialize the database
         leaveTypeRepository.saveAndFlush(leaveType);
 
@@ -279,7 +279,7 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveTypesByNameNotContainsSomething() throws Exception {
+    void getAllLeaveTypesByNameNotContainsSomething() throws Exception {
         // Initialize the database
         leaveTypeRepository.saveAndFlush(leaveType);
 
@@ -292,7 +292,7 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveTypesByDescriptionIsEqualToSomething() throws Exception {
+    void getAllLeaveTypesByDescriptionIsEqualToSomething() throws Exception {
         // Initialize the database
         leaveTypeRepository.saveAndFlush(leaveType);
 
@@ -305,7 +305,7 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveTypesByDescriptionIsNotEqualToSomething() throws Exception {
+    void getAllLeaveTypesByDescriptionIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leaveTypeRepository.saveAndFlush(leaveType);
 
@@ -318,7 +318,7 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveTypesByDescriptionIsInShouldWork() throws Exception {
+    void getAllLeaveTypesByDescriptionIsInShouldWork() throws Exception {
         // Initialize the database
         leaveTypeRepository.saveAndFlush(leaveType);
 
@@ -331,7 +331,7 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveTypesByDescriptionIsNullOrNotNull() throws Exception {
+    void getAllLeaveTypesByDescriptionIsNullOrNotNull() throws Exception {
         // Initialize the database
         leaveTypeRepository.saveAndFlush(leaveType);
 
@@ -344,7 +344,7 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveTypesByDescriptionContainsSomething() throws Exception {
+    void getAllLeaveTypesByDescriptionContainsSomething() throws Exception {
         // Initialize the database
         leaveTypeRepository.saveAndFlush(leaveType);
 
@@ -357,7 +357,7 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveTypesByDescriptionNotContainsSomething() throws Exception {
+    void getAllLeaveTypesByDescriptionNotContainsSomething() throws Exception {
         // Initialize the database
         leaveTypeRepository.saveAndFlush(leaveType);
 
@@ -370,7 +370,7 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveTypesByProcessNameIsEqualToSomething() throws Exception {
+    void getAllLeaveTypesByProcessNameIsEqualToSomething() throws Exception {
         // Initialize the database
         leaveTypeRepository.saveAndFlush(leaveType);
 
@@ -383,7 +383,7 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveTypesByProcessNameIsNotEqualToSomething() throws Exception {
+    void getAllLeaveTypesByProcessNameIsNotEqualToSomething() throws Exception {
         // Initialize the database
         leaveTypeRepository.saveAndFlush(leaveType);
 
@@ -396,7 +396,7 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveTypesByProcessNameIsInShouldWork() throws Exception {
+    void getAllLeaveTypesByProcessNameIsInShouldWork() throws Exception {
         // Initialize the database
         leaveTypeRepository.saveAndFlush(leaveType);
 
@@ -409,7 +409,7 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveTypesByProcessNameIsNullOrNotNull() throws Exception {
+    void getAllLeaveTypesByProcessNameIsNullOrNotNull() throws Exception {
         // Initialize the database
         leaveTypeRepository.saveAndFlush(leaveType);
 
@@ -422,7 +422,7 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveTypesByProcessNameContainsSomething() throws Exception {
+    void getAllLeaveTypesByProcessNameContainsSomething() throws Exception {
         // Initialize the database
         leaveTypeRepository.saveAndFlush(leaveType);
 
@@ -435,7 +435,7 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void getAllLeaveTypesByProcessNameNotContainsSomething() throws Exception {
+    void getAllLeaveTypesByProcessNameNotContainsSomething() throws Exception {
         // Initialize the database
         leaveTypeRepository.saveAndFlush(leaveType);
 
@@ -451,7 +451,7 @@ public class LeaveTypeResourceIT {
      */
     private void defaultLeaveTypeShouldBeFound(String filter) throws Exception {
         restLeaveTypeMockMvc
-            .perform(get("/api/leave-types?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(leaveType.getId().intValue())))
@@ -461,7 +461,7 @@ public class LeaveTypeResourceIT {
 
         // Check, that the count call also returns 1
         restLeaveTypeMockMvc
-            .perform(get("/api/leave-types/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -472,7 +472,7 @@ public class LeaveTypeResourceIT {
      */
     private void defaultLeaveTypeShouldNotBeFound(String filter) throws Exception {
         restLeaveTypeMockMvc
-            .perform(get("/api/leave-types?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -480,7 +480,7 @@ public class LeaveTypeResourceIT {
 
         // Check, that the count call also returns 0
         restLeaveTypeMockMvc
-            .perform(get("/api/leave-types/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));
@@ -488,14 +488,14 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void getNonExistingLeaveType() throws Exception {
+    void getNonExistingLeaveType() throws Exception {
         // Get the leaveType
-        restLeaveTypeMockMvc.perform(get("/api/leave-types/{id}", Long.MAX_VALUE)).andExpect(status().isNotFound());
+        restLeaveTypeMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    public void updateLeaveType() throws Exception {
+    void putNewLeaveType() throws Exception {
         // Initialize the database
         leaveTypeRepository.saveAndFlush(leaveType);
 
@@ -510,7 +510,7 @@ public class LeaveTypeResourceIT {
 
         restLeaveTypeMockMvc
             .perform(
-                put("/api/leave-types")
+                put(ENTITY_API_URL_ID, leaveTypeDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveTypeDTO))
@@ -528,8 +528,9 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void updateNonExistingLeaveType() throws Exception {
+    void putNonExistingLeaveType() throws Exception {
         int databaseSizeBeforeUpdate = leaveTypeRepository.findAll().size();
+        leaveType.setId(count.incrementAndGet());
 
         // Create the LeaveType
         LeaveTypeDTO leaveTypeDTO = leaveTypeMapper.toDto(leaveType);
@@ -537,7 +538,7 @@ public class LeaveTypeResourceIT {
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restLeaveTypeMockMvc
             .perform(
-                put("/api/leave-types")
+                put(ENTITY_API_URL_ID, leaveTypeDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveTypeDTO))
@@ -551,7 +552,191 @@ public class LeaveTypeResourceIT {
 
     @Test
     @Transactional
-    public void deleteLeaveType() throws Exception {
+    void putWithIdMismatchLeaveType() throws Exception {
+        int databaseSizeBeforeUpdate = leaveTypeRepository.findAll().size();
+        leaveType.setId(count.incrementAndGet());
+
+        // Create the LeaveType
+        LeaveTypeDTO leaveTypeDTO = leaveTypeMapper.toDto(leaveType);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeaveTypeMockMvc
+            .perform(
+                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(leaveTypeDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the LeaveType in the database
+        List<LeaveType> leaveTypeList = leaveTypeRepository.findAll();
+        assertThat(leaveTypeList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void putWithMissingIdPathParamLeaveType() throws Exception {
+        int databaseSizeBeforeUpdate = leaveTypeRepository.findAll().size();
+        leaveType.setId(count.incrementAndGet());
+
+        // Create the LeaveType
+        LeaveTypeDTO leaveTypeDTO = leaveTypeMapper.toDto(leaveType);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeaveTypeMockMvc
+            .perform(
+                put(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(leaveTypeDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the LeaveType in the database
+        List<LeaveType> leaveTypeList = leaveTypeRepository.findAll();
+        assertThat(leaveTypeList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void partialUpdateLeaveTypeWithPatch() throws Exception {
+        // Initialize the database
+        leaveTypeRepository.saveAndFlush(leaveType);
+
+        int databaseSizeBeforeUpdate = leaveTypeRepository.findAll().size();
+
+        // Update the leaveType using partial update
+        LeaveType partialUpdatedLeaveType = new LeaveType();
+        partialUpdatedLeaveType.setId(leaveType.getId());
+
+        partialUpdatedLeaveType.name(UPDATED_NAME).processName(UPDATED_PROCESS_NAME);
+
+        restLeaveTypeMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedLeaveType.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedLeaveType))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the LeaveType in the database
+        List<LeaveType> leaveTypeList = leaveTypeRepository.findAll();
+        assertThat(leaveTypeList).hasSize(databaseSizeBeforeUpdate);
+        LeaveType testLeaveType = leaveTypeList.get(leaveTypeList.size() - 1);
+        assertThat(testLeaveType.getName()).isEqualTo(UPDATED_NAME);
+        assertThat(testLeaveType.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
+        assertThat(testLeaveType.getProcessName()).isEqualTo(UPDATED_PROCESS_NAME);
+    }
+
+    @Test
+    @Transactional
+    void fullUpdateLeaveTypeWithPatch() throws Exception {
+        // Initialize the database
+        leaveTypeRepository.saveAndFlush(leaveType);
+
+        int databaseSizeBeforeUpdate = leaveTypeRepository.findAll().size();
+
+        // Update the leaveType using partial update
+        LeaveType partialUpdatedLeaveType = new LeaveType();
+        partialUpdatedLeaveType.setId(leaveType.getId());
+
+        partialUpdatedLeaveType.name(UPDATED_NAME).description(UPDATED_DESCRIPTION).processName(UPDATED_PROCESS_NAME);
+
+        restLeaveTypeMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedLeaveType.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedLeaveType))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the LeaveType in the database
+        List<LeaveType> leaveTypeList = leaveTypeRepository.findAll();
+        assertThat(leaveTypeList).hasSize(databaseSizeBeforeUpdate);
+        LeaveType testLeaveType = leaveTypeList.get(leaveTypeList.size() - 1);
+        assertThat(testLeaveType.getName()).isEqualTo(UPDATED_NAME);
+        assertThat(testLeaveType.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
+        assertThat(testLeaveType.getProcessName()).isEqualTo(UPDATED_PROCESS_NAME);
+    }
+
+    @Test
+    @Transactional
+    void patchNonExistingLeaveType() throws Exception {
+        int databaseSizeBeforeUpdate = leaveTypeRepository.findAll().size();
+        leaveType.setId(count.incrementAndGet());
+
+        // Create the LeaveType
+        LeaveTypeDTO leaveTypeDTO = leaveTypeMapper.toDto(leaveType);
+
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
+        restLeaveTypeMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, leaveTypeDTO.getId())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(leaveTypeDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the LeaveType in the database
+        List<LeaveType> leaveTypeList = leaveTypeRepository.findAll();
+        assertThat(leaveTypeList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithIdMismatchLeaveType() throws Exception {
+        int databaseSizeBeforeUpdate = leaveTypeRepository.findAll().size();
+        leaveType.setId(count.incrementAndGet());
+
+        // Create the LeaveType
+        LeaveTypeDTO leaveTypeDTO = leaveTypeMapper.toDto(leaveType);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeaveTypeMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(leaveTypeDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the LeaveType in the database
+        List<LeaveType> leaveTypeList = leaveTypeRepository.findAll();
+        assertThat(leaveTypeList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithMissingIdPathParamLeaveType() throws Exception {
+        int databaseSizeBeforeUpdate = leaveTypeRepository.findAll().size();
+        leaveType.setId(count.incrementAndGet());
+
+        // Create the LeaveType
+        LeaveTypeDTO leaveTypeDTO = leaveTypeMapper.toDto(leaveType);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restLeaveTypeMockMvc
+            .perform(
+                patch(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(leaveTypeDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the LeaveType in the database
+        List<LeaveType> leaveTypeList = leaveTypeRepository.findAll();
+        assertThat(leaveTypeList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void deleteLeaveType() throws Exception {
         // Initialize the database
         leaveTypeRepository.saveAndFlush(leaveType);
 
@@ -559,7 +744,7 @@ public class LeaveTypeResourceIT {
 
         // Delete the leaveType
         restLeaveTypeMockMvc
-            .perform(delete("/api/leave-types/{id}", leaveType.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, leaveType.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

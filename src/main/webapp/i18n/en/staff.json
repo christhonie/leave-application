@@ -3,6 +3,7 @@
     "staff": {
       "home": {
         "title": "Staff",
+        "refreshListLabel": "Refresh list",
         "createLabel": "Create a new Staff",
         "createOrEditLabel": "Create or edit a Staff",
         "notFound": "No Staff found"
@@ -16,6 +17,7 @@
       "detail": {
         "title": "Staff"
       },
+      "id": "ID",
       "position": "Position",
       "employeeID": "Employee ID",
       "startDate": "Start Date",

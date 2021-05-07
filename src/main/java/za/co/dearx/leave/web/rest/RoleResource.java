@@ -1,13 +1,12 @@
 package za.co.dearx.leave.web.rest;
 
-import io.github.jhipster.web.util.HeaderUtil;
-import io.github.jhipster.web.util.PaginationUtil;
-import io.github.jhipster.web.util.ResponseUtil;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,9 +17,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import tech.jhipster.web.util.HeaderUtil;
+import tech.jhipster.web.util.PaginationUtil;
+import tech.jhipster.web.util.ResponseUtil;
+import za.co.dearx.leave.repository.RoleRepository;
 import za.co.dearx.leave.service.RoleQueryService;
 import za.co.dearx.leave.service.RoleService;
-import za.co.dearx.leave.service.dto.RoleCriteria;
+import za.co.dearx.leave.service.criteria.RoleCriteria;
 import za.co.dearx.leave.service.dto.RoleDTO;
 import za.co.dearx.leave.web.rest.errors.BadRequestAlertException;
 
@@ -30,6 +33,7 @@ import za.co.dearx.leave.web.rest.errors.BadRequestAlertException;
 @RestController
 @RequestMapping("/api")
 public class RoleResource {
+
     private final Logger log = LoggerFactory.getLogger(RoleResource.class);
 
     private static final String ENTITY_NAME = "role";
@@ -39,10 +43,13 @@ public class RoleResource {
 
     private final RoleService roleService;
 
+    private final RoleRepository roleRepository;
+
     private final RoleQueryService roleQueryService;
 
-    public RoleResource(RoleService roleService, RoleQueryService roleQueryService) {
+    public RoleResource(RoleService roleService, RoleRepository roleRepository, RoleQueryService roleQueryService) {
         this.roleService = roleService;
+        this.roleRepository = roleRepository;
         this.roleQueryService = roleQueryService;
     }
 
@@ -67,25 +74,73 @@ public class RoleResource {
     }
 
     /**
-     * {@code PUT  /roles} : Updates an existing role.
+     * {@code PUT  /roles/:id} : Updates an existing role.
      *
+     * @param id the id of the roleDTO to save.
      * @param roleDTO the roleDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated roleDTO,
      * or with status {@code 400 (Bad Request)} if the roleDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the roleDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/roles")
-    public ResponseEntity<RoleDTO> updateRole(@Valid @RequestBody RoleDTO roleDTO) throws URISyntaxException {
-        log.debug("REST request to update Role : {}", roleDTO);
+    @PutMapping("/roles/{id}")
+    public ResponseEntity<RoleDTO> updateRole(
+        @PathVariable(value = "id", required = false) final Long id,
+        @Valid @RequestBody RoleDTO roleDTO
+    ) throws URISyntaxException {
+        log.debug("REST request to update Role : {}, {}", id, roleDTO);
         if (roleDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
+        if (!Objects.equals(id, roleDTO.getId())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+
+        if (!roleRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
         RoleDTO result = roleService.save(roleDTO);
         return ResponseEntity
             .ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, roleDTO.getId().toString()))
             .body(result);
+    }
+
+    /**
+     * {@code PATCH  /roles/:id} : Partial updates given fields of an existing role, field will ignore if it is null
+     *
+     * @param id the id of the roleDTO to save.
+     * @param roleDTO the roleDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated roleDTO,
+     * or with status {@code 400 (Bad Request)} if the roleDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the roleDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the roleDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PatchMapping(value = "/roles/{id}", consumes = "application/merge-patch+json")
+    public ResponseEntity<RoleDTO> partialUpdateRole(
+        @PathVariable(value = "id", required = false) final Long id,
+        @NotNull @RequestBody RoleDTO roleDTO
+    ) throws URISyntaxException {
+        log.debug("REST request to partial update Role partially : {}, {}", id, roleDTO);
+        if (roleDTO.getId() == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!Objects.equals(id, roleDTO.getId())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+
+        if (!roleRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        Optional<RoleDTO> result = roleService.partialUpdate(roleDTO);
+
+        return ResponseUtil.wrapOrNotFound(
+            result,
+            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, roleDTO.getId().toString())
+        );
     }
 
     /**

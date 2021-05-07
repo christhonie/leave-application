@@ -1,21 +1,21 @@
 package za.co.dearx.leave.service.dto;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.validation.constraints.*;
 
 /**
  * A DTO for the {@link za.co.dearx.leave.domain.Team} entity.
  */
 public class TeamDTO implements Serializable {
+
     private Long id;
 
     @NotNull
     @Size(max = 50)
     private String name;
 
-    private Long managerId;
-
-    private String managerLogin;
+    private UserDTO manager;
 
     public Long getId() {
         return id;
@@ -33,20 +33,12 @@ public class TeamDTO implements Serializable {
         this.name = name;
     }
 
-    public Long getManagerId() {
-        return managerId;
+    public UserDTO getManager() {
+        return manager;
     }
 
-    public void setManagerId(Long userId) {
-        this.managerId = userId;
-    }
-
-    public String getManagerLogin() {
-        return managerLogin;
-    }
-
-    public void setManagerLogin(String userLogin) {
-        this.managerLogin = userLogin;
+    public void setManager(UserDTO manager) {
+        this.manager = manager;
     }
 
     @Override
@@ -58,12 +50,16 @@ public class TeamDTO implements Serializable {
             return false;
         }
 
-        return id != null && id.equals(((TeamDTO) o).id);
+        TeamDTO teamDTO = (TeamDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, teamDTO.id);
     }
 
     @Override
     public int hashCode() {
-        return 31;
+        return Objects.hash(this.id);
     }
 
     // prettier-ignore
@@ -72,8 +68,7 @@ public class TeamDTO implements Serializable {
         return "TeamDTO{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
-            ", managerId=" + getManagerId() +
-            ", managerLogin='" + getManagerLogin() + "'" +
+            ", manager=" + getManager() +
             "}";
     }
 }

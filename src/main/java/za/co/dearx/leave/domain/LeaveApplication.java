@@ -17,6 +17,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "leave_application")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class LeaveApplication implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -48,16 +49,14 @@ public class LeaveApplication implements Serializable {
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = "leaveApplications", allowSetters = true)
     private LeaveType leaveType;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = "leaveApplications", allowSetters = true)
     private LeaveStatus leaveStatus;
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = "leaveApplications", allowSetters = true)
+    @JsonIgnoreProperties(value = { "user", "teams" }, allowSetters = true)
     private Staff staff;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -69,8 +68,13 @@ public class LeaveApplication implements Serializable {
         this.id = id;
     }
 
+    public LeaveApplication id(Long id) {
+        this.id = id;
+        return this;
+    }
+
     public LocalDate getStartDate() {
-        return startDate;
+        return this.startDate;
     }
 
     public LeaveApplication startDate(LocalDate startDate) {
@@ -83,7 +87,7 @@ public class LeaveApplication implements Serializable {
     }
 
     public LocalDate getEndDate() {
-        return endDate;
+        return this.endDate;
     }
 
     public LeaveApplication endDate(LocalDate endDate) {
@@ -96,7 +100,7 @@ public class LeaveApplication implements Serializable {
     }
 
     public ZonedDateTime getAppliedDate() {
-        return appliedDate;
+        return this.appliedDate;
     }
 
     public LeaveApplication appliedDate(ZonedDateTime appliedDate) {
@@ -109,7 +113,7 @@ public class LeaveApplication implements Serializable {
     }
 
     public ZonedDateTime getUpdateDate() {
-        return updateDate;
+        return this.updateDate;
     }
 
     public LeaveApplication updateDate(ZonedDateTime updateDate) {
@@ -122,7 +126,7 @@ public class LeaveApplication implements Serializable {
     }
 
     public BigDecimal getDays() {
-        return days;
+        return this.days;
     }
 
     public LeaveApplication days(BigDecimal days) {
@@ -134,8 +138,8 @@ public class LeaveApplication implements Serializable {
         this.days = days;
     }
 
-    public Boolean isDeleted() {
-        return deleted;
+    public Boolean getDeleted() {
+        return this.deleted;
     }
 
     public LeaveApplication deleted(Boolean deleted) {
@@ -148,11 +152,11 @@ public class LeaveApplication implements Serializable {
     }
 
     public LeaveType getLeaveType() {
-        return leaveType;
+        return this.leaveType;
     }
 
     public LeaveApplication leaveType(LeaveType leaveType) {
-        this.leaveType = leaveType;
+        this.setLeaveType(leaveType);
         return this;
     }
 
@@ -161,11 +165,11 @@ public class LeaveApplication implements Serializable {
     }
 
     public LeaveStatus getLeaveStatus() {
-        return leaveStatus;
+        return this.leaveStatus;
     }
 
     public LeaveApplication leaveStatus(LeaveStatus leaveStatus) {
-        this.leaveStatus = leaveStatus;
+        this.setLeaveStatus(leaveStatus);
         return this;
     }
 
@@ -174,11 +178,11 @@ public class LeaveApplication implements Serializable {
     }
 
     public Staff getStaff() {
-        return staff;
+        return this.staff;
     }
 
     public LeaveApplication staff(Staff staff) {
-        this.staff = staff;
+        this.setStaff(staff);
         return this;
     }
 
@@ -201,7 +205,8 @@ public class LeaveApplication implements Serializable {
 
     @Override
     public int hashCode() {
-        return 31;
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        return getClass().hashCode();
     }
 
     // prettier-ignore
@@ -214,7 +219,7 @@ public class LeaveApplication implements Serializable {
             ", appliedDate='" + getAppliedDate() + "'" +
             ", updateDate='" + getUpdateDate() + "'" +
             ", days=" + getDays() +
-            ", deleted='" + isDeleted() + "'" +
+            ", deleted='" + getDeleted() + "'" +
             "}";
     }
 }

@@ -1,8 +1,5 @@
 package za.co.dearx.leave.security;
 
-import io.github.jhipster.config.JHipsterProperties;
-import io.github.jhipster.security.PersistentTokenCache;
-import io.github.jhipster.security.RandomUtil;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
@@ -16,6 +13,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.rememberme.*;
 import org.springframework.stereotype.Service;
+import tech.jhipster.config.JHipsterProperties;
+import tech.jhipster.security.PersistentTokenCache;
+import tech.jhipster.security.RandomUtil;
 import za.co.dearx.leave.domain.PersistentToken;
 import za.co.dearx.leave.repository.PersistentTokenRepository;
 import za.co.dearx.leave.repository.UserRepository;
@@ -49,6 +49,7 @@ import za.co.dearx.leave.repository.UserRepository;
  */
 @Service
 public class PersistentTokenRememberMeServices extends AbstractRememberMeServices {
+
     private final Logger log = LoggerFactory.getLogger(PersistentTokenRememberMeServices.class);
 
     // Token is valid for one month
@@ -200,6 +201,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
     }
 
     private static class UpgradedRememberMeToken implements Serializable {
+
         private static final long serialVersionUID = 1L;
 
         private final String[] upgradedToken;

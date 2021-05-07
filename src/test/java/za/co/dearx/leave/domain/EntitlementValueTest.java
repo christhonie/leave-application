@@ -5,10 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import za.co.dearx.leave.web.rest.TestUtil;
 
-public class EntitlementValueTest {
+class EntitlementValueTest {
 
     @Test
-    public void equalsVerifier() throws Exception {
+    void equalsVerifier() throws Exception {
         TestUtil.equalsVerifier(EntitlementValue.class);
         EntitlementValue entitlementValue1 = new EntitlementValue();
         entitlementValue1.setId(1L);

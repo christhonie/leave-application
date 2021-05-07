@@ -1,16 +1,15 @@
 import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
 
-import { LeaveApplicationSharedModule } from 'app/shared/shared.module';
-import { LeaveStatusComponent } from './leave-status.component';
-import { LeaveStatusDetailComponent } from './leave-status-detail.component';
-import { LeaveStatusUpdateComponent } from './leave-status-update.component';
-import { LeaveStatusDeleteDialogComponent } from './leave-status-delete-dialog.component';
-import { leaveStatusRoute } from './leave-status.route';
+import { SharedModule } from 'app/shared/shared.module';
+import { LeaveStatusComponent } from './list/leave-status.component';
+import { LeaveStatusDetailComponent } from './detail/leave-status-detail.component';
+import { LeaveStatusUpdateComponent } from './update/leave-status-update.component';
+import { LeaveStatusDeleteDialogComponent } from './delete/leave-status-delete-dialog.component';
+import { LeaveStatusRoutingModule } from './route/leave-status-routing.module';
 
 @NgModule({
-  imports: [LeaveApplicationSharedModule, RouterModule.forChild(leaveStatusRoute)],
+  imports: [SharedModule, LeaveStatusRoutingModule],
   declarations: [LeaveStatusComponent, LeaveStatusDetailComponent, LeaveStatusUpdateComponent, LeaveStatusDeleteDialogComponent],
   entryComponents: [LeaveStatusDeleteDialogComponent],
 })
-export class LeaveApplicationLeaveStatusModule {}
+export class LeaveStatusModule {}

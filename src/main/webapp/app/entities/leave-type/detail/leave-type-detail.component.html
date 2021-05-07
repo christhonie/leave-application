@@ -1,0 +1,40 @@
+<div class="row justify-content-center">
+  <div class="col-8">
+    <div *ngIf="leaveType">
+      <h2 data-cy="leaveTypeDetailsHeading"><span jhiTranslate="leaveApplicationApp.leaveType.detail.title">Leave Type</span></h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dd>
+          <span>{{ leaveType.id }}</span>
+        </dd>
+        <dt><span jhiTranslate="leaveApplicationApp.leaveType.name">Name</span></dt>
+        <dd>
+          <span>{{ leaveType.name }}</span>
+        </dd>
+        <dt><span jhiTranslate="leaveApplicationApp.leaveType.description">Description</span></dt>
+        <dd>
+          <span>{{ leaveType.description }}</span>
+        </dd>
+        <dt><span jhiTranslate="leaveApplicationApp.leaveType.processName">Process Name</span></dt>
+        <dd>
+          <span>{{ leaveType.processName }}</span>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+      </button>
+
+      <button type="button" [routerLink]="['/leave-type', leaveType.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+      </button>
+    </div>
+  </div>
+</div>

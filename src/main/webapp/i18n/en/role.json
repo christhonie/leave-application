@@ -3,6 +3,7 @@
     "role": {
       "home": {
         "title": "Roles",
+        "refreshListLabel": "Refresh list",
         "createLabel": "Create a new Role",
         "createOrEditLabel": "Create or edit a Role",
         "notFound": "No Roles found"
@@ -16,6 +17,7 @@
       "detail": {
         "title": "Role"
       },
+      "id": "ID",
       "name": "Name",
       "user": "User"
     }

@@ -1,0 +1,234 @@
+<div class="row justify-content-center">
+  <div class="col-8">
+    <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-leave-application-heading"
+        data-cy="LeaveApplicationCreateUpdateHeading"
+        jhiTranslate="leaveApplicationApp.leaveApplication.home.createOrEditLabel"
+      >
+        Create or edit a Leave Application
+      </h2>
+
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+
+        <div class="form-group" [hidden]="editForm.get('id')!.value == null">
+          <label class="form-control-label" jhiTranslate="global.field.id" for="field_id">ID</label>
+          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" jhiTranslate="leaveApplicationApp.leaveApplication.startDate" for="field_startDate"
+            >Start Date</label
+          >
+          <div class="input-group">
+            <input
+              id="field_startDate"
+              data-cy="startDate"
+              type="text"
+              class="form-control"
+              name="startDate"
+              ngbDatepicker
+              #startDateDp="ngbDatepicker"
+              formControlName="startDate"
+            />
+            <span class="input-group-append">
+              <button type="button" class="btn btn-secondary" (click)="startDateDp.toggle()">
+                <fa-icon icon="calendar-alt"></fa-icon>
+              </button>
+            </span>
+          </div>
+          <div *ngIf="editForm.get('startDate')!.invalid && (editForm.get('startDate')!.dirty || editForm.get('startDate')!.touched)">
+            <small
+              class="form-text text-danger"
+              *ngIf="editForm.get('startDate')?.errors?.required"
+              jhiTranslate="entity.validation.required"
+            >
+              This field is required.
+            </small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" jhiTranslate="leaveApplicationApp.leaveApplication.endDate" for="field_endDate">End Date</label>
+          <div class="input-group">
+            <input
+              id="field_endDate"
+              data-cy="endDate"
+              type="text"
+              class="form-control"
+              name="endDate"
+              ngbDatepicker
+              #endDateDp="ngbDatepicker"
+              formControlName="endDate"
+            />
+            <span class="input-group-append">
+              <button type="button" class="btn btn-secondary" (click)="endDateDp.toggle()"><fa-icon icon="calendar-alt"></fa-icon></button>
+            </span>
+          </div>
+          <div *ngIf="editForm.get('endDate')!.invalid && (editForm.get('endDate')!.dirty || editForm.get('endDate')!.touched)">
+            <small
+              class="form-text text-danger"
+              *ngIf="editForm.get('endDate')?.errors?.required"
+              jhiTranslate="entity.validation.required"
+            >
+              This field is required.
+            </small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" jhiTranslate="leaveApplicationApp.leaveApplication.appliedDate" for="field_appliedDate"
+            >Applied Date</label
+          >
+          <div class="d-flex">
+            <input
+              id="field_appliedDate"
+              data-cy="appliedDate"
+              type="datetime-local"
+              class="form-control"
+              name="appliedDate"
+              formControlName="appliedDate"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          <div *ngIf="editForm.get('appliedDate')!.invalid && (editForm.get('appliedDate')!.dirty || editForm.get('appliedDate')!.touched)">
+            <small
+              class="form-text text-danger"
+              *ngIf="editForm.get('appliedDate')?.errors?.required"
+              jhiTranslate="entity.validation.required"
+            >
+              This field is required.
+            </small>
+            <small
+              class="form-text text-danger"
+              [hidden]="!editForm.get('appliedDate')?.errors?.ZonedDateTimelocal"
+              jhiTranslate="entity.validation.ZonedDateTimelocal"
+            >
+              This field should be a date and time.
+            </small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" jhiTranslate="leaveApplicationApp.leaveApplication.updateDate" for="field_updateDate"
+            >Update Date</label
+          >
+          <div class="d-flex">
+            <input
+              id="field_updateDate"
+              data-cy="updateDate"
+              type="datetime-local"
+              class="form-control"
+              name="updateDate"
+              formControlName="updateDate"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" jhiTranslate="leaveApplicationApp.leaveApplication.days" for="field_days">Days</label>
+          <input type="number" class="form-control" name="days" id="field_days" data-cy="days" formControlName="days" />
+          <div *ngIf="editForm.get('days')!.invalid && (editForm.get('days')!.dirty || editForm.get('days')!.touched)">
+            <small class="form-text text-danger" *ngIf="editForm.get('days')?.errors?.required" jhiTranslate="entity.validation.required">
+              This field is required.
+            </small>
+            <small class="form-text text-danger" [hidden]="!editForm.get('days')?.errors?.number" jhiTranslate="entity.validation.number">
+              This field should be a number.
+            </small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" jhiTranslate="leaveApplicationApp.leaveApplication.deleted" for="field_deleted">Deleted</label>
+          <input type="checkbox" class="form-check" name="deleted" id="field_deleted" data-cy="deleted" formControlName="deleted" />
+          <div *ngIf="editForm.get('deleted')!.invalid && (editForm.get('deleted')!.dirty || editForm.get('deleted')!.touched)">
+            <small
+              class="form-text text-danger"
+              *ngIf="editForm.get('deleted')?.errors?.required"
+              jhiTranslate="entity.validation.required"
+            >
+              This field is required.
+            </small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" jhiTranslate="leaveApplicationApp.leaveApplication.leaveType" for="field_leaveType"
+            >Leave Type</label
+          >
+          <select class="form-control" id="field_leaveType" data-cy="leaveType" name="leaveType" formControlName="leaveType">
+            <option *ngIf="!editForm.get('leaveType')!.value" [ngValue]="null" selected></option>
+            <option
+              [ngValue]="leaveTypeOption.id === editForm.get('leaveType')!.value?.id ? editForm.get('leaveType')!.value : leaveTypeOption"
+              *ngFor="let leaveTypeOption of leaveTypesSharedCollection; trackBy: trackLeaveTypeById"
+            >
+              {{ leaveTypeOption.name }}
+            </option>
+          </select>
+        </div>
+        <div *ngIf="editForm.get(['leaveType'])!.invalid && (editForm.get(['leaveType'])!.dirty || editForm.get(['leaveType'])!.touched)">
+          <small
+            class="form-text text-danger"
+            *ngIf="editForm.get(['leaveType'])?.errors?.required"
+            jhiTranslate="entity.validation.required"
+          >
+            This field is required.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" jhiTranslate="leaveApplicationApp.leaveApplication.leaveStatus" for="field_leaveStatus"
+            >Leave Status</label
+          >
+          <select class="form-control" id="field_leaveStatus" data-cy="leaveStatus" name="leaveStatus" formControlName="leaveStatus">
+            <option [ngValue]="null"></option>
+            <option
+              [ngValue]="
+                leaveStatusOption.id === editForm.get('leaveStatus')!.value?.id ? editForm.get('leaveStatus')!.value : leaveStatusOption
+              "
+              *ngFor="let leaveStatusOption of leaveStatusesSharedCollection; trackBy: trackLeaveStatusById"
+            >
+              {{ leaveStatusOption.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" jhiTranslate="leaveApplicationApp.leaveApplication.staff" for="field_staff">Staff</label>
+          <select class="form-control" id="field_staff" data-cy="staff" name="staff" formControlName="staff">
+            <option *ngIf="!editForm.get('staff')!.value" [ngValue]="null" selected></option>
+            <option
+              [ngValue]="staffOption.id === editForm.get('staff')!.value?.id ? editForm.get('staff')!.value : staffOption"
+              *ngFor="let staffOption of staffSharedCollection; trackBy: trackStaffById"
+            >
+              {{ staffOption.name }}
+            </option>
+          </select>
+        </div>
+        <div *ngIf="editForm.get(['staff'])!.invalid && (editForm.get(['staff'])!.dirty || editForm.get(['staff'])!.touched)">
+          <small class="form-text text-danger" *ngIf="editForm.get(['staff'])?.errors?.required" jhiTranslate="entity.validation.required">
+            This field is required.
+          </small>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

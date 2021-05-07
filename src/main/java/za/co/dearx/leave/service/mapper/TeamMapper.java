@@ -1,5 +1,6 @@
 package za.co.dearx.leave.service.mapper;
 
+import java.util.Set;
 import org.mapstruct.*;
 import za.co.dearx.leave.domain.*;
 import za.co.dearx.leave.service.dto.TeamDTO;
@@ -9,21 +10,12 @@ import za.co.dearx.leave.service.dto.TeamDTO;
  */
 @Mapper(componentModel = "spring", uses = { UserMapper.class })
 public interface TeamMapper extends EntityMapper<TeamDTO, Team> {
-    @Mapping(source = "manager.id", target = "managerId")
-    @Mapping(source = "manager.login", target = "managerLogin")
-    TeamDTO toDto(Team team);
+    @Mapping(target = "manager", source = "manager", qualifiedByName = "login")
+    TeamDTO toDto(Team s);
 
-    @Mapping(source = "managerId", target = "manager")
-    @Mapping(target = "members", ignore = true)
-    @Mapping(target = "removeMember", ignore = true)
-    Team toEntity(TeamDTO teamDTO);
-
-    default Team fromId(Long id) {
-        if (id == null) {
-            return null;
-        }
-        Team team = new Team();
-        team.setId(id);
-        return team;
-    }
+    @Named("nameSet")
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "name", source = "name")
+    Set<TeamDTO> toDtoNameSet(Set<Team> team);
 }

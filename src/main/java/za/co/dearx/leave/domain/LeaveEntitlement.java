@@ -16,6 +16,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "leave_entitlement")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class LeaveEntitlement implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -32,12 +33,11 @@ public class LeaveEntitlement implements Serializable {
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = "leaveEntitlements", allowSetters = true)
     private LeaveType leaveType;
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = "leaveEntitlements", allowSetters = true)
+    @JsonIgnoreProperties(value = { "user", "teams" }, allowSetters = true)
     private Staff staff;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -49,8 +49,13 @@ public class LeaveEntitlement implements Serializable {
         this.id = id;
     }
 
+    public LeaveEntitlement id(Long id) {
+        this.id = id;
+        return this;
+    }
+
     public LocalDate getEntitlementDate() {
-        return entitlementDate;
+        return this.entitlementDate;
     }
 
     public LeaveEntitlement entitlementDate(LocalDate entitlementDate) {
@@ -63,7 +68,7 @@ public class LeaveEntitlement implements Serializable {
     }
 
     public BigDecimal getDays() {
-        return days;
+        return this.days;
     }
 
     public LeaveEntitlement days(BigDecimal days) {
@@ -76,11 +81,11 @@ public class LeaveEntitlement implements Serializable {
     }
 
     public LeaveType getLeaveType() {
-        return leaveType;
+        return this.leaveType;
     }
 
     public LeaveEntitlement leaveType(LeaveType leaveType) {
-        this.leaveType = leaveType;
+        this.setLeaveType(leaveType);
         return this;
     }
 
@@ -89,11 +94,11 @@ public class LeaveEntitlement implements Serializable {
     }
 
     public Staff getStaff() {
-        return staff;
+        return this.staff;
     }
 
     public LeaveEntitlement staff(Staff staff) {
-        this.staff = staff;
+        this.setStaff(staff);
         return this;
     }
 
@@ -116,7 +121,8 @@ public class LeaveEntitlement implements Serializable {
 
     @Override
     public int hashCode() {
-        return 31;
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        return getClass().hashCode();
     }
 
     // prettier-ignore

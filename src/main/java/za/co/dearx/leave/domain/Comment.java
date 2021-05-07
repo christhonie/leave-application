@@ -14,6 +14,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "comment")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Comment implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -27,12 +28,11 @@ public class Comment implements Serializable {
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = "comments", allowSetters = true)
+    @JsonIgnoreProperties(value = { "leaveType", "leaveStatus", "staff" }, allowSetters = true)
     private LeaveApplication leaveApplication;
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = "comments", allowSetters = true)
     private User user;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -44,8 +44,13 @@ public class Comment implements Serializable {
         this.id = id;
     }
 
+    public Comment id(Long id) {
+        this.id = id;
+        return this;
+    }
+
     public String getComment() {
-        return comment;
+        return this.comment;
     }
 
     public Comment comment(String comment) {
@@ -58,11 +63,11 @@ public class Comment implements Serializable {
     }
 
     public LeaveApplication getLeaveApplication() {
-        return leaveApplication;
+        return this.leaveApplication;
     }
 
     public Comment leaveApplication(LeaveApplication leaveApplication) {
-        this.leaveApplication = leaveApplication;
+        this.setLeaveApplication(leaveApplication);
         return this;
     }
 
@@ -71,11 +76,11 @@ public class Comment implements Serializable {
     }
 
     public User getUser() {
-        return user;
+        return this.user;
     }
 
     public Comment user(User user) {
-        this.user = user;
+        this.setUser(user);
         return this;
     }
 
@@ -98,7 +103,8 @@ public class Comment implements Serializable {
 
     @Override
     public int hashCode() {
-        return 31;
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        return getClass().hashCode();
     }
 
     // prettier-ignore

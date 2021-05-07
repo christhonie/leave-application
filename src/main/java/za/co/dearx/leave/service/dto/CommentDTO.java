@@ -1,23 +1,23 @@
 package za.co.dearx.leave.service.dto;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.validation.constraints.*;
 
 /**
  * A DTO for the {@link za.co.dearx.leave.domain.Comment} entity.
  */
 public class CommentDTO implements Serializable {
+
     private Long id;
 
     @NotNull
     @Size(max = 5000)
     private String comment;
 
-    private Long leaveApplicationId;
+    private LeaveApplicationDTO leaveApplication;
 
-    private Long userId;
-
-    private String userLogin;
+    private UserDTO user;
 
     public Long getId() {
         return id;
@@ -35,28 +35,20 @@ public class CommentDTO implements Serializable {
         this.comment = comment;
     }
 
-    public Long getLeaveApplicationId() {
-        return leaveApplicationId;
+    public LeaveApplicationDTO getLeaveApplication() {
+        return leaveApplication;
     }
 
-    public void setLeaveApplicationId(Long leaveApplicationId) {
-        this.leaveApplicationId = leaveApplicationId;
+    public void setLeaveApplication(LeaveApplicationDTO leaveApplication) {
+        this.leaveApplication = leaveApplication;
     }
 
-    public Long getUserId() {
-        return userId;
+    public UserDTO getUser() {
+        return user;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public String getUserLogin() {
-        return userLogin;
-    }
-
-    public void setUserLogin(String userLogin) {
-        this.userLogin = userLogin;
+    public void setUser(UserDTO user) {
+        this.user = user;
     }
 
     @Override
@@ -68,12 +60,16 @@ public class CommentDTO implements Serializable {
             return false;
         }
 
-        return id != null && id.equals(((CommentDTO) o).id);
+        CommentDTO commentDTO = (CommentDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, commentDTO.id);
     }
 
     @Override
     public int hashCode() {
-        return 31;
+        return Objects.hash(this.id);
     }
 
     // prettier-ignore
@@ -82,9 +78,8 @@ public class CommentDTO implements Serializable {
         return "CommentDTO{" +
             "id=" + getId() +
             ", comment='" + getComment() + "'" +
-            ", leaveApplicationId=" + getLeaveApplicationId() +
-            ", userId=" + getUserId() +
-            ", userLogin='" + getUserLogin() + "'" +
+            ", leaveApplication=" + getLeaveApplication() +
+            ", user=" + getUser() +
             "}";
     }
 }

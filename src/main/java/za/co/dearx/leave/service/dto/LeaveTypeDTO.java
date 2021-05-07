@@ -1,12 +1,14 @@
 package za.co.dearx.leave.service.dto;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.validation.constraints.*;
 
 /**
  * A DTO for the {@link za.co.dearx.leave.domain.LeaveType} entity.
  */
 public class LeaveTypeDTO implements Serializable {
+
     private Long id;
 
     @NotNull
@@ -60,12 +62,16 @@ public class LeaveTypeDTO implements Serializable {
             return false;
         }
 
-        return id != null && id.equals(((LeaveTypeDTO) o).id);
+        LeaveTypeDTO leaveTypeDTO = (LeaveTypeDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, leaveTypeDTO.id);
     }
 
     @Override
     public int hashCode() {
-        return 31;
+        return Objects.hash(this.id);
     }
 
     // prettier-ignore

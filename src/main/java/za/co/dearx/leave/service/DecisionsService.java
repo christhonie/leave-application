@@ -18,6 +18,7 @@ import za.co.dearx.leave.service.mapper.DecisionsMapper;
 @Service
 @Transactional
 public class DecisionsService {
+
     private final Logger log = LoggerFactory.getLogger(DecisionsService.class);
 
     private final DecisionsRepository decisionsRepository;
@@ -40,6 +41,27 @@ public class DecisionsService {
         Decisions decisions = decisionsMapper.toEntity(decisionsDTO);
         decisions = decisionsRepository.save(decisions);
         return decisionsMapper.toDto(decisions);
+    }
+
+    /**
+     * Partially update a decisions.
+     *
+     * @param decisionsDTO the entity to update partially.
+     * @return the persisted entity.
+     */
+    public Optional<DecisionsDTO> partialUpdate(DecisionsDTO decisionsDTO) {
+        log.debug("Request to partially update Decisions : {}", decisionsDTO);
+
+        return decisionsRepository
+            .findById(decisionsDTO.getId())
+            .map(
+                existingDecisions -> {
+                    decisionsMapper.partialUpdate(existingDecisions, decisionsDTO);
+                    return existingDecisions;
+                }
+            )
+            .map(decisionsRepository::save)
+            .map(decisionsMapper::toDto);
     }
 
     /**

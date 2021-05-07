@@ -3,6 +3,7 @@ package za.co.dearx.leave.service.dto;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import javax.validation.constraints.*;
 
@@ -10,6 +11,7 @@ import javax.validation.constraints.*;
  * A DTO for the {@link za.co.dearx.leave.domain.Staff} entity.
  */
 public class StaffDTO implements Serializable {
+
     private Long id;
 
     @Size(max = 50)
@@ -43,9 +45,8 @@ public class StaffDTO implements Serializable {
     @Size(max = 2)
     private String gender;
 
-    private Long userId;
+    private UserDTO user;
 
-    private String userLogin;
     private Set<TeamDTO> teams = new HashSet<>();
 
     public Long getId() {
@@ -128,20 +129,12 @@ public class StaffDTO implements Serializable {
         this.gender = gender;
     }
 
-    public Long getUserId() {
-        return userId;
+    public UserDTO getUser() {
+        return user;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public String getUserLogin() {
-        return userLogin;
-    }
-
-    public void setUserLogin(String userLogin) {
-        this.userLogin = userLogin;
+    public void setUser(UserDTO user) {
+        this.user = user;
     }
 
     public Set<TeamDTO> getTeams() {
@@ -161,12 +154,16 @@ public class StaffDTO implements Serializable {
             return false;
         }
 
-        return id != null && id.equals(((StaffDTO) o).id);
+        StaffDTO staffDTO = (StaffDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, staffDTO.id);
     }
 
     @Override
     public int hashCode() {
-        return 31;
+        return Objects.hash(this.id);
     }
 
     // prettier-ignore
@@ -183,9 +180,8 @@ public class StaffDTO implements Serializable {
             ", email='" + getEmail() + "'" +
             ", contractNumber='" + getContractNumber() + "'" +
             ", gender='" + getGender() + "'" +
-            ", userId=" + getUserId() +
-            ", userLogin='" + getUserLogin() + "'" +
-            ", teams='" + getTeams() + "'" +
+            ", user=" + getUser() +
+            ", teams=" + getTeams() +
             "}";
     }
 }
