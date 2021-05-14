@@ -1,7 +1,12 @@
 package za.co.dearx.leave.config;
 
+import java.util.Collections;
+import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,6 +23,8 @@ import org.springframework.web.filter.CorsFilter;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 import tech.jhipster.config.JHipsterProperties;
 import tech.jhipster.security.*;
+import za.co.dearx.leave.filter.CamundaAuthenticationFilter;
+import za.co.dearx.leave.filter.WebAppAuthenticationProvider;
 import za.co.dearx.leave.security.*;
 
 @EnableWebSecurity
@@ -26,6 +33,8 @@ import za.co.dearx.leave.security.*;
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final JHipsterProperties jHipsterProperties;
+
+    private final CamundaBpmProperties bpmnProperies;
 
     private final RememberMeServices rememberMeServices;
 
@@ -36,12 +45,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         RememberMeServices rememberMeServices,
         CorsFilter corsFilter,
         JHipsterProperties jHipsterProperties,
-        SecurityProblemSupport problemSupport
+        SecurityProblemSupport problemSupport,
+        CamundaBpmProperties bpmnProperies
     ) {
         this.rememberMeServices = rememberMeServices;
         this.corsFilter = corsFilter;
         this.problemSupport = problemSupport;
         this.jHipsterProperties = jHipsterProperties;
+        this.bpmnProperies = bpmnProperies;
     }
 
     @Bean
@@ -70,6 +81,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .ignoring()
             .antMatchers(HttpMethod.OPTIONS, "/**")
             .antMatchers("/app/**/*.{js,html}")
+            .antMatchers("/" + bpmnProperies.getWebapp().getApplicationPath() + "/**/*.{js,html,json}")
             .antMatchers("/i18n/**")
             .antMatchers("/content/**")
             .antMatchers("/h2-console/**")
@@ -129,5 +141,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/management/prometheus").permitAll()
             .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN);
         // @formatter:on
+    }
+
+    @Bean
+    @Order(SecurityProperties.BASIC_AUTH_ORDER - 15)
+    public FilterRegistrationBean<CamundaAuthenticationFilter> containerBasedAuthenticationFilter() {
+        FilterRegistrationBean<CamundaAuthenticationFilter> filterRegistration = new FilterRegistrationBean<>();
+        filterRegistration.setFilter(new CamundaAuthenticationFilter());
+        filterRegistration.setInitParameters(
+            Collections.singletonMap("authentication-provider", WebAppAuthenticationProvider.class.getName())
+        );
+        filterRegistration.setOrder(101); // make sure the filter is registered after the Spring Security Filter Chain
+        filterRegistration.addUrlPatterns("/camunda/*");
+        return filterRegistration;
     }
 }
