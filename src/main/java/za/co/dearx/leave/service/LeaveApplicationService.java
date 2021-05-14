@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import za.co.dearx.leave.bpmn.MessageHander;
 import za.co.dearx.leave.domain.LeaveApplication;
 import za.co.dearx.leave.domain.LeaveStatus;
 import za.co.dearx.leave.domain.LeaveType;
@@ -35,16 +36,20 @@ public class LeaveApplicationService {
 
     private final LeaveTypeService leaveTypeService;
 
+    private final MessageHander messageHandler;
+
     public LeaveApplicationService(
         LeaveApplicationRepository leaveApplicationRepository,
         LeaveApplicationMapper leaveApplicationMapper,
         LeaveStatusService leaveStatusService,
-        LeaveTypeService leaveTypeService
+        LeaveTypeService leaveTypeService,
+        MessageHander messageHandler
     ) {
         this.leaveApplicationRepository = leaveApplicationRepository;
         this.leaveApplicationMapper = leaveApplicationMapper;
         this.leaveStatusService = leaveStatusService;
         this.leaveTypeService = leaveTypeService;
+        this.messageHandler = messageHandler;
     }
 
     /**
@@ -77,7 +82,9 @@ public class LeaveApplicationService {
         leaveApplication.setLeaveType(leaveType);
 
         //Start a new business process, if defined
-        if (newProcess && leaveType != null && leaveType.getProcessName() != null) {}
+        if (newProcess && leaveType != null && leaveType.getProcessName() != null) {
+            messageHandler.processLeaveApplication(leaveApplication);
+        }
 
         return leaveApplicationMapper.toDto(leaveApplication);
     }
