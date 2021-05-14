@@ -35,19 +35,15 @@ public class LeaveApplicationService {
 
     private final LeaveTypeService leaveTypeService;
 
-    private final RuntimeService runtimeService;
-
     public LeaveApplicationService(
         LeaveApplicationRepository leaveApplicationRepository,
         LeaveApplicationMapper leaveApplicationMapper,
         LeaveStatusService leaveStatusService,
-        LeaveTypeService leaveTypeService,
-        RuntimeService runtimeService
+        LeaveTypeService leaveTypeService
     ) {
         this.leaveApplicationRepository = leaveApplicationRepository;
         this.leaveApplicationMapper = leaveApplicationMapper;
         this.leaveStatusService = leaveStatusService;
-        this.runtimeService = runtimeService;
         this.leaveTypeService = leaveTypeService;
     }
 
@@ -78,11 +74,10 @@ public class LeaveApplicationService {
 
         //When mapping a new LeaveApplication the LeaveType will not be fully set. Retrieve full record
         LeaveType leaveType = leaveTypeService.findEntityById(leaveApplication.getLeaveType().getId()).orElse(null);
+        leaveApplication.setLeaveType(leaveType);
 
         //Start a new business process, if defined
-        if (newProcess && leaveType != null && leaveType.getProcessName() != null) {
-            runtimeService.startProcessInstanceByKey(leaveType.getProcessName(), leaveApplication.getId().toString());
-        }
+        if (newProcess && leaveType != null && leaveType.getProcessName() != null) {}
 
         return leaveApplicationMapper.toDto(leaveApplication);
     }
@@ -113,9 +108,7 @@ public class LeaveApplicationService {
         leaveApplication = leaveApplicationRepository.save(leaveApplication);
 
         //Start a new business process, if defined
-        if (newProcess && leaveApplication.getLeaveType().getProcessName() != null) {
-            runtimeService.startProcessInstanceByKey(leaveApplication.getLeaveType().getProcessName());
-        }
+        if (newProcess && leaveApplication.getLeaveType().getProcessName() != null) {}
 
         return leaveApplicationMapper.toDto(leaveApplication);
         //TODO Make sure we cannot save a deleted record. Must throw exception.
