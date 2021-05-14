@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import za.co.dearx.leave.bpmn.MessageHander;
+import za.co.dearx.leave.bpmn.exception.NoMessageCatchException;
 import za.co.dearx.leave.domain.LeaveApplication;
 import za.co.dearx.leave.domain.LeaveStatus;
 import za.co.dearx.leave.domain.LeaveType;
@@ -231,9 +232,13 @@ public class LeaveApplicationService {
             .findById(id)
             .ifPresent(
                 record -> {
-                    //TODO Add after code regeneration
-                    //record.setDeleted(true);
+                    record.setDeleted(true);
                     leaveApplicationRepository.save(record);
+                    try {
+                        messageHandler.cancelProcess(record);
+                    } catch (NoMessageCatchException e) {
+                        //Nothing to do
+                    }
                 }
             );
     }
