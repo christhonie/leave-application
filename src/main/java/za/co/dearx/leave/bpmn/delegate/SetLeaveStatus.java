@@ -2,7 +2,6 @@ package za.co.dearx.leave.bpmn.delegate;
 
 import java.util.Map;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +20,8 @@ import za.co.dearx.leave.service.LeaveStatusService;
  */
 @Component
 public class SetLeaveStatus implements JavaDelegate {
-    private final Logger log = LoggerFactory.getLogger(SetLeaveStatus.class);
 
-    @Autowired
-    private BPMNUtil util;
+    private final Logger log = LoggerFactory.getLogger(SetLeaveStatus.class);
 
     @Autowired
     private LeaveStatusService leaveStatusService;
@@ -32,19 +29,16 @@ public class SetLeaveStatus implements JavaDelegate {
     @Autowired
     private LeaveApplicationService leaveApplicationService;
 
-    /**
-     * Optional Input variable from BPMN Service Task.
-     */
-    private Expression status;
-
     @Override
     public void execute(DelegateExecution execution) throws Exception {
         log.debug("Process Set Leave Status delegate.");
 
-        BPMNUtil.logExecution(log, execution);
-        BPMNUtil.logVariables(log, execution);
+        if (log.isDebugEnabled()) {
+            BPMNUtil.logExecution(log, execution);
+            BPMNUtil.logVariables(log, execution);
+        }
 
-        Long applicationId = util.getBusinessKeyAsLong(execution);
+        Long applicationId = BPMNUtil.getBusinessKeyAsLong(execution);
 
         LeaveStatus newStatus = null;
         Map<String, Object> variables = execution.getVariables();
@@ -58,13 +52,5 @@ public class SetLeaveStatus implements JavaDelegate {
         }
 
         leaveApplicationService.updateStatus(applicationId, newStatus);
-    }
-
-    public Expression getStatus() {
-        return status;
-    }
-
-    public void setStatus(Expression status) {
-        this.status = status;
     }
 }

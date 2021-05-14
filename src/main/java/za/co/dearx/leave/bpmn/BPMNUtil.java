@@ -3,13 +3,11 @@ package za.co.dearx.leave.bpmn;
 import java.util.Map;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
-import org.springframework.stereotype.Component;
 import za.co.dearx.leave.service.exception.NotFoundException;
 
-@Component
 public class BPMNUtil {
 
-    public Long getBusinessKeyAsLong(DelegateExecution execution) throws NotFoundException {
+    public static Long getBusinessKeyAsLong(DelegateExecution execution) throws NotFoundException {
         try {
             return Long.parseUnsignedLong(execution.getProcessBusinessKey());
         } catch (NumberFormatException e) {
