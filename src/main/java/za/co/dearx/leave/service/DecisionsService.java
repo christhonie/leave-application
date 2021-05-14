@@ -10,7 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 import za.co.dearx.leave.domain.Decisions;
 import za.co.dearx.leave.repository.DecisionsRepository;
 import za.co.dearx.leave.service.dto.DecisionsDTO;
+import za.co.dearx.leave.service.exception.ValidationException;
 import za.co.dearx.leave.service.mapper.DecisionsMapper;
+import za.co.dearx.leave.bpmn.MessageHander;
+import za.co.dearx.leave.bpmn.exception.NoMessageCatchException;
 
 /**
  * Service Implementation for managing {@link Decisions}.
@@ -24,10 +27,14 @@ public class DecisionsService {
     private final DecisionsRepository decisionsRepository;
 
     private final DecisionsMapper decisionsMapper;
+    
+    private final MessageHander messageHandler;
 
-    public DecisionsService(DecisionsRepository decisionsRepository, DecisionsMapper decisionsMapper) {
+    public DecisionsService(DecisionsRepository decisionsRepository, DecisionsMapper decisionsMapper,
+    		MessageHander messageHandler) {
         this.decisionsRepository = decisionsRepository;
         this.decisionsMapper = decisionsMapper;
+        this.messageHandler = messageHandler;
     }
 
     /**
@@ -42,6 +49,13 @@ public class DecisionsService {
         //TODO Investigate if this was really necessary
         decisions.getComment().setComment(decisionsDTO.getComment().getComment());
         decisions = decisionsRepository.save(decisions);
+        // Call messageHandler and pass in withdraw...  
+        try {
+			messageHandler.processDecicion(decisions);
+		} catch (ValidationException | NoMessageCatchException e) {
+			// TODO Auto-generated catch block
+			log.debug("Could not throw withdraw message " ,e);
+		}
         return decisionsMapper.toDto(decisions);
     }
 
