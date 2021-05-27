@@ -162,4 +162,21 @@ public class MessageHander {
             throw new NoMessageCatchException(processName, decision.getLeaveApplication().getId().toString(), MESSAGE_DECISION);
         }
     }
+
+    public void cancelProcess(LeaveApplication leaveApplication) throws NoMessageCatchException {
+        try {
+            runtimeService
+                .createMessageCorrelation(MESSAGE_CANCEL)
+                .processInstanceBusinessKey(leaveApplication.getId().toString())
+                .correlateWithResult();
+        } catch (MismatchingMessageCorrelationException e) {
+            //Process was not found, or there might have been multiple instance (which should not normally happen)
+            //Raise an exception to indicate this.
+            String processName = "Unknown";
+            if (leaveApplication.getLeaveType() != null) {
+                processName = leaveApplication.getLeaveType().getProcessName();
+            }
+            throw new NoMessageCatchException(processName, leaveApplication.getId().toString(), MESSAGE_CANCEL);
+        }
+    }
 }

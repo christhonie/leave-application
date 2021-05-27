@@ -1,5 +1,6 @@
 package za.co.dearx.leave.bpmn.delegate;
 
+import java.util.Map;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -34,12 +35,21 @@ public class NotifyUser implements JavaDelegate {
 
         if (log.isDebugEnabled()) BPMNUtil.logExecution(log, execution);
 
+        final String notification;
+        Map<String, Object> variables = execution.getVariables();
+        if (variables.containsKey("notificationType")) {
+            notification = (String) variables.get("notificationType");
+        } else {
+            notification = "";
+        }
+
         Long applicationId = BPMNUtil.getBusinessKeyAsLong(execution);
         leaveApplicationService
             .findOne(applicationId)
             .ifPresent(
                 application -> {
                     log.debug("Notifying user " + application.getStaff().getName() + " via email at " + application.getStaff().getEmail());
+                    log.debug("Your leave status is " + notification);
                     //TODO Send email
                 }
             );
