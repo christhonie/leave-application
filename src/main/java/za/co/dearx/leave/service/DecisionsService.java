@@ -7,13 +7,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import za.co.dearx.leave.bpmn.MessageHander;
+import za.co.dearx.leave.bpmn.exception.NoMessageCatchException;
+import za.co.dearx.leave.domain.Comment;
 import za.co.dearx.leave.domain.Decisions;
 import za.co.dearx.leave.repository.DecisionsRepository;
 import za.co.dearx.leave.service.dto.DecisionsDTO;
 import za.co.dearx.leave.service.exception.ValidationException;
 import za.co.dearx.leave.service.mapper.DecisionsMapper;
-import za.co.dearx.leave.bpmn.MessageHander;
-import za.co.dearx.leave.bpmn.exception.NoMessageCatchException;
 
 /**
  * Service Implementation for managing {@link Decisions}.
@@ -27,14 +28,21 @@ public class DecisionsService {
     private final DecisionsRepository decisionsRepository;
 
     private final DecisionsMapper decisionsMapper;
-    
+
     private final MessageHander messageHandler;
 
-    public DecisionsService(DecisionsRepository decisionsRepository, DecisionsMapper decisionsMapper,
-    		MessageHander messageHandler) {
+    private final LeaveApplicationService leaveApplicationService;
+
+    public DecisionsService(
+        DecisionsRepository decisionsRepository,
+        DecisionsMapper decisionsMapper,
+        MessageHander messageHandler,
+        LeaveApplicationService leaveApplicationService
+    ) {
         this.decisionsRepository = decisionsRepository;
         this.decisionsMapper = decisionsMapper;
         this.messageHandler = messageHandler;
+        this.leaveApplicationService = leaveApplicationService;
     }
 
     /**
@@ -45,18 +53,32 @@ public class DecisionsService {
      */
     public DecisionsDTO save(DecisionsDTO decisionsDTO) {
         log.debug("Request to save Decisions : {}", decisionsDTO);
-        Decisions decisions = decisionsMapper.toEntity(decisionsDTO);
+        final Decisions decisions = decisionsMapper.toEntity(decisionsDTO);
+
+        //Load latest LeaveApplication from database
+        if (decisions.getLeaveApplication() != null) leaveApplicationService
+            .findOneEntity(decisions.getLeaveApplication().getId())
+            .ifPresent(
+                la -> {
+                    decisions.setLeaveApplication(la);
+                }
+            );
+
         //TODO Investigate if this was really necessary
-        decisions.getComment().setComment(decisionsDTO.getComment().getComment());
-        decisions = decisionsRepository.save(decisions);
-        // Call messageHandler and pass in withdraw...  
+        if (decisionsDTO.getComment() != null && decisions.getComment() == null) {
+            Comment comment = new Comment();
+            comment.setComment(decisionsDTO.getComment().getComment());
+            decisions.setComment(comment);
+        }
+        Decisions result = decisionsRepository.save(decisions);
+        // Call messageHandler and pass in withdraw...
         try {
-			messageHandler.processDecicion(decisions);
-		} catch (ValidationException | NoMessageCatchException e) {
-			// TODO Auto-generated catch block
-			log.debug("Could not throw withdraw message " ,e);
-		}
-        return decisionsMapper.toDto(decisions);
+            messageHandler.processDecicion(result);
+        } catch (ValidationException | NoMessageCatchException e) {
+            // TODO Auto-generated catch block
+            log.debug("Could not throw withdraw message ", e);
+        }
+        return decisionsMapper.toDto(result);
     }
 
     /**
