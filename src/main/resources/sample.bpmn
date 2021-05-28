@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0x07krs" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.8.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.14.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0x07krs" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.7.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.14.0">
   <bpmn:process id="sample" name="Sample Leave Process" isExecutable="true" camunda:versionTag="1">
     <bpmn:startEvent id="StartEvent_1" name="Start leave application">
       <bpmn:outgoing>Flow_1beic05</bpmn:outgoing>
@@ -26,10 +26,6 @@
       </bpmn:startEvent>
       <bpmn:sequenceFlow id="Flow_1xbxm9f" sourceRef="Event_Start_Withdraw" targetRef="Activity_1nmbktz" />
       <bpmn:sequenceFlow id="Flow_03khdzl" sourceRef="Activity_1nmbktz" targetRef="Event_0e9xbnw" />
-      <bpmn:endEvent id="Event_0e9xbnw">
-        <bpmn:incoming>Flow_03khdzl</bpmn:incoming>
-        <bpmn:terminateEventDefinition id="TerminateEventDefinition_0xqx7o1" />
-      </bpmn:endEvent>
       <bpmn:serviceTask id="Activity_1nmbktz" name="Set Status to Withdraw" camunda:delegateExpression="${setLeaveStatus}">
         <bpmn:extensionElements>
           <camunda:inputOutput>
@@ -39,6 +35,10 @@
         <bpmn:incoming>Flow_1xbxm9f</bpmn:incoming>
         <bpmn:outgoing>Flow_03khdzl</bpmn:outgoing>
       </bpmn:serviceTask>
+      <bpmn:endEvent id="Event_0e9xbnw">
+        <bpmn:incoming>Flow_03khdzl</bpmn:incoming>
+        <bpmn:terminateEventDefinition id="TerminateEventDefinition_0xqx7o1" />
+      </bpmn:endEvent>
     </bpmn:subProcess>
     <bpmn:serviceTask id="Activity_0mqt23g" name="Save Reject" camunda:delegateExpression="${setLeaveStatus}">
       <bpmn:extensionElements>
@@ -104,7 +104,7 @@
       <bpmn:outgoing>Flow_12g660g</bpmn:outgoing>
     </bpmn:serviceTask>
   </bpmn:process>
-  <bpmn:message id="Message_0db7tw6" name="Withdraw" />
+  <bpmn:message id="Message_0db7tw6" name="Message_Withdraw" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="sample">
       <bpmndi:BPMNEdge id="Flow_1v3c0oe_di" bpmnElement="Flow_1v3c0oe">
@@ -212,29 +212,6 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_014uzjk_di" bpmnElement="Activity_15gtc71">
         <dc:Bounds x="920" y="227" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0uoheea_di" bpmnElement="Activity_1qknhnu" isExpanded="true">
-        <dc:Bounds x="160" y="390" width="480" height="200" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_03khdzl_di" bpmnElement="Flow_03khdzl">
-        <di:waypoint x="470" y="490" />
-        <di:waypoint x="562" y="490" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1xbxm9f_di" bpmnElement="Flow_1xbxm9f">
-        <di:waypoint x="228" y="490" />
-        <di:waypoint x="370" y="490" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Event_1umwnkv_di" bpmnElement="Event_Start_Withdraw">
-        <dc:Bounds x="192" y="472" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="175" y="515" width="71" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0d19qvi_di" bpmnElement="Event_0e9xbnw">
-        <dc:Bounds x="562" y="472" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1e8sz9k_di" bpmnElement="Activity_1nmbktz">
-        <dc:Bounds x="370" y="450" width="100" height="80" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
