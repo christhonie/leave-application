@@ -12,11 +12,9 @@ import za.co.dearx.leave.bpmn.exception.NoMessageCatchException;
 import za.co.dearx.leave.domain.Comment;
 import za.co.dearx.leave.domain.Decision;
 import za.co.dearx.leave.repository.DecisionRepository;
-import za.co.dearx.leave.repository.LeaveApplicationRepository;
 import za.co.dearx.leave.service.dto.DecisionDTO;
 import za.co.dearx.leave.service.exception.ValidationException;
 import za.co.dearx.leave.service.mapper.DecisionMapper;
-import za.co.dearx.leave.service.mapper.LeaveApplicationMapper;
 
 /**
  * Service Implementation for managing {@link Decision}.
