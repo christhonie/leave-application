@@ -105,17 +105,17 @@ enum DecisionChoice {
     WITHDRAW
 }
  
-entity Decisions {
+entity Decision {
   choice DecisionChoice required
   decidedOn Instant required
 }
 relationship ManyToOne {
-	Decisions{user(login) required} to User
-    Decisions{leaveApplication required} to LeaveApplication 
+	Decision{user(login) required} to User
+    Decision{leaveApplication required} to LeaveApplication 
 }
 relationship OneToOne {
     /** Optional comment DTO */
-    Decisions{comment(comment)} to Comment
+    Decision{comment(comment)} to Comment
 }
 
 // Set pagination options

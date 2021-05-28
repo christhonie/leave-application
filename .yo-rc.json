@@ -36,7 +36,19 @@
     "dtoSuffix": "DTO",
     "otherModules": [],
     "blueprints": [],
-    "prettierJava": true
+    "prettierJava": true,
+    "entities": [
+      "Decision",
+      "Role",
+      "Team",
+      "Staff",
+      "LeaveStatus",
+      "LeaveType",
+      "LeaveEntitlement",
+      "EntitlementValue",
+      "LeaveApplication",
+      "Comment"
+    ]
   },
   "git-provider": "GitHub",
   "git-company": "christhonie",

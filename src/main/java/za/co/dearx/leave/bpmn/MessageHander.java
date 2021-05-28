@@ -4,7 +4,7 @@ import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Service;
 import za.co.dearx.leave.bpmn.exception.NoMessageCatchException;
-import za.co.dearx.leave.domain.Decisions;
+import za.co.dearx.leave.domain.Decision;
 import za.co.dearx.leave.domain.LeaveApplication;
 import za.co.dearx.leave.domain.enumeration.DecisionChoice;
 import za.co.dearx.leave.service.exception.ValidationException;
@@ -82,7 +82,7 @@ public class MessageHander {
      * @param decision to be validated
      * @throws ValidationException indicating which validation failed.
      */
-    private void checkValidDecision(Decisions decision) throws ValidationException {
+    private void checkValidDecision(Decision decision) throws ValidationException {
         if (decision == null) {
             throw new ValidationException("Decision", "The entity is null.");
         }
@@ -134,7 +134,7 @@ public class MessageHander {
      * @throws NoMessageCatchException if the process either does not have such a message,
      * or that the process was not waiting for such a message.
      */
-    public void processDecicion(Decisions decision) throws ValidationException, NoMessageCatchException {
+    public void processDecicion(Decision decision) throws ValidationException, NoMessageCatchException {
         //Validate that all required properties are set
         checkValidDecision(decision);
         try {
