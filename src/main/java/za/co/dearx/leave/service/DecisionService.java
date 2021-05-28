@@ -19,7 +19,8 @@ import za.co.dearx.leave.service.mapper.DecisionMapper;
 /**
  * Service Implementation for managing {@link Decision}.
  */
-@Service
+//Need an alternative name to avoid conflicts with Camunda bean with the same name.
+@Service("leaveDecisionService")
 @Transactional
 public class DecisionService {
 
