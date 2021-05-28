@@ -1,5 +1,7 @@
 package za.co.dearx.leave.service.dto;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
@@ -9,6 +11,7 @@ import javax.validation.constraints.*;
 /**
  * A DTO for the {@link za.co.dearx.leave.domain.Role} entity.
  */
+@ApiModel(description = "Represent a role a user may have within the application.")
 public class RoleDTO implements Serializable {
 
     private Long id;

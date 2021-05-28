@@ -12,7 +12,7 @@ const leaveApplicationRoute: Routes = [
     path: '',
     component: LeaveApplicationComponent,
     data: {
-      defaultSort: 'startDate,asc',
+      defaultSort: 'id,asc',
     },
     canActivate: [UserRouteAccessService],
   },

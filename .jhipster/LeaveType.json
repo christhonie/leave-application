@@ -4,26 +4,21 @@
     {
       "fieldName": "name",
       "fieldType": "String",
-      "fieldValidateRules": [
-        "maxlength",
-        "required"
-      ],
+      "javadoc": "A unique name for the leave type.",
+      "fieldValidateRules": ["maxlength", "required"],
       "fieldValidateRulesMaxlength": "50"
     },
     {
       "fieldName": "description",
       "fieldType": "String",
-      "fieldValidateRules": [
-        "maxlength"
-      ],
+      "fieldValidateRules": ["maxlength"],
       "fieldValidateRulesMaxlength": "200"
     },
     {
       "fieldName": "processName",
       "fieldType": "String",
-      "fieldValidateRules": [
-        "maxlength"
-      ],
+      "javadoc": "The process ID to invoke for a new leave application.",
+      "fieldValidateRules": ["maxlength"],
       "fieldValidateRulesMaxlength": "200"
     }
   ],
@@ -38,5 +33,6 @@
   "readOnly": false,
   "embedded": false,
   "clientRootFolder": "",
-  "applications": "*"
+  "applications": "*",
+  "javadoc": "A type of leave supported by the system.\\nEach type can be linked to a business process, which is invoked when a new application is created."
 }

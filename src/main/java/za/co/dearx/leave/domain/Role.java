@@ -9,7 +9,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A Role.
+ * Represent a role a user may have within the application.
  */
 @Entity
 @Table(name = "role")
@@ -27,6 +27,9 @@ public class Role implements Serializable {
     @Column(name = "name", length = 50, nullable = false)
     private String name;
 
+    /**
+     * The user(s) linked to the role.
+     */
     @ManyToMany
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JoinTable(name = "rel_role__user", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))

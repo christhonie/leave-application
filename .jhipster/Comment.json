@@ -4,6 +4,7 @@
     {
       "fieldName": "comment",
       "fieldType": "String",
+      "javadoc": "A free text message up to 5000 characters.",
       "fieldValidateRules": ["maxlength", "required"],
       "fieldValidateRulesMaxlength": "5000"
     }
@@ -14,14 +15,15 @@
       "otherEntityName": "leaveApplication",
       "otherEntityRelationshipName": "comment",
       "relationshipValidateRules": "required",
-      "relationshipName": "leaveApplication",
-      "otherEntityField": "id"
+      "javadoc": "The leave application the comment is related to.",
+      "relationshipName": "leaveApplication"
     },
     {
       "relationshipType": "many-to-one",
       "otherEntityName": "user",
       "otherEntityRelationshipName": "comment",
       "relationshipValidateRules": "required",
+      "javadoc": "The user who created the comment. This is set by the system and is read-only.",
       "relationshipName": "user",
       "otherEntityField": "login"
     }
@@ -36,5 +38,6 @@
   "readOnly": false,
   "embedded": false,
   "clientRootFolder": "",
-  "applications": "*"
+  "applications": "*",
+  "javadoc": "Comments assigned to a Decision or a LeaveApplication."
 }

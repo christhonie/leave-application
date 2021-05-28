@@ -7,7 +7,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A LeaveStatus.
+ * A possible status of the LeaveApplication. The system defines a number of default statuses which cannot be changed.
  */
 @Entity
 @Table(name = "leave_status")
@@ -20,6 +20,9 @@ public class LeaveStatus implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * A unique name for the status. This value is used in the BPMN process and should not be changed once created.
+     */
     @NotNull
     @Size(max = 50)
     @Column(name = "name", length = 50, nullable = false)

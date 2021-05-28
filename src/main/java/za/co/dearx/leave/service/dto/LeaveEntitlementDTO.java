@@ -1,5 +1,7 @@
 package za.co.dearx.leave.service.dto;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -9,14 +11,25 @@ import javax.validation.constraints.*;
 /**
  * A DTO for the {@link za.co.dearx.leave.domain.LeaveEntitlement} entity.
  */
+@ApiModel(
+    description = "An entitlement represents an instance when leave days are assigned to zero, one or more Staff members.\nEntitlements are typically assigned at the start of an entitlement period, such as the first day of the month.\nAlso see {@link EntitlementValue} for how the days are assigned to the {@link Staff} members."
+)
 public class LeaveEntitlementDTO implements Serializable {
 
     private Long id;
 
+    /**
+     * The date the entitlement is applied to the Staff member.
+     */
     @NotNull
+    @ApiModelProperty(value = "The date the entitlement is applied to the Staff member.", required = true)
     private LocalDate entitlementDate;
 
+    /**
+     * @depricated Use the EntitlementValue
+     */
     @NotNull
+    @ApiModelProperty(value = "@depricated Use the EntitlementValue", required = true)
     private BigDecimal days;
 
     private LeaveTypeDTO leaveType;

@@ -29,7 +29,13 @@
         </div>
 
         <div class="form-group">
-          <label class="form-control-label" jhiTranslate="leaveApplicationApp.staff.employeeID" for="field_employeeID">Employee ID</label>
+          <label
+            class="form-control-label"
+            jhiTranslate="leaveApplicationApp.staff.employeeID"
+            for="field_employeeID"
+            [ngbTooltip]="'leaveApplicationApp.staff.help.employeeID' | translate"
+            >Employee ID</label
+          >
           <input
             type="text"
             class="form-control"
@@ -58,7 +64,13 @@
         </div>
 
         <div class="form-group">
-          <label class="form-control-label" jhiTranslate="leaveApplicationApp.staff.startDate" for="field_startDate">Start Date</label>
+          <label
+            class="form-control-label"
+            jhiTranslate="leaveApplicationApp.staff.startDate"
+            for="field_startDate"
+            [ngbTooltip]="'leaveApplicationApp.staff.help.startDate' | translate"
+            >Start Date</label
+          >
           <div class="input-group">
             <input
               id="field_startDate"
@@ -88,7 +100,13 @@
         </div>
 
         <div class="form-group">
-          <label class="form-control-label" jhiTranslate="leaveApplicationApp.staff.name" for="field_name">Name</label>
+          <label
+            class="form-control-label"
+            jhiTranslate="leaveApplicationApp.staff.name"
+            for="field_name"
+            [ngbTooltip]="'leaveApplicationApp.staff.help.name' | translate"
+            >Name</label
+          >
           <input type="text" class="form-control" name="name" id="field_name" data-cy="name" formControlName="name" />
           <div *ngIf="editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)">
             <small
@@ -162,7 +180,11 @@
         </div>
 
         <div class="form-group">
-          <label class="form-control-label" jhiTranslate="leaveApplicationApp.staff.contractNumber" for="field_contractNumber"
+          <label
+            class="form-control-label"
+            jhiTranslate="leaveApplicationApp.staff.contractNumber"
+            for="field_contractNumber"
+            [ngbTooltip]="'leaveApplicationApp.staff.help.contractNumber' | translate"
             >Contract Number</label
           >
           <input

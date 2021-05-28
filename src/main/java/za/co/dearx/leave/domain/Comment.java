@@ -8,7 +8,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A Comment.
+ * Comments assigned to a Decision or a LeaveApplication.
  */
 @Entity
 @Table(name = "comment")
@@ -21,16 +21,25 @@ public class Comment implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * A free text message up to 5000 characters.
+     */
     @NotNull
     @Size(max = 5000)
     @Column(name = "comment", length = 5000, nullable = false)
     private String comment;
 
+    /**
+     * The leave application the comment is related to.
+     */
     @ManyToOne(optional = false)
     @NotNull
     @JsonIgnoreProperties(value = { "leaveType", "leaveStatus", "staff" }, allowSetters = true)
     private LeaveApplication leaveApplication;
 
+    /**
+     * The user who created the comment. This is set by the system and is read-only.
+     */
     @ManyToOne(optional = false)
     @NotNull
     private User user;

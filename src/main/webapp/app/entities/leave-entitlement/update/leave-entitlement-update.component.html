@@ -18,7 +18,11 @@
         </div>
 
         <div class="form-group">
-          <label class="form-control-label" jhiTranslate="leaveApplicationApp.leaveEntitlement.entitlementDate" for="field_entitlementDate"
+          <label
+            class="form-control-label"
+            jhiTranslate="leaveApplicationApp.leaveEntitlement.entitlementDate"
+            for="field_entitlementDate"
+            [ngbTooltip]="'leaveApplicationApp.leaveEntitlement.help.entitlementDate' | translate"
             >Entitlement Date</label
           >
           <div class="input-group">
@@ -55,7 +59,13 @@
         </div>
 
         <div class="form-group">
-          <label class="form-control-label" jhiTranslate="leaveApplicationApp.leaveEntitlement.days" for="field_days">Days</label>
+          <label
+            class="form-control-label"
+            jhiTranslate="leaveApplicationApp.leaveEntitlement.days"
+            for="field_days"
+            [ngbTooltip]="'leaveApplicationApp.leaveEntitlement.help.days' | translate"
+            >Days</label
+          >
           <input type="number" class="form-control" name="days" id="field_days" data-cy="days" formControlName="days" />
           <div *ngIf="editForm.get('days')!.invalid && (editForm.get('days')!.dirty || editForm.get('days')!.touched)">
             <small class="form-text text-danger" *ngIf="editForm.get('days')?.errors?.required" jhiTranslate="entity.validation.required">

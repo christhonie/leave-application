@@ -10,14 +10,14 @@
         Added the entity Decision.
     -->
     <changeSet id="20210430145353-1" author="jhipster">
-        <createTable tableName="decision">
+        <createTable tableName="decision" remarks="A decision made against a LeaveApplication.">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="choice" type="varchar(255)">
+            <column name="choice" type="varchar(255)" remarks="The choice made against the leave application.">
                 <constraints nullable="false" />
             </column>
-            <column name="decided_on" type="${datetimeType}">
+            <column name="decided_on" type="${datetimeType}" remarks="The date and time of the decision.">
                 <constraints nullable="false" />
             </column>
             <column name="comment_id" type="bigint">

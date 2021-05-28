@@ -10,17 +10,17 @@
         Added the entity LeaveType.
     -->
     <changeSet id="20210430144853-1" author="jhipster">
-        <createTable tableName="leave_type">
+        <createTable tableName="leave_type" remarks="A type of leave supported by the system.\nEach type can be linked to a business process, which is invoked when a new application is created.">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="name" type="varchar(50)">
+            <column name="name" type="varchar(50)" remarks="A unique name for the leave type.">
                 <constraints nullable="false" />
             </column>
             <column name="description" type="varchar(200)">
                 <constraints nullable="true" />
             </column>
-            <column name="process_name" type="varchar(200)">
+            <column name="process_name" type="varchar(200)" remarks="The process ID to invoke for a new leave application.">
                 <constraints nullable="true" />
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->

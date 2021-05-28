@@ -1,5 +1,6 @@
 package za.co.dearx.leave.service.dto;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.time.Instant;
@@ -10,14 +11,23 @@ import za.co.dearx.leave.domain.enumeration.DecisionChoice;
 /**
  * A DTO for the {@link za.co.dearx.leave.domain.Decision} entity.
  */
+@ApiModel(description = "A decision made against a LeaveApplication.")
 public class DecisionDTO implements Serializable {
 
     private Long id;
 
+    /**
+     * The choice made against the leave application.
+     */
     @NotNull
+    @ApiModelProperty(value = "The choice made against the leave application.", required = true)
     private DecisionChoice choice;
 
+    /**
+     * The date and time of the decision.
+     */
     @NotNull
+    @ApiModelProperty(value = "The date and time of the decision.", required = true)
     private Instant decidedOn;
 
     private CommentDTO comment;

@@ -1,5 +1,7 @@
 package za.co.dearx.leave.service.dto;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -10,6 +12,9 @@ import javax.validation.constraints.*;
 /**
  * A DTO for the {@link za.co.dearx.leave.domain.Staff} entity.
  */
+@ApiModel(
+    description = "An employee of the company.\nThe person can be linked to zero or more teams and may be linked to a User of the system."
+)
 public class StaffDTO implements Serializable {
 
     private Long id;
@@ -17,14 +22,29 @@ public class StaffDTO implements Serializable {
     @Size(max = 50)
     private String position;
 
+    /**
+     * The unique employee number assigned by the company or payroll system.
+     */
     @NotNull
     @Size(max = 50)
+    @ApiModelProperty(value = "The unique employee number assigned by the company or payroll system.", required = true)
     private String employeeID;
 
+    /**
+     * When the person started at the organisation. This is used by some LeaveEntitlement calculations.
+     */
     @NotNull
+    @ApiModelProperty(
+        value = "When the person started at the organisation. This is used by some LeaveEntitlement calculations.",
+        required = true
+    )
     private LocalDate startDate;
 
+    /**
+     * A read-only field consisting out of the first name and last name of the person.
+     */
     @Size(max = 100)
+    @ApiModelProperty(value = "A read-only field consisting out of the first name and last name of the person.")
     private String name;
 
     @NotNull
@@ -38,7 +58,11 @@ public class StaffDTO implements Serializable {
     @Size(max = 100)
     private String email;
 
+    /**
+     * Preferably the cellphone number. This can be used for sending messages to the person.
+     */
     @Size(max = 50)
+    @ApiModelProperty(value = "Preferably the cellphone number. This can be used for sending messages to the person.")
     private String contractNumber;
 
     @NotNull

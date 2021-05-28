@@ -4,12 +4,14 @@
     {
       "fieldName": "choice",
       "fieldType": "DecisionChoice",
+      "javadoc": "The choice made against the leave application.",
       "fieldValues": "APPROVE,REJECT,WITHDRAW",
       "fieldValidateRules": ["required"]
     },
     {
       "fieldName": "decidedOn",
       "fieldType": "Instant",
+      "javadoc": "The date and time of the decision.",
       "fieldValidateRules": ["required"]
     }
   ],
@@ -18,7 +20,7 @@
       "relationshipType": "one-to-one",
       "otherEntityName": "comment",
       "otherEntityRelationshipName": "decision",
-      "javadoc": "Optional comment DTO",
+      "javadoc": "An optional comment linked to the decision.",
       "relationshipName": "comment",
       "otherEntityField": "comment",
       "ownerSide": true
@@ -28,6 +30,7 @@
       "otherEntityName": "user",
       "otherEntityRelationshipName": "decision",
       "relationshipValidateRules": "required",
+      "javadoc": "The user who made the decision. This is set by the system and is read-only.",
       "relationshipName": "user",
       "otherEntityField": "login"
     },
@@ -36,6 +39,7 @@
       "otherEntityName": "leaveApplication",
       "otherEntityRelationshipName": "decision",
       "relationshipValidateRules": "required",
+      "javadoc": "The leave application the decision was made against.",
       "relationshipName": "leaveApplication"
     }
   ],
@@ -48,5 +52,6 @@
   "fluentMethods": true,
   "readOnly": false,
   "embedded": false,
-  "applications": "*"
+  "applications": "*",
+  "javadoc": "A decision made against a LeaveApplication."
 }

@@ -14,11 +14,21 @@
         <dd>
           <span>{{ decision.id }}</span>
         </dd>
-        <dt><span jhiTranslate="leaveApplicationApp.decision.choice">Choice</span></dt>
+        <dt>
+          <span jhiTranslate="leaveApplicationApp.decision.choice" [ngbTooltip]="'leaveApplicationApp.decision.help.choice' | translate"
+            >Choice</span
+          >
+        </dt>
         <dd>
           <span jhiTranslate="{{ 'leaveApplicationApp.DecisionChoice.' + decision.choice }}">{{ decision.choice }}</span>
         </dd>
-        <dt><span jhiTranslate="leaveApplicationApp.decision.decidedOn">Decided On</span></dt>
+        <dt>
+          <span
+            jhiTranslate="leaveApplicationApp.decision.decidedOn"
+            [ngbTooltip]="'leaveApplicationApp.decision.help.decidedOn' | translate"
+            >Decided On</span
+          >
+        </dt>
         <dd>
           <span>{{ decision.decidedOn | formatMediumDatetime }}</span>
         </dd>

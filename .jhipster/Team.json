@@ -13,6 +13,7 @@
       "relationshipType": "many-to-one",
       "otherEntityName": "user",
       "otherEntityRelationshipName": "team",
+      "javadoc": "The manager of the team.",
       "relationshipName": "manager",
       "otherEntityField": "login"
     },
@@ -35,5 +36,6 @@
   "readOnly": false,
   "embedded": false,
   "clientRootFolder": "",
-  "applications": "*"
+  "applications": "*",
+  "javadoc": "A team combines one or more Staff members under a (User) manager."
 }

@@ -22,7 +22,11 @@
       "decidedOn": "Decided On",
       "comment": "Comment",
       "user": "User",
-      "leaveApplication": "Leave Application"
+      "leaveApplication": "Leave Application",
+      "help": {
+        "choice": "The choice made against the leave application.",
+        "decidedOn": "The date and time of the decision."
+      }
     }
   }
 }

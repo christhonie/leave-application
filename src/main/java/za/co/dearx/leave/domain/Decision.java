@@ -10,7 +10,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import za.co.dearx.leave.domain.enumeration.DecisionChoice;
 
 /**
- * A Decision.
+ * A decision made against a LeaveApplication.
  */
 @Entity
 @Table(name = "decision")
@@ -23,27 +23,39 @@ public class Decision implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * The choice made against the leave application.
+     */
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "choice", nullable = false)
     private DecisionChoice choice;
 
+    /**
+     * The date and time of the decision.
+     */
     @NotNull
     @Column(name = "decided_on", nullable = false)
     private Instant decidedOn;
 
     /**
-     * Optional comment DTO
+     * An optional comment linked to the decision.
      */
     @JsonIgnoreProperties(value = { "leaveApplication", "user" }, allowSetters = true)
     @OneToOne
     @JoinColumn(unique = true)
     private Comment comment;
 
+    /**
+     * The user who made the decision. This is set by the system and is read-only.
+     */
     @ManyToOne(optional = false)
     @NotNull
     private User user;
 
+    /**
+     * The leave application the decision was made against.
+     */
     @ManyToOne(optional = false)
     @NotNull
     @JsonIgnoreProperties(value = { "leaveType", "leaveStatus", "staff" }, allowSetters = true)
