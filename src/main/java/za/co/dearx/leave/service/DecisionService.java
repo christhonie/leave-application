@@ -62,7 +62,7 @@ public class DecisionService {
             .findOneEntity(decision.getLeaveApplication().getId())
             .ifPresent(
                 la -> {
-                    decisions.setLeaveApplication(la);
+                    decision.setLeaveApplication(la);
                 }
             );
 
