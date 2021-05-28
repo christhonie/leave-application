@@ -184,6 +184,18 @@ public class LeaveApplicationService {
     }
 
     /**
+     * Get one leaveApplication by id.
+     *
+     * @param id the id of the entity.
+     * @return the entity.
+     */
+    @Transactional(readOnly = true)
+    public Optional<LeaveApplication> findOneEntity(Long id) {
+        log.debug("Request to get LeaveApplication : {}", id);
+        return leaveApplicationRepository.findById(id);
+    }
+
+    /**
      * Update leaveApplication status.
      *
      * @param id the id of the entity.
