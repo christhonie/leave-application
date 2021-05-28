@@ -58,7 +58,7 @@ public class LeaveApplicationService {
      *
      * @param leaveApplicationDTO the entity to save.
      * @return the persisted entity.
-     * @throws ValidationException
+     * @throws ValidationException when no LeaveStatus was specified and there is also no default LeaveStatus defined.
      */
     public LeaveApplicationDTO create(LeaveApplicationDTO leaveApplicationDTO) throws ValidationException {
         log.debug("Request to create LeaveApplication : {}", leaveApplicationDTO);
@@ -95,7 +95,7 @@ public class LeaveApplicationService {
      *
      * @param leaveApplicationDTO the entity to save.
      * @return the persisted entity.
-     * @throws NotFoundException
+     * @throws ValidationException when no LeaveStatus was specified and there is also no default LeaveStatus defined.
      */
     public LeaveApplicationDTO save(@Valid LeaveApplicationDTO leaveApplicationDTO) throws ValidationException {
         log.debug("Request to save LeaveApplication : {}", leaveApplicationDTO);
@@ -199,17 +199,16 @@ public class LeaveApplicationService {
      * Update leaveApplication status.
      *
      * @param id the id of the entity.
-     * @param status of the entity.
-     * @return
-     * @return the entity.
-     * @throws NotFoundException
+     * @param statusName is the name of the LeaveStatus.
+     * @return the updated LeaveApplication
+     * @throws NotFoundException when the LeaveStatus with the statusName could not be found.
      */
-    public LeaveApplication updateStatus(Long id, final String statusString) throws NotFoundException {
-        log.debug("Update LeaveApplication status: {} {}", id, statusString);
+    public LeaveApplication updateStatus(Long id, final String statusName) throws NotFoundException {
+        log.debug("Update LeaveApplication status: {} {}", id, statusName);
 
         LeaveStatus status = leaveStatusService
-            .findEntityByName(statusString)
-            .orElseThrow(() -> new NotFoundException("LeaveStatus", "Lookup with name not found: " + statusString));
+            .findEntityByName(statusName)
+            .orElseThrow(() -> new NotFoundException("LeaveStatus", "Lookup with name not found: " + statusName));
 
         return updateStatus(id, status);
     }
@@ -218,10 +217,9 @@ public class LeaveApplicationService {
      * Update leaveApplication status.
      *
      * @param id the id of the entity.
-     * @param status of the entity.
-     * @return
-     * @return the entity.
-     * @throws NotFoundException
+     * @param status to apply to the {@link LeaveApplication}
+     * @return the updated LeaveApplication with ID entity.
+     * @throws NotFoundException when the LeaveApplication with ID with the given id could not be found.
      */
     public LeaveApplication updateStatus(Long id, final LeaveStatus status) throws NotFoundException {
         log.debug("Update LeaveApplication status: {} {}", id, status);
