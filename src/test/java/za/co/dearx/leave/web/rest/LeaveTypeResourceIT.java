@@ -1,5 +1,6 @@
 package za.co.dearx.leave.web.rest;
 
+import static org.assertj.core.api.Assertions.anyOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
+import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +41,7 @@ class LeaveTypeResourceIT {
     private static final String DEFAULT_DESCRIPTION = "AAAAAAAAAA";
     private static final String UPDATED_DESCRIPTION = "BBBBBBBBBB";
 
-    private static final String DEFAULT_PROCESS_NAME = "AAAAAAAAAA";
+    private static final String DEFAULT_PROCESS_NAME = "";
     private static final String UPDATED_PROCESS_NAME = "BBBBBBBBBB";
 
     private static final String ENTITY_API_URL = "/api/leave-types";
@@ -110,7 +112,10 @@ class LeaveTypeResourceIT {
         LeaveType testLeaveType = leaveTypeList.get(leaveTypeList.size() - 1);
         assertThat(testLeaveType.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testLeaveType.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
-        assertThat(testLeaveType.getProcessName()).isEqualTo(DEFAULT_PROCESS_NAME);
+
+        Condition<String> nullValue = new Condition<>(pn -> pn == null, "Null value");
+        Condition<String> defaultValue = new Condition<>(pn -> pn.equals(DEFAULT_PROCESS_NAME), "Default value");
+        assertThat(testLeaveType.getProcessName()).is(anyOf(nullValue, defaultValue));
     }
 
     @Test

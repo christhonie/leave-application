@@ -65,6 +65,7 @@ class LeaveApplicationResourceIT {
     private static final BigDecimal SMALLER_DAYS = new BigDecimal(1 - 1);
 
     private static final Boolean DEFAULT_DELETED = false;
+    private static final Boolean DELETED = true;
     private static final Boolean UPDATED_DELETED = true;
 
     private static final String ENTITY_API_URL = "/api/leave-applications";
@@ -111,6 +112,16 @@ class LeaveApplicationResourceIT {
             leaveType = TestUtil.findAll(em, LeaveType.class).get(0);
         }
         leaveApplication.setLeaveType(leaveType);
+        // Add required entity
+        LeaveStatus leaveStatus;
+        if (TestUtil.findAll(em, LeaveStatus.class).isEmpty()) {
+            leaveStatus = LeaveStatusResourceIT.createEntity(em);
+            em.persist(leaveStatus);
+            em.flush();
+        } else {
+            leaveStatus = TestUtil.findAll(em, LeaveStatus.class).get(0);
+        }
+        leaveApplication.setLeaveStatus(leaveStatus);
         // Add required entity
         Staff staff;
         if (TestUtil.findAll(em, Staff.class).isEmpty()) {
@@ -1350,6 +1361,10 @@ class LeaveApplicationResourceIT {
 
         // Validate the database contains one less item
         List<LeaveApplication> leaveApplicationList = leaveApplicationRepository.findAll();
-        assertThat(leaveApplicationList).hasSize(databaseSizeBeforeDelete - 1);
+        //We no longer delete the record, so it should be there
+        assertThat(leaveApplicationList).hasSize(databaseSizeBeforeDelete);
+        // Validate the LeaveApplication in the database
+        LeaveApplication testLeaveApplication = leaveApplicationList.get(leaveApplicationList.size() - 1);
+        assertThat(testLeaveApplication.getDeleted()).isEqualTo(DELETED);
     }
 }
