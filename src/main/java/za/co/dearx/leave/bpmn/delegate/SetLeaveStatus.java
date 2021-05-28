@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import za.co.dearx.leave.bpmn.BPMNUtil;
+import za.co.dearx.leave.bpmn.exception.InvalidStatusException;
 import za.co.dearx.leave.domain.LeaveApplication;
 import za.co.dearx.leave.domain.LeaveStatus;
 import za.co.dearx.leave.service.LeaveApplicationService;
@@ -40,15 +41,16 @@ public class SetLeaveStatus implements JavaDelegate {
 
         Long applicationId = BPMNUtil.getBusinessKeyAsLong(execution);
 
+        final String processStatus = (String) execution.getVariable("status");
         LeaveStatus newStatus = null;
-        Map<String, Object> variables = execution.getVariables();
-        if (variables.containsKey("status")) {
-            newStatus = leaveStatusService.findEntityByName((String) variables.get("status")).orElse(null);
-        }
-
-        String processStatus = (String) execution.getVariable("status");
-        if (newStatus == null && processStatus != null) {
-            newStatus = leaveStatusService.findEntityByName(processStatus).orElse(null);
+        if (processStatus != null) {
+            newStatus =
+                leaveStatusService
+                    .findEntityByName(processStatus)
+                    .orElseThrow(
+                        () ->
+                            new InvalidStatusException(execution.getProcessDefinitionId(), execution.getProcessBusinessKey(), processStatus)
+                    );
         }
 
         leaveApplicationService.updateStatus(applicationId, newStatus);
