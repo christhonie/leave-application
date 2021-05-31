@@ -61,7 +61,7 @@ jobs:
             - name: Package using Maven
               run: |
                 chmod +x mvnw
-                ./mvnw -ntp -Pprod package
+                ./mvnw -ntp package -Pprod -DskipTests --batch-mode
             - name: Log into DeARX Azure Container Registry
               uses: Azure/docker-login@v1
               if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
