@@ -13,9 +13,6 @@ import { ILeaveType } from 'app/entities/leave-type/leave-type.model';
 import { LeaveTypeService } from 'app/entities/leave-type/service/leave-type.service';
 import { ILeaveStatus } from 'app/entities/leave-status/leave-status.model';
 import { LeaveStatusService } from 'app/entities/leave-status/service/leave-status.service';
-import { IStaff } from 'app/entities/staff/staff.model';
-import { StaffService } from 'app/entities/staff/service/staff.service';
-
 import { LeaveApplicationUpdateComponent } from './leave-application-update.component';
 
 describe('Component Tests', () => {
@@ -26,7 +23,6 @@ describe('Component Tests', () => {
     let leaveApplicationService: LeaveApplicationService;
     let leaveTypeService: LeaveTypeService;
     let leaveStatusService: LeaveStatusService;
-    let staffService: StaffService;
 
     beforeEach(() => {
       TestBed.configureTestingModule({
@@ -42,7 +38,6 @@ describe('Component Tests', () => {
       leaveApplicationService = TestBed.inject(LeaveApplicationService);
       leaveTypeService = TestBed.inject(LeaveTypeService);
       leaveStatusService = TestBed.inject(LeaveStatusService);
-      staffService = TestBed.inject(StaffService);
 
       comp = fixture.componentInstance;
     });
@@ -89,33 +84,12 @@ describe('Component Tests', () => {
         expect(comp.leaveStatusesSharedCollection).toEqual(expectedCollection);
       });
 
-      it('Should call Staff query and add missing value', () => {
-        const leaveApplication: ILeaveApplication = { id: 456 };
-        const staff: IStaff = { id: 16944 };
-        leaveApplication.staff = staff;
-
-        const staffCollection: IStaff[] = [{ id: 89747 }];
-        spyOn(staffService, 'query').and.returnValue(of(new HttpResponse({ body: staffCollection })));
-        const additionalStaff = [staff];
-        const expectedCollection: IStaff[] = [...additionalStaff, ...staffCollection];
-        spyOn(staffService, 'addStaffToCollectionIfMissing').and.returnValue(expectedCollection);
-
-        activatedRoute.data = of({ leaveApplication });
-        comp.ngOnInit();
-
-        expect(staffService.query).toHaveBeenCalled();
-        expect(staffService.addStaffToCollectionIfMissing).toHaveBeenCalledWith(staffCollection, ...additionalStaff);
-        expect(comp.staffSharedCollection).toEqual(expectedCollection);
-      });
-
       it('Should update editForm', () => {
         const leaveApplication: ILeaveApplication = { id: 456 };
         const leaveType: ILeaveType = { id: 61713 };
         leaveApplication.leaveType = leaveType;
         const leaveStatus: ILeaveStatus = { id: 22090 };
         leaveApplication.leaveStatus = leaveStatus;
-        const staff: IStaff = { id: 8488 };
-        leaveApplication.staff = staff;
 
         activatedRoute.data = of({ leaveApplication });
         comp.ngOnInit();
@@ -123,7 +97,6 @@ describe('Component Tests', () => {
         expect(comp.editForm.value).toEqual(expect.objectContaining(leaveApplication));
         expect(comp.leaveTypesSharedCollection).toContain(leaveType);
         expect(comp.leaveStatusesSharedCollection).toContain(leaveStatus);
-        expect(comp.staffSharedCollection).toContain(staff);
       });
     });
 
@@ -204,14 +177,6 @@ describe('Component Tests', () => {
         it('Should return tracked LeaveStatus primary key', () => {
           const entity = { id: 123 };
           const trackResult = comp.trackLeaveStatusById(0, entity);
-          expect(trackResult).toEqual(entity.id);
-        });
-      });
-
-      describe('trackStaffById', () => {
-        it('Should return tracked Staff primary key', () => {
-          const entity = { id: 123 };
-          const trackResult = comp.trackStaffById(0, entity);
           expect(trackResult).toEqual(entity.id);
         });
       });

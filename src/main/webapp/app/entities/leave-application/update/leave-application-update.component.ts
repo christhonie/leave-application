@@ -14,8 +14,6 @@ import { ILeaveType } from 'app/entities/leave-type/leave-type.model';
 import { LeaveTypeService } from 'app/entities/leave-type/service/leave-type.service';
 import { ILeaveStatus } from 'app/entities/leave-status/leave-status.model';
 import { LeaveStatusService } from 'app/entities/leave-status/service/leave-status.service';
-import { IStaff } from 'app/entities/staff/staff.model';
-import { StaffService } from 'app/entities/staff/service/staff.service';
 
 @Component({
   selector: 'jhi-leave-application-update',
@@ -26,7 +24,6 @@ export class LeaveApplicationUpdateComponent implements OnInit {
 
   leaveTypesSharedCollection: ILeaveType[] = [];
   leaveStatusesSharedCollection: ILeaveStatus[] = [];
-  staffSharedCollection: IStaff[] = [];
 
   editForm = this.fb.group({
     id: [],
@@ -38,14 +35,12 @@ export class LeaveApplicationUpdateComponent implements OnInit {
     deleted: [null, [Validators.required]],
     leaveType: [null, Validators.required],
     leaveStatus: [],
-    staff: [null, Validators.required],
   });
 
   constructor(
     protected leaveApplicationService: LeaveApplicationService,
     protected leaveTypeService: LeaveTypeService,
     protected leaveStatusService: LeaveStatusService,
-    protected staffService: StaffService,
     protected activatedRoute: ActivatedRoute,
     protected fb: FormBuilder
   ) {}
@@ -86,10 +81,6 @@ export class LeaveApplicationUpdateComponent implements OnInit {
     return item.id!;
   }
 
-  trackStaffById(index: number, item: IStaff): number {
-    return item.id!;
-  }
-
   protected subscribeToSaveResponse(result: Observable<HttpResponse<ILeaveApplication>>): void {
     result.pipe(finalize(() => this.onSaveFinalize())).subscribe(
       () => this.onSaveSuccess(),
@@ -120,7 +111,6 @@ export class LeaveApplicationUpdateComponent implements OnInit {
       deleted: leaveApplication.deleted,
       leaveType: leaveApplication.leaveType,
       leaveStatus: leaveApplication.leaveStatus,
-      staff: leaveApplication.staff,
     });
 
     this.leaveTypesSharedCollection = this.leaveTypeService.addLeaveTypeToCollectionIfMissing(
@@ -131,7 +121,6 @@ export class LeaveApplicationUpdateComponent implements OnInit {
       this.leaveStatusesSharedCollection,
       leaveApplication.leaveStatus
     );
-    this.staffSharedCollection = this.staffService.addStaffToCollectionIfMissing(this.staffSharedCollection, leaveApplication.staff);
   }
 
   protected loadRelationshipsOptions(): void {
@@ -154,12 +143,6 @@ export class LeaveApplicationUpdateComponent implements OnInit {
         )
       )
       .subscribe((leaveStatuses: ILeaveStatus[]) => (this.leaveStatusesSharedCollection = leaveStatuses));
-
-    this.staffService
-      .query()
-      .pipe(map((res: HttpResponse<IStaff[]>) => res.body ?? []))
-      .pipe(map((staff: IStaff[]) => this.staffService.addStaffToCollectionIfMissing(staff, this.editForm.get('staff')!.value)))
-      .subscribe((staff: IStaff[]) => (this.staffSharedCollection = staff));
   }
 
   protected createFromForm(): ILeaveApplication {
@@ -176,7 +159,6 @@ export class LeaveApplicationUpdateComponent implements OnInit {
       deleted: this.editForm.get(['deleted'])!.value,
       leaveType: this.editForm.get(['leaveType'])!.value,
       leaveStatus: this.editForm.get(['leaveStatus'])!.value,
-      staff: this.editForm.get(['staff'])!.value,
     };
   }
 }

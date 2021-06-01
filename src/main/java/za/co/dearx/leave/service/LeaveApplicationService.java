@@ -2,7 +2,6 @@ package za.co.dearx.leave.service;
 
 import java.util.Optional;
 import javax.validation.Valid;
-import org.camunda.bpm.engine.RuntimeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -11,10 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import za.co.dearx.leave.bpmn.MessageHander;
 import za.co.dearx.leave.bpmn.exception.NoMessageCatchException;
+import za.co.dearx.leave.config.Constants;
 import za.co.dearx.leave.domain.LeaveApplication;
 import za.co.dearx.leave.domain.LeaveStatus;
 import za.co.dearx.leave.domain.LeaveType;
 import za.co.dearx.leave.repository.LeaveApplicationRepository;
+import za.co.dearx.leave.repository.StaffRepository;
+import za.co.dearx.leave.security.SecurityUtils;
 import za.co.dearx.leave.service.dto.LeaveApplicationDTO;
 import za.co.dearx.leave.service.exception.NotFoundException;
 import za.co.dearx.leave.service.exception.ValidationException;
@@ -39,18 +41,22 @@ public class LeaveApplicationService {
 
     private final MessageHander messageHandler;
 
+    private final StaffRepository staffRepository;
+
     public LeaveApplicationService(
         LeaveApplicationRepository leaveApplicationRepository,
         LeaveApplicationMapper leaveApplicationMapper,
         LeaveStatusService leaveStatusService,
         LeaveTypeService leaveTypeService,
-        MessageHander messageHandler
+        MessageHander messageHandler,
+        StaffRepository staffRepository
     ) {
         this.leaveApplicationRepository = leaveApplicationRepository;
         this.leaveApplicationMapper = leaveApplicationMapper;
         this.leaveStatusService = leaveStatusService;
         this.leaveTypeService = leaveTypeService;
         this.messageHandler = messageHandler;
+        this.staffRepository = staffRepository;
     }
 
     /**
@@ -62,7 +68,7 @@ public class LeaveApplicationService {
      */
     public LeaveApplicationDTO create(LeaveApplicationDTO leaveApplicationDTO) throws ValidationException {
         log.debug("Request to create LeaveApplication : {}", leaveApplicationDTO);
-        LeaveApplication leaveApplication = leaveApplicationMapper.toEntity(leaveApplicationDTO);
+        final LeaveApplication leaveApplication = leaveApplicationMapper.toEntity(leaveApplicationDTO);
 
         boolean newProcess = false;
         if (leaveApplication.getId() == null) {
@@ -76,10 +82,17 @@ public class LeaveApplicationService {
             }
         }
 
-        leaveApplication = leaveApplicationRepository.save(leaveApplication);
+        // Use SecurityUtils find the current user's username then looking up a Staff memeber using the username
+        // Defaults to the admin user since it's currently the only user that will not be a staff memeber
+        // TODO: Figure out what to do with other non-staff users
+        staffRepository
+            .findBySpecificUsername(SecurityUtils.getCurrentUserLogin().orElse(Constants.ADMIN))
+            .ifPresent(staff -> leaveApplication.setStaff(staff));
+
+        LeaveApplication savedleaveApplication = leaveApplicationRepository.save(leaveApplication);
 
         //When mapping a new LeaveApplication the LeaveType will not be fully set. Retrieve full record
-        LeaveType leaveType = leaveTypeService.findEntityById(leaveApplication.getLeaveType().getId()).orElse(null);
+        LeaveType leaveType = leaveTypeService.findEntityById(savedleaveApplication.getLeaveType().getId()).orElse(null);
         leaveApplication.setLeaveType(leaveType);
 
         //Start a new business process, if defined
@@ -99,7 +112,7 @@ public class LeaveApplicationService {
      */
     public LeaveApplicationDTO save(@Valid LeaveApplicationDTO leaveApplicationDTO) throws ValidationException {
         log.debug("Request to save LeaveApplication : {}", leaveApplicationDTO);
-        LeaveApplication leaveApplication = leaveApplicationMapper.toEntity(leaveApplicationDTO);
+        final LeaveApplication leaveApplication = leaveApplicationMapper.toEntity(leaveApplicationDTO);
 
         boolean newProcess = false;
         if (leaveApplication.getId() == null) {
@@ -113,12 +126,14 @@ public class LeaveApplicationService {
             }
         }
 
-        leaveApplication = leaveApplicationRepository.save(leaveApplication);
+        staffRepository.findByUserIsCurrentUser().ifPresent(staff -> leaveApplication.setStaff(staff));
+
+        LeaveApplication savedApplication = leaveApplicationRepository.save(leaveApplication);
 
         //Start a new business process, if defined
-        if (newProcess && leaveApplication.getLeaveType().getProcessName() != null) {}
+        if (newProcess && savedApplication.getLeaveType().getProcessName() != null) {}
 
-        return leaveApplicationMapper.toDto(leaveApplication);
+        return leaveApplicationMapper.toDto(savedApplication);
         //TODO Make sure we cannot save a deleted record. Must throw exception.
     }
 
