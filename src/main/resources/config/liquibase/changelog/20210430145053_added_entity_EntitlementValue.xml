@@ -10,11 +10,11 @@
         Added the entity EntitlementValue.
     -->
     <changeSet id="20210430145053-1" author="jhipster">
-        <createTable tableName="entitlement_value">
+        <createTable tableName="entitlement_value" remarks="The allocation of leave days for a given {@link LeaveEntitlement} and {@link Staff} member.">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="entitlement_value" type="decimal(21,2)">
+            <column name="entitlement_value" type="decimal(21,2)" remarks="The value, in days, assigned to a {@link Staff} member.">
                 <constraints nullable="false" />
             </column>
             <column name="entitlement_id" type="bigint">

@@ -20,7 +20,10 @@
       "id": "ID",
       "entitlementValue": "Entitlement Value",
       "entitlement": "Entitlement",
-      "staff": "Staff"
+      "staff": "Staff",
+      "help": {
+        "entitlementValue": "The value, in days, assigned to a {@link Staff} member."
+      }
     }
   }
 }

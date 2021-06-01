@@ -10,11 +10,11 @@
         Added the entity LeaveStatus.
     -->
     <changeSet id="20210430144753-1" author="jhipster">
-        <createTable tableName="leave_status">
+        <createTable tableName="leave_status" remarks="A possible status of the LeaveApplication. The system defines a number of default statuses which cannot be changed.">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="name" type="varchar(50)">
+            <column name="name" type="varchar(50)" remarks="A unique name for the status. This value is used in the BPMN process and should not be changed once created.">
                 <constraints nullable="false" />
             </column>
             <column name="description" type="varchar(200)">

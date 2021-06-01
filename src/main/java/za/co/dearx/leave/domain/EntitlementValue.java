@@ -9,7 +9,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A EntitlementValue.
+ * The allocation of leave days for a given {@link LeaveEntitlement} and {@link Staff} member.
  */
 @Entity
 @Table(name = "entitlement_value")
@@ -22,16 +22,25 @@ public class EntitlementValue implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * The value, in days, assigned to a {@link Staff} member.
+     */
     @NotNull
     @Column(name = "entitlement_value", precision = 21, scale = 2, nullable = false)
     private BigDecimal entitlementValue;
 
+    /**
+     * The LeaveEntitlement this value is related to.
+     */
     @JsonIgnoreProperties(value = { "leaveType", "staff" }, allowSetters = true)
     @OneToOne(optional = false)
     @NotNull
     @JoinColumn(unique = true)
     private LeaveEntitlement entitlement;
 
+    /**
+     * The staff member this value is assigned to.
+     */
     @JsonIgnoreProperties(value = { "user", "teams" }, allowSetters = true)
     @OneToOne(optional = false)
     @NotNull

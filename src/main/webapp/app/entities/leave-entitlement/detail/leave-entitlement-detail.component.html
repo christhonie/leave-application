@@ -16,11 +16,23 @@
         <dd>
           <span>{{ leaveEntitlement.id }}</span>
         </dd>
-        <dt><span jhiTranslate="leaveApplicationApp.leaveEntitlement.entitlementDate">Entitlement Date</span></dt>
+        <dt>
+          <span
+            jhiTranslate="leaveApplicationApp.leaveEntitlement.entitlementDate"
+            [ngbTooltip]="'leaveApplicationApp.leaveEntitlement.help.entitlementDate' | translate"
+            >Entitlement Date</span
+          >
+        </dt>
         <dd>
           <span>{{ leaveEntitlement.entitlementDate | formatMediumDate }}</span>
         </dd>
-        <dt><span jhiTranslate="leaveApplicationApp.leaveEntitlement.days">Days</span></dt>
+        <dt>
+          <span
+            jhiTranslate="leaveApplicationApp.leaveEntitlement.days"
+            [ngbTooltip]="'leaveApplicationApp.leaveEntitlement.help.days' | translate"
+            >Days</span
+          >
+        </dt>
         <dd>
           <span>{{ leaveEntitlement.days }}</span>
         </dd>

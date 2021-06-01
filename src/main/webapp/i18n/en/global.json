@@ -16,7 +16,7 @@
         "entitlementValue": "Entitlement Value",
         "leaveApplication": "Leave Application",
         "comment": "Comment",
-        "decisions": "Decisions",
+        "decision": "Decision",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },
       "account": {

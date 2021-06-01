@@ -19,7 +19,10 @@
       },
       "id": "ID",
       "name": "Name",
-      "description": "Description"
+      "description": "Description",
+      "help": {
+        "name": "A unique name for the status. This value is used in the BPMN process and should not be changed once created."
+      }
     }
   }
 }

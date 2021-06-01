@@ -20,7 +20,10 @@
       "id": "ID",
       "comment": "Comment",
       "leaveApplication": "Leave Application",
-      "user": "User"
+      "user": "User",
+      "help": {
+        "comment": "A free text message up to 5000 characters."
+      }
     }
   }
 }

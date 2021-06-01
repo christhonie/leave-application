@@ -4,11 +4,13 @@
     {
       "fieldName": "entitlementDate",
       "fieldType": "LocalDate",
+      "javadoc": "The date the entitlement is applied to the Staff member.",
       "fieldValidateRules": ["required"]
     },
     {
       "fieldName": "days",
       "fieldType": "BigDecimal",
+      "javadoc": "@depricated Use the EntitlementValue",
       "fieldValidateRules": ["required"]
     }
   ],
@@ -18,6 +20,7 @@
       "otherEntityName": "leaveType",
       "otherEntityRelationshipName": "leaveEntitlement",
       "relationshipValidateRules": "required",
+      "javadoc": "The leave type this entitlement applies to.",
       "relationshipName": "leaveType",
       "otherEntityField": "name"
     },
@@ -26,6 +29,7 @@
       "otherEntityName": "staff",
       "otherEntityRelationshipName": "leaveEntitlement",
       "relationshipValidateRules": "required",
+      "javadoc": "The staff member the leave is assigned to.",
       "relationshipName": "staff",
       "otherEntityField": "name"
     }
@@ -40,5 +44,6 @@
   "readOnly": false,
   "embedded": false,
   "clientRootFolder": "",
-  "applications": "*"
+  "applications": "*",
+  "javadoc": "An entitlement represents an instance when leave days are assigned to zero, one or more Staff members.\\nEntitlements are typically assigned at the start of an entitlement period, such as the first day of the month.\\nAlso see {@link EntitlementValue} for how the days are assigned to the {@link Staff} members."
 }

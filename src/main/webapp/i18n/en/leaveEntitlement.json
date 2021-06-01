@@ -21,7 +21,11 @@
       "entitlementDate": "Entitlement Date",
       "days": "Days",
       "leaveType": "Leave Type",
-      "staff": "Staff"
+      "staff": "Staff",
+      "help": {
+        "entitlementDate": "The date the entitlement is applied to the Staff member.",
+        "days": "@depricated Use the EntitlementValue"
+      }
     }
   }
 }

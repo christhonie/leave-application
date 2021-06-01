@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <!--
+        Added the constraints for entity Decision.
+    -->
+    <changeSet id="20210430145353-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="comment_id"
+                                 baseTableName="decision"
+                                 constraintName="fk_decision__comment_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="comment"/>
+
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="decision"
+                                 constraintName="fk_decision__user_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_user"/>
+
+        <addForeignKeyConstraint baseColumnNames="leave_application_id"
+                                 baseTableName="decision"
+                                 constraintName="fk_decision__leave_application_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="leave_application"/>
+    </changeSet>
+</databaseChangeLog>

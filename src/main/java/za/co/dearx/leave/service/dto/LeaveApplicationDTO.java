@@ -1,5 +1,7 @@
 package za.co.dearx.leave.service.dto;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -10,6 +12,7 @@ import javax.validation.constraints.*;
 /**
  * A DTO for the {@link za.co.dearx.leave.domain.LeaveApplication} entity.
  */
+@ApiModel(description = "An application for leave by a Staff member.")
 public class LeaveApplicationDTO implements Serializable {
 
     private Long id;

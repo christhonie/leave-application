@@ -1,5 +1,7 @@
 package za.co.dearx.leave.service.dto;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.validation.constraints.*;
@@ -7,12 +9,17 @@ import javax.validation.constraints.*;
 /**
  * A DTO for the {@link za.co.dearx.leave.domain.Comment} entity.
  */
+@ApiModel(description = "Comments assigned to a Decision or a LeaveApplication.")
 public class CommentDTO implements Serializable {
 
     private Long id;
 
+    /**
+     * A free text message up to 5000 characters.
+     */
     @NotNull
     @Size(max = 5000)
+    @ApiModelProperty(value = "A free text message up to 5000 characters.", required = true)
     private String comment;
 
     private LeaveApplicationDTO leaveApplication;

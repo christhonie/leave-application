@@ -10,7 +10,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A LeaveEntitlement.
+ * An entitlement represents an instance when leave days are assigned to zero, one or more Staff members.\nEntitlements are typically assigned at the start of an entitlement period, such as the first day of the month.\nAlso see {@link EntitlementValue} for how the days are assigned to the {@link Staff} members.
  */
 @Entity
 @Table(name = "leave_entitlement")
@@ -23,18 +23,30 @@ public class LeaveEntitlement implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * The date the entitlement is applied to the Staff member.
+     */
     @NotNull
     @Column(name = "entitlement_date", nullable = false)
     private LocalDate entitlementDate;
 
+    /**
+     * @deprecated Use the EntitlementValue
+     */
     @NotNull
     @Column(name = "days", precision = 21, scale = 2, nullable = false)
     private BigDecimal days;
 
+    /**
+     * The leave type this entitlement applies to.
+     */
     @ManyToOne(optional = false)
     @NotNull
     private LeaveType leaveType;
 
+    /**
+     * The staff member the leave is assigned to.
+     */
     @ManyToOne(optional = false)
     @NotNull
     @JsonIgnoreProperties(value = { "user", "teams" }, allowSetters = true)

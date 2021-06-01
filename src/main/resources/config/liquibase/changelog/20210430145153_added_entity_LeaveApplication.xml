@@ -10,7 +10,7 @@
         Added the entity LeaveApplication.
     -->
     <changeSet id="20210430145153-1" author="jhipster">
-        <createTable tableName="leave_application">
+        <createTable tableName="leave_application" remarks="An application for leave by a {@link Staff} member.">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>

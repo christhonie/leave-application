@@ -1,0 +1,124 @@
+<div>
+  <h2 id="page-heading" data-cy="DecisionHeading">
+    <span jhiTranslate="leaveApplicationApp.decision.home.title">Decisions</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info mr-2" (click)="loadPage()" [disabled]="isLoading">
+        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+        <span jhiTranslate="leaveApplicationApp.decision.home.refreshListLabel">Refresh List</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-decision"
+        [routerLink]="['/decision/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="leaveApplicationApp.decision.home.createLabel"> Create a new Decision </span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  <div class="alert alert-warning" id="no-result" *ngIf="decisions?.length === 0">
+    <span jhiTranslate="leaveApplicationApp.decision.home.notFound">No decisions found</span>
+  </div>
+
+  <div class="table-responsive" id="entities" *ngIf="decisions && decisions.length > 0">
+    <table class="table table-striped" aria-describedby="page-heading">
+      <thead>
+        <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" [callback]="loadPage.bind(this)">
+          <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort"></fa-icon></th>
+          <th scope="col" jhiSortBy="choice">
+            <span jhiTranslate="leaveApplicationApp.decision.choice">Choice</span> <fa-icon icon="sort"></fa-icon>
+          </th>
+          <th scope="col" jhiSortBy="decidedOn">
+            <span jhiTranslate="leaveApplicationApp.decision.decidedOn">Decided On</span> <fa-icon icon="sort"></fa-icon>
+          </th>
+          <th scope="col" jhiSortBy="comment.comment">
+            <span jhiTranslate="leaveApplicationApp.decision.comment">Comment</span> <fa-icon icon="sort"></fa-icon>
+          </th>
+          <th scope="col" jhiSortBy="user.login">
+            <span jhiTranslate="leaveApplicationApp.decision.user">User</span> <fa-icon icon="sort"></fa-icon>
+          </th>
+          <th scope="col" jhiSortBy="leaveApplication.id">
+            <span jhiTranslate="leaveApplicationApp.decision.leaveApplication">Leave Application</span> <fa-icon icon="sort"></fa-icon>
+          </th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let decision of decisions; trackBy: trackId" data-cy="entityTable">
+          <td>
+            <a [routerLink]="['/decision', decision.id, 'view']">{{ decision.id }}</a>
+          </td>
+          <td jhiTranslate="{{ 'leaveApplicationApp.DecisionChoice.' + decision.choice }}">{{ decision.choice }}</td>
+          <td>{{ decision.decidedOn | formatMediumDatetime }}</td>
+          <td>
+            <div *ngIf="decision.comment">
+              <a [routerLink]="['/comment', decision.comment?.id, 'view']">{{ decision.comment?.comment }}</a>
+            </div>
+          </td>
+          <td>
+            {{ decision.user?.login }}
+          </td>
+          <td>
+            <div *ngIf="decision.leaveApplication">
+              <a [routerLink]="['/leave-application', decision.leaveApplication?.id, 'view']">{{ decision.leaveApplication?.id }}</a>
+            </div>
+          </td>
+          <td class="text-right">
+            <div class="btn-group">
+              <button
+                type="submit"
+                [routerLink]="['/decision', decision.id, 'view']"
+                class="btn btn-info btn-sm"
+                data-cy="entityDetailsButton"
+              >
+                <fa-icon icon="eye"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+              </button>
+
+              <button
+                type="submit"
+                [routerLink]="['/decision', decision.id, 'edit']"
+                class="btn btn-primary btn-sm"
+                data-cy="entityEditButton"
+              >
+                <fa-icon icon="pencil-alt"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+              </button>
+
+              <button type="submit" (click)="delete(decision)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                <fa-icon icon="times"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="decisions && decisions.length > 0">
+    <div class="row justify-content-center">
+      <jhi-item-count [params]="{ page: page, totalItems: totalItems, itemsPerPage: itemsPerPage }"></jhi-item-count>
+    </div>
+
+    <div class="row justify-content-center">
+      <ngb-pagination
+        [collectionSize]="totalItems"
+        [(page)]="ngbPaginationPage"
+        [pageSize]="itemsPerPage"
+        [maxSize]="5"
+        [rotate]="true"
+        [boundaryLinks]="true"
+        (pageChange)="loadPage($event)"
+      ></ngb-pagination>
+    </div>
+  </div>
+</div>

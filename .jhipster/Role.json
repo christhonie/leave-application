@@ -13,6 +13,7 @@
       "relationshipType": "many-to-many",
       "otherEntityName": "user",
       "otherEntityRelationshipName": "role",
+      "javadoc": "The user(s) linked to the role.",
       "relationshipName": "user",
       "otherEntityField": "login",
       "ownerSide": true
@@ -28,5 +29,6 @@
   "readOnly": false,
   "embedded": false,
   "clientRootFolder": "",
-  "applications": "*"
+  "applications": "*",
+  "javadoc": "Represent a role a user may have within the application."
 }

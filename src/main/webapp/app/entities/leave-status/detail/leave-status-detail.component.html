@@ -14,7 +14,11 @@
         <dd>
           <span>{{ leaveStatus.id }}</span>
         </dd>
-        <dt><span jhiTranslate="leaveApplicationApp.leaveStatus.name">Name</span></dt>
+        <dt>
+          <span jhiTranslate="leaveApplicationApp.leaveStatus.name" [ngbTooltip]="'leaveApplicationApp.leaveStatus.help.name' | translate"
+            >Name</span
+          >
+        </dt>
         <dd>
           <span>{{ leaveStatus.name }}</span>
         </dd>

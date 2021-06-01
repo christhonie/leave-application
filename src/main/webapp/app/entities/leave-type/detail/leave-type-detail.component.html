@@ -14,7 +14,11 @@
         <dd>
           <span>{{ leaveType.id }}</span>
         </dd>
-        <dt><span jhiTranslate="leaveApplicationApp.leaveType.name">Name</span></dt>
+        <dt>
+          <span jhiTranslate="leaveApplicationApp.leaveType.name" [ngbTooltip]="'leaveApplicationApp.leaveType.help.name' | translate"
+            >Name</span
+          >
+        </dt>
         <dd>
           <span>{{ leaveType.name }}</span>
         </dd>
@@ -22,7 +26,13 @@
         <dd>
           <span>{{ leaveType.description }}</span>
         </dd>
-        <dt><span jhiTranslate="leaveApplicationApp.leaveType.processName">Process Name</span></dt>
+        <dt>
+          <span
+            jhiTranslate="leaveApplicationApp.leaveType.processName"
+            [ngbTooltip]="'leaveApplicationApp.leaveType.help.processName' | translate"
+            >Process Name</span
+          >
+        </dt>
         <dd>
           <span>{{ leaveType.processName }}</span>
         </dd>

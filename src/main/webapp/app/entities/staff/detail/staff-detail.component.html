@@ -18,15 +18,25 @@
         <dd>
           <span>{{ staff.position }}</span>
         </dd>
-        <dt><span jhiTranslate="leaveApplicationApp.staff.employeeID">Employee ID</span></dt>
+        <dt>
+          <span jhiTranslate="leaveApplicationApp.staff.employeeID" [ngbTooltip]="'leaveApplicationApp.staff.help.employeeID' | translate"
+            >Employee ID</span
+          >
+        </dt>
         <dd>
           <span>{{ staff.employeeID }}</span>
         </dd>
-        <dt><span jhiTranslate="leaveApplicationApp.staff.startDate">Start Date</span></dt>
+        <dt>
+          <span jhiTranslate="leaveApplicationApp.staff.startDate" [ngbTooltip]="'leaveApplicationApp.staff.help.startDate' | translate"
+            >Start Date</span
+          >
+        </dt>
         <dd>
           <span>{{ staff.startDate | formatMediumDate }}</span>
         </dd>
-        <dt><span jhiTranslate="leaveApplicationApp.staff.name">Name</span></dt>
+        <dt>
+          <span jhiTranslate="leaveApplicationApp.staff.name" [ngbTooltip]="'leaveApplicationApp.staff.help.name' | translate">Name</span>
+        </dt>
         <dd>
           <span>{{ staff.name }}</span>
         </dd>
@@ -42,7 +52,13 @@
         <dd>
           <span>{{ staff.email }}</span>
         </dd>
-        <dt><span jhiTranslate="leaveApplicationApp.staff.contractNumber">Contract Number</span></dt>
+        <dt>
+          <span
+            jhiTranslate="leaveApplicationApp.staff.contractNumber"
+            [ngbTooltip]="'leaveApplicationApp.staff.help.contractNumber' | translate"
+            >Contract Number</span
+          >
+        </dt>
         <dd>
           <span>{{ staff.contractNumber }}</span>
         </dd>

@@ -50,9 +50,9 @@ import { RouterModule } from '@angular/router';
         loadChildren: () => import('./comment/comment.module').then(m => m.CommentModule),
       },
       {
-        path: 'decisions',
-        data: { pageTitle: 'leaveApplicationApp.decisions.home.title' },
-        loadChildren: () => import('./decisions/decisions.module').then(m => m.DecisionsModule),
+        path: 'decision',
+        data: { pageTitle: 'leaveApplicationApp.decision.home.title' },
+        loadChildren: () => import('./decision/decision.module').then(m => m.DecisionModule),
       },
       /* jhipster-needle-add-entity-route - JHipster will add entity modules routes here */
     ]),
