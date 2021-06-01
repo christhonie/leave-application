@@ -32,24 +32,18 @@
     <table class="table table-striped" aria-describedby="page-heading">
       <thead>
         <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" [callback]="loadPage.bind(this)">
-          <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort"></fa-icon></th>
+          <th scope="col" jhiSortBy="staff.name">
+            <span jhiTranslate="leaveApplicationApp.leaveApplication.staff">Staff</span>
+            <fa-icon icon="sort"></fa-icon>
+          </th>
           <th scope="col" jhiSortBy="startDate">
             <span jhiTranslate="leaveApplicationApp.leaveApplication.startDate">Start Date</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col" jhiSortBy="endDate">
             <span jhiTranslate="leaveApplicationApp.leaveApplication.endDate">End Date</span> <fa-icon icon="sort"></fa-icon>
           </th>
-          <th scope="col" jhiSortBy="appliedDate">
-            <span jhiTranslate="leaveApplicationApp.leaveApplication.appliedDate">Applied Date</span> <fa-icon icon="sort"></fa-icon>
-          </th>
-          <th scope="col" jhiSortBy="updateDate">
-            <span jhiTranslate="leaveApplicationApp.leaveApplication.updateDate">Update Date</span> <fa-icon icon="sort"></fa-icon>
-          </th>
           <th scope="col" jhiSortBy="days">
             <span jhiTranslate="leaveApplicationApp.leaveApplication.days">Days</span> <fa-icon icon="sort"></fa-icon>
-          </th>
-          <th scope="col" jhiSortBy="deleted">
-            <span jhiTranslate="leaveApplicationApp.leaveApplication.deleted">Deleted</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col" jhiSortBy="leaveType.name">
             <span jhiTranslate="leaveApplicationApp.leaveApplication.leaveType">Leave Type</span> <fa-icon icon="sort"></fa-icon>
@@ -57,23 +51,19 @@
           <th scope="col" jhiSortBy="leaveStatus.name">
             <span jhiTranslate="leaveApplicationApp.leaveApplication.leaveStatus">Leave Status</span> <fa-icon icon="sort"></fa-icon>
           </th>
-          <th scope="col" jhiSortBy="staff.name">
-            <span jhiTranslate="leaveApplicationApp.leaveApplication.staff">Staff</span> <fa-icon icon="sort"></fa-icon>
-          </th>
           <th scope="col"></th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let leaveApplication of leaveApplications; trackBy: trackId" data-cy="entityTable">
           <td>
-            <a [routerLink]="['/leave-application', leaveApplication.id, 'view']">{{ leaveApplication.id }}</a>
+            <div *ngIf="leaveApplication.staff">
+              <a [routerLink]="['/staff', leaveApplication.staff?.id, 'view']">{{ leaveApplication.staff?.name }}</a>
+            </div>
           </td>
           <td>{{ leaveApplication.startDate | formatMediumDate }}</td>
           <td>{{ leaveApplication.endDate | formatMediumDate }}</td>
-          <td>{{ leaveApplication.appliedDate | formatMediumDatetime }}</td>
-          <td>{{ leaveApplication.updateDate | formatMediumDatetime }}</td>
           <td>{{ leaveApplication.days }}</td>
-          <td>{{ leaveApplication.deleted }}</td>
           <td>
             <div *ngIf="leaveApplication.leaveType">
               <a [routerLink]="['/leave-type', leaveApplication.leaveType?.id, 'view']">{{ leaveApplication.leaveType?.name }}</a>
@@ -82,11 +72,6 @@
           <td>
             <div *ngIf="leaveApplication.leaveStatus">
               <a [routerLink]="['/leave-status', leaveApplication.leaveStatus?.id, 'view']">{{ leaveApplication.leaveStatus?.name }}</a>
-            </div>
-          </td>
-          <td>
-            <div *ngIf="leaveApplication.staff">
-              <a [routerLink]="['/staff', leaveApplication.staff?.id, 'view']">{{ leaveApplication.staff?.name }}</a>
             </div>
           </td>
           <td class="text-right">
