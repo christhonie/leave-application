@@ -1,0 +1,76 @@
+= GitHub - Set Azure Container Registry credentials
+
+The project can be build using a GitHub Action and then push the Docker container to the DeARX Container Registry hosted in DeARX's Azure Container Registry (ACR).
+
+This document covers the steps to setup GitHub Actions to authenticate against DeARX's Azure Container Repository.
+
+== Create a Service Principal for all ACRs
+
+The GitHub Action will use a Service Principle (SP) to login to the ACR during build time. To create the SP, which can access all ACRs, perform the following using Powershell;
+
+[source, shell]
+----
+az login <1>
+az ad sp create-for-rbac -n "GitHubActions" --role acrpull <2>
+----
+<1> Login to the Azure CLI using your own Azure credentials
+<2> Create an SP using a custom name, "GitHubActions". The _acrpull_ roll is assigned to this SP and will apply to all container repositories. If the role should only be assigned to a single repository follow the next section.
+
+The command will output the account creation details, the details of which will be used in subsequent configuration. 
+
+.Sample output
+----
+{
+  "appId": "4af9558d-cefb-4af7-aad4-31a1beb64ba3", <1>
+  "displayName": "GitHubActions",
+  "name": "http://GitHubActions",
+  "password": "JtU3w37WYUF4Rh2H3ZM-Jeap9dN3wmjz8s", <2>
+  "tenant": "1a33fe0e-c283-4e3d-afeb-a3c53e9c6812"
+}
+----
+<1> appId will serve as the login username
+<2> password will serve as the login password
+
+== Create a Service Principal for one ACR
+
+In order to apply the _acrpull_ role to only one ACR, retrieve the _ACR ResourceID_ of the AzureContainerRegistry in the JSON output on the Overview page of the ACR.
+
+[source, shell]
+----
+az login <1>
+az ad sp create-for-rbac -n "GitHubActions" --skip-assignment <2>
+az role assignment create --assignee "http://GitHubActions" --scope "<ACR ResourceID>" --role "acrpull" <3>
+----
+<1> Login to the Azure CLI using your own Azure credentials
+<2> Create an SP using a custom name, "GitHubActions". Use the _--skip-assignment_ option to skip assigning a role directly to the SP.
+
+A similar output is generated as per the earlier section. Extract the username and password from the output.
+
+== Connect to ACR in Actions
+
+Add the _Azure/docker-login@v1_ step to the pipeline with the credentials created above.
+
+[source, yaml]
+----
+steps:
+    - name: Log into DeARX Azure Container Registry
+      uses: Azure/docker-login@v1
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
+      with:
+        username: ${{ secrets.ACR_USERNAME }} <1>
+        password: ${{ secrets.ACR_PASSWORD }} <2>
+        login-server: dearxcontainerregistry.azurecr.io <3>
+----
+<1> The username created earlier
+<2> The password created earlier
+<3> The ACR login server address, which can be obtained on the Overview page of the ACR
+
+Set the username as part of the Action secret configurations;
+
+.Set the username variable as a secret
+image::images/Image-290521-122046.128.png[]
+
+and do the same for the password;
+
+.Set the password variable as a secret
+image::images/Image-290521-122317.553.png[]

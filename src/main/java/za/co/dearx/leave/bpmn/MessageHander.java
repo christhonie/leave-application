@@ -94,7 +94,7 @@ public class MessageHander {
 
     /**
      * Start a new process for the given leave application.
-     * If an existing process was already created before it will be re-used and the {@link #SIGNAL_UPDATE} signal will be sent.
+     * If an existing process was already created before it will be re-used and the {@link #MESSAGE_UPDATE} signal will be sent.
      * @param leaveApplication to be associated with the process.
      * @return TRUE if a new process was created or FALSE if the process already existed.
      * @throws ValidationException if any of the required fields failed validation.

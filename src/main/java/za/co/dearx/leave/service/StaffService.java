@@ -79,6 +79,7 @@ public class StaffService {
     /**
      * Get all the staff with eager load of many-to-many relationships.
      *
+     * @param pageable the pagination information.
      * @return the list of entities.
      */
     public Page<StaffDTO> findAllWithEagerRelationships(Pageable pageable) {

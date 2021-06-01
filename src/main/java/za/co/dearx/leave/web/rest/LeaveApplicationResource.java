@@ -150,6 +150,14 @@ public class LeaveApplicationResource {
         if (leaveApplicationDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
+        if (!Objects.equals(id, leaveApplicationDTO.getId())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+
+        if (!leaveApplicationRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
         LeaveApplicationDTO result;
         try {
             result = leaveApplicationService.save(leaveApplicationDTO);

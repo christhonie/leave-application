@@ -26,7 +26,7 @@
 
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
 
-    <changeSet id="20210312135833-2" author="Christhonie Geldenhuys">
+    <changeSet id="20210312135833-2" author="Christhonie Geldenhuys" context="!test">
         <loadData
                   file="config/liquibase/data/leave_status.csv"
                   separator=";"
