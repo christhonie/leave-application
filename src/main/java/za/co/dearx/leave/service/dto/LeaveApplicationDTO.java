@@ -12,7 +12,7 @@ import javax.validation.constraints.*;
 /**
  * A DTO for the {@link za.co.dearx.leave.domain.LeaveApplication} entity.
  */
-@ApiModel(description = "An application for leave by a {@link Staff} member.")
+@ApiModel(description = "An application for leave by a Staff member.")
 public class LeaveApplicationDTO implements Serializable {
 
     private Long id;

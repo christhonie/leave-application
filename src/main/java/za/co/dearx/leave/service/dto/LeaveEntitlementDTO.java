@@ -12,7 +12,9 @@ import javax.validation.constraints.*;
  * A DTO for the {@link za.co.dearx.leave.domain.LeaveEntitlement} entity.
  */
 @ApiModel(
-    description = "An entitlement represents an instance when leave days are assigned to zero, one or more Staff members.\nEntitlements are typically assigned at the start of an entitlement period, such as the first day of the month.\nAlso see {@link EntitlementValue} for how the days are assigned to the {@link Staff} members."
+    description = "An entitlement represents an instance when leave days are assigned to zero, one or more Staff members. " +
+    "Entitlements are typically assigned at the start of an entitlement period, such as the first day of the month. " +
+    "Also see EntitlementValue for how the days are assigned to the Staff members."
 )
 public class LeaveEntitlementDTO implements Serializable {
 

@@ -11,7 +11,7 @@ import za.co.dearx.leave.domain.Staff;
 /**
  * A DTO for the {@link za.co.dearx.leave.domain.EntitlementValue} entity.
  */
-@ApiModel(description = "The allocation of leave days for a given {@link LeaveEntitlement} and {@link Staff} member.")
+@ApiModel(description = "The allocation of leave days for a given LeaveEntitlement and Staff member.")
 public class EntitlementValueDTO implements Serializable {
 
     private Long id;
@@ -20,7 +20,7 @@ public class EntitlementValueDTO implements Serializable {
      * The value, in days, assigned to a {@link Staff} member.
      */
     @NotNull
-    @ApiModelProperty(value = "The value, in days, assigned to a {@link Staff} member.", required = true)
+    @ApiModelProperty(value = "The value, in days, assigned to a Staff member.", required = true)
     private BigDecimal entitlementValue;
 
     private LeaveEntitlementDTO entitlement;
