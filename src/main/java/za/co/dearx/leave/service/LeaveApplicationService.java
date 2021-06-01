@@ -27,6 +27,11 @@ import za.co.dearx.leave.service.mapper.LeaveApplicationMapper;
 @Transactional
 public class LeaveApplicationService {
 
+    private static final String LEAVE_STATUS_NOT_SPECIFIED_MESSAGE =
+        "LeaveStatus was not specified and there is also no default LeaveStatus defined.";
+
+    private static final String LEAVE_APPLICATION_DTO = "LeaveApplicationDTO";
+
     private final Logger log = LoggerFactory.getLogger(LeaveApplicationService.class);
 
     private final LeaveApplicationRepository leaveApplicationRepository;
@@ -71,7 +76,7 @@ public class LeaveApplicationService {
                 try {
                     leaveApplication.setLeaveStatus(leaveStatusService.getDraft());
                 } catch (NotFoundException e) {
-                    throw new ValidationException("LeaveApplicationDTO", "Status was null and default state cannot be found.");
+                    throw new ValidationException(LEAVE_APPLICATION_DTO, LEAVE_STATUS_NOT_SPECIFIED_MESSAGE);
                 }
             }
         }
@@ -108,7 +113,7 @@ public class LeaveApplicationService {
                 try {
                     leaveApplication.setLeaveStatus(leaveStatusService.getDraft());
                 } catch (NotFoundException e) {
-                    throw new ValidationException("LeaveApplicationDTO", "Status was null and default state cannot be found.");
+                    throw new ValidationException(LEAVE_APPLICATION_DTO, LEAVE_STATUS_NOT_SPECIFIED_MESSAGE);
                 }
             }
         }
