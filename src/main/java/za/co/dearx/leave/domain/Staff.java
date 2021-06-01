@@ -11,7 +11,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * An employee of the company.\nThe person can be linked to zero or more teams and may be linked to a User of the system.
+ * An employee of the company. The person can be linked to zero or more teams and may be linked to a User of the system.
  */
 @Entity
 @Table(name = "staff")

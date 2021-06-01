@@ -127,10 +127,10 @@ public class MessageHander {
     }
 
     /**
-     * Process a {@link Decisions} for a {@link LeaveApplication}.
+     * Process a {@link Decision} for a {@link LeaveApplication}.
      * @param decision to process.
      * @throws ValidationException if any of the required fields failed validation.
-     * See {@link #checkValidDecision(Decisions)}.
+     * See {@link #checkValidDecision(Decision)}.
      * @throws NoMessageCatchException if the process either does not have such a message,
      * or that the process was not waiting for such a message.
      */

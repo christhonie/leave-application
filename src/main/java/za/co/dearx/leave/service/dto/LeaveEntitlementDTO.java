@@ -26,7 +26,7 @@ public class LeaveEntitlementDTO implements Serializable {
     private LocalDate entitlementDate;
 
     /**
-     * @depricated Use the EntitlementValue
+     * @deprecated Use the EntitlementValue
      */
     @NotNull
     @ApiModelProperty(value = "@depricated Use the EntitlementValue", required = true)

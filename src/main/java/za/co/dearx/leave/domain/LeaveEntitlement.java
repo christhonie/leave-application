@@ -31,7 +31,7 @@ public class LeaveEntitlement implements Serializable {
     private LocalDate entitlementDate;
 
     /**
-     * @depricated Use the EntitlementValue
+     * @deprecated Use the EntitlementValue
      */
     @NotNull
     @Column(name = "days", precision = 21, scale = 2, nullable = false)

@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Objects;
 import javax.validation.constraints.*;
+import za.co.dearx.leave.domain.Staff;
 
 /**
  * A DTO for the {@link za.co.dearx.leave.domain.EntitlementValue} entity.
