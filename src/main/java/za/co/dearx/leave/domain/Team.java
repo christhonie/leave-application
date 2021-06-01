@@ -10,7 +10,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A Team.
+ * A team combines one or more Staff members under a (User) manager.
  */
 @Entity
 @Table(name = "team")
@@ -28,6 +28,9 @@ public class Team implements Serializable {
     @Column(name = "name", length = 50, nullable = false)
     private String name;
 
+    /**
+     * The manager of the team.
+     */
     @ManyToOne
     private User manager;
 

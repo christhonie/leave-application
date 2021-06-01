@@ -28,7 +28,13 @@
       "contractNumber": "Contract Number",
       "gender": "Gender",
       "user": "User",
-      "team": "Team"
+      "team": "Team",
+      "help": {
+        "employeeID": "The unique employee number assigned by the company or payroll system.",
+        "startDate": "When the person started at the organisation. This is used by some LeaveEntitlement calculations.",
+        "name": "A read-only field consisting out of the first name and last name of the person.",
+        "contractNumber": "Preferably the cellphone number. This can be used for sending messages to the person."
+      }
     }
   }
 }

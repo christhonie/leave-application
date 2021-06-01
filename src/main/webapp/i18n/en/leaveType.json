@@ -20,7 +20,11 @@
       "id": "ID",
       "name": "Name",
       "description": "Description",
-      "processName": "Process Name"
+      "processName": "Process Name",
+      "help": {
+        "name": "A unique name for the leave type.",
+        "processName": "The process ID to invoke for a new leave application."
+      }
     }
   }
 }

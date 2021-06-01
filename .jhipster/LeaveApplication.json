@@ -37,6 +37,7 @@
       "otherEntityName": "leaveType",
       "otherEntityRelationshipName": "leaveApplication",
       "relationshipValidateRules": "required",
+      "javadoc": "The leave type of this application. This field cannot be changed once the record is created.",
       "relationshipName": "leaveType",
       "otherEntityField": "name"
     },
@@ -52,6 +53,7 @@
       "otherEntityName": "staff",
       "otherEntityRelationshipName": "leaveApplication",
       "relationshipValidateRules": "required",
+      "javadoc": "The Staff member the leave is assigned to. This field cannot be changed once the record is created.",
       "relationshipName": "staff",
       "otherEntityField": "name"
     }
@@ -66,5 +68,6 @@
   "readOnly": false,
   "embedded": false,
   "clientRootFolder": "",
-  "applications": "*"
+  "applications": "*",
+  "javadoc": "An application for leave by a {@link Staff} member."
 }

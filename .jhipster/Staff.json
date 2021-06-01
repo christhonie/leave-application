@@ -10,17 +10,20 @@
     {
       "fieldName": "employeeID",
       "fieldType": "String",
+      "javadoc": "The unique employee number assigned by the company or payroll system.",
       "fieldValidateRules": ["maxlength", "required"],
       "fieldValidateRulesMaxlength": "50"
     },
     {
       "fieldName": "startDate",
       "fieldType": "LocalDate",
+      "javadoc": "When the person started at the organisation. This is used by some LeaveEntitlement calculations.",
       "fieldValidateRules": ["required"]
     },
     {
       "fieldName": "name",
       "fieldType": "String",
+      "javadoc": "A read-only field consisting out of the first name and last name of the person.",
       "fieldValidateRules": ["maxlength"],
       "fieldValidateRulesMaxlength": "100"
     },
@@ -45,6 +48,7 @@
     {
       "fieldName": "contractNumber",
       "fieldType": "String",
+      "javadoc": "Preferably the cellphone number. This can be used for sending messages to the person.",
       "fieldValidateRules": ["maxlength"],
       "fieldValidateRulesMaxlength": "50"
     },
@@ -60,6 +64,7 @@
       "relationshipType": "many-to-one",
       "otherEntityName": "user",
       "otherEntityRelationshipName": "staff",
+      "javadoc": "The system user, used to access the front-end applications, linked to the person.",
       "relationshipName": "user",
       "otherEntityField": "login"
     },
@@ -67,6 +72,7 @@
       "relationshipType": "many-to-many",
       "otherEntityName": "team",
       "otherEntityRelationshipName": "member",
+      "javadoc": "The team(s) the person is linked to. This is used for approvals and escalations.",
       "relationshipName": "team",
       "otherEntityField": "name",
       "ownerSide": true
@@ -82,5 +88,6 @@
   "readOnly": false,
   "embedded": false,
   "clientRootFolder": "",
-  "applications": "*"
+  "applications": "*",
+  "javadoc": "An employee of the company.\\nThe person can be linked to zero or more teams and may be linked to a User of the system."
 }

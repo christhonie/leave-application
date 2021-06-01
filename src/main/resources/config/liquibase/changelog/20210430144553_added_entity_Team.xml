@@ -10,7 +10,7 @@
         Added the entity Team.
     -->
     <changeSet id="20210430144553-1" author="jhipster">
-        <createTable tableName="team">
+        <createTable tableName="team" remarks="A team combines one or more Staff members under a (User) manager.">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>

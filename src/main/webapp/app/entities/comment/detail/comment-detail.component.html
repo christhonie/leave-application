@@ -14,7 +14,11 @@
         <dd>
           <span>{{ comment.id }}</span>
         </dd>
-        <dt><span jhiTranslate="leaveApplicationApp.comment.comment">Comment</span></dt>
+        <dt>
+          <span jhiTranslate="leaveApplicationApp.comment.comment" [ngbTooltip]="'leaveApplicationApp.comment.help.comment' | translate"
+            >Comment</span
+          >
+        </dt>
         <dd>
           <span>{{ comment.comment }}</span>
         </dd>

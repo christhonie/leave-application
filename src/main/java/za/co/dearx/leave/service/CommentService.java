@@ -8,7 +8,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import za.co.dearx.leave.domain.Comment;
+import za.co.dearx.leave.domain.User;
 import za.co.dearx.leave.repository.CommentRepository;
+import za.co.dearx.leave.security.SecurityUtils;
 import za.co.dearx.leave.service.dto.CommentDTO;
 import za.co.dearx.leave.service.mapper.CommentMapper;
 
@@ -25,9 +27,12 @@ public class CommentService {
 
     private final CommentMapper commentMapper;
 
-    public CommentService(CommentRepository commentRepository, CommentMapper commentMapper) {
+    private final UserService userService;
+
+    public CommentService(CommentRepository commentRepository, CommentMapper commentMapper, UserService userService) {
         this.commentRepository = commentRepository;
         this.commentMapper = commentMapper;
+        this.userService = userService;
     }
 
     /**
@@ -38,9 +43,13 @@ public class CommentService {
      */
     public CommentDTO save(CommentDTO commentDTO) {
         log.debug("Request to save Comment : {}", commentDTO);
-        Comment comment = commentMapper.toEntity(commentDTO);
-        comment = commentRepository.save(comment);
-        return commentMapper.toDto(comment);
+        final Comment comment = commentMapper.toEntity(commentDTO);
+        if (comment.getId() == null) {
+            //This is a new record
+            userService.getUserWithAuthorities().ifPresent(user -> comment.setUser(user));
+        }
+        final Comment result = commentRepository.save(comment);
+        return commentMapper.toDto(result);
     }
 
     /**

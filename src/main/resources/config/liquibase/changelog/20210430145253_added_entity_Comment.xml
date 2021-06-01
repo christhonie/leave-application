@@ -10,11 +10,11 @@
         Added the entity Comment.
     -->
     <changeSet id="20210430145253-1" author="jhipster">
-        <createTable tableName="comment">
+        <createTable tableName="comment" remarks="Comments assigned to a Decision or a LeaveApplication.">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="comment" type="varchar(5000)">
+            <column name="comment" type="varchar(5000)" remarks="A free text message up to 5000 characters.">
                 <constraints nullable="false" />
             </column>
             <column name="leave_application_id" type="bigint">

@@ -1,0 +1,57 @@
+{
+  "name": "Decision",
+  "fields": [
+    {
+      "fieldName": "choice",
+      "fieldType": "DecisionChoice",
+      "javadoc": "The choice made against the leave application.",
+      "fieldValues": "APPROVE,REJECT,WITHDRAW",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "decidedOn",
+      "fieldType": "Instant",
+      "javadoc": "The date and time of the decision.",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "comment",
+      "otherEntityRelationshipName": "decision",
+      "javadoc": "An optional comment linked to the decision.",
+      "relationshipName": "comment",
+      "otherEntityField": "comment",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "user",
+      "otherEntityRelationshipName": "decision",
+      "relationshipValidateRules": "required",
+      "javadoc": "The user who made the decision. This is set by the system and is read-only.",
+      "relationshipName": "user",
+      "otherEntityField": "login"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "leaveApplication",
+      "otherEntityRelationshipName": "decision",
+      "relationshipValidateRules": "required",
+      "javadoc": "The leave application the decision was made against.",
+      "relationshipName": "leaveApplication"
+    }
+  ],
+  "entityTableName": "decision",
+  "changelogDate": "20210430145353",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceClass",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "javadoc": "A decision made against a LeaveApplication."
+}

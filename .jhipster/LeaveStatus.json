@@ -4,6 +4,7 @@
     {
       "fieldName": "name",
       "fieldType": "String",
+      "javadoc": "A unique name for the status. This value is used in the BPMN process and should not be changed once created.",
       "fieldValidateRules": ["maxlength", "required"],
       "fieldValidateRulesMaxlength": "50"
     },
@@ -25,5 +26,6 @@
   "readOnly": false,
   "embedded": false,
   "clientRootFolder": "",
-  "applications": "*"
+  "applications": "*",
+  "javadoc": "A possible status of the LeaveApplication. The system defines a number of default statuses which cannot be changed."
 }

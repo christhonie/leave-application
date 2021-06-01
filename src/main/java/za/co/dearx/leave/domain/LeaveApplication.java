@@ -11,7 +11,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A LeaveApplication.
+ * An application for leave by a {@link Staff} member.
  */
 @Entity
 @Table(name = "leave_application")
@@ -47,6 +47,9 @@ public class LeaveApplication implements Serializable {
     @Column(name = "deleted", nullable = false)
     private Boolean deleted;
 
+    /**
+     * The leave type of this application. This field cannot be changed once the record is created.
+     */
     @ManyToOne(optional = false)
     @NotNull
     private LeaveType leaveType;
@@ -56,6 +59,9 @@ public class LeaveApplication implements Serializable {
     @JsonIgnoreProperties(value = "leaveApplications", allowSetters = true)
     private LeaveStatus leaveStatus;
 
+    /**
+     * The Staff member the leave is assigned to. This field cannot be changed once the record is created.
+     */
     @ManyToOne(optional = false)
     @NotNull
     @JsonIgnoreProperties(value = { "user", "teams" }, allowSetters = true)

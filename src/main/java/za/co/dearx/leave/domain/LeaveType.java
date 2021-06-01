@@ -7,7 +7,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A LeaveType.
+ * A type of leave supported by the system.\nEach type can be linked to a business process, which is invoked when a new application is created.
  */
 @Entity
 @Table(name = "leave_type")
@@ -20,6 +20,9 @@ public class LeaveType implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * A unique name for the leave type.
+     */
     @NotNull
     @Size(max = 50)
     @Column(name = "name", length = 50, nullable = false)
@@ -29,6 +32,9 @@ public class LeaveType implements Serializable {
     @Column(name = "description", length = 200)
     private String description;
 
+    /**
+     * The process ID to invoke for a new leave application.
+     */
     @Size(max = 200)
     @Column(name = "process_name", length = 200)
     private String processName;

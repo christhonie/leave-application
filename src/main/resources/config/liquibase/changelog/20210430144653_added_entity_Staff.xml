@@ -10,17 +10,17 @@
         Added the entity Staff.
     -->
     <changeSet id="20210430144653-1" author="jhipster">
-        <createTable tableName="staff">
+        <createTable tableName="staff" remarks="An employee of the company.\nThe person can be linked to zero or more teams and may be linked to a User of the system.">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="position" type="varchar(50)">
                 <constraints nullable="true" />
             </column>
-            <column name="employee_id" type="varchar(50)">
+            <column name="employee_id" type="varchar(50)" remarks="The unique employee number assigned by the company or payroll system.">
                 <constraints nullable="false" />
             </column>
-            <column name="start_date" type="date">
+            <column name="start_date" type="date" remarks="When the person started at the organisation. This is used by some LeaveEntitlement calculations.">
                 <constraints nullable="false" />
             </column>
             <column name="first_name" type="varchar(50)">
@@ -32,7 +32,7 @@
             <column name="email" type="varchar(100)">
                 <constraints nullable="true" />
             </column>
-            <column name="contract_number" type="varchar(50)">
+            <column name="contract_number" type="varchar(50)" remarks="Preferably the cellphone number. This can be used for sending messages to the person.">
                 <constraints nullable="true" />
             </column>
             <column name="gender" type="varchar(2)">

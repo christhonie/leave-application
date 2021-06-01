@@ -11,7 +11,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A Staff.
+ * An employee of the company. The person can be linked to zero or more teams and may be linked to a User of the system.
  */
 @Entity
 @Table(name = "staff")
@@ -28,11 +28,17 @@ public class Staff implements Serializable {
     @Column(name = "position", length = 50)
     private String position;
 
+    /**
+     * The unique employee number assigned by the company or payroll system.
+     */
     @NotNull
     @Size(max = 50)
     @Column(name = "employee_id", length = 50, nullable = false)
     private String employeeID;
 
+    /**
+     * When the person started at the organisation. This is used by some LeaveEntitlement calculations.
+     */
     @NotNull
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
@@ -51,6 +57,9 @@ public class Staff implements Serializable {
     @Column(name = "email", length = 100)
     private String email;
 
+    /**
+     * Preferably the cellphone number. This can be used for sending messages to the person.
+     */
     @Size(max = 50)
     @Column(name = "contract_number", length = 50)
     private String contractNumber;
@@ -60,9 +69,15 @@ public class Staff implements Serializable {
     @Column(name = "gender", length = 2, nullable = false)
     private String gender;
 
+    /**
+     * The system user, used to access the front-end applications, linked to the person.
+     */
     @ManyToOne
     private User user;
 
+    /**
+     * The team(s) the person is linked to. This is used for approvals and escalations.
+     */
     @ManyToMany
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JoinTable(name = "rel_staff__team", joinColumns = @JoinColumn(name = "staff_id"), inverseJoinColumns = @JoinColumn(name = "team_id"))

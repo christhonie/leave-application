@@ -14,7 +14,13 @@
         </div>
 
         <div class="form-group">
-          <label class="form-control-label" jhiTranslate="leaveApplicationApp.comment.comment" for="field_comment">Comment</label>
+          <label
+            class="form-control-label"
+            jhiTranslate="leaveApplicationApp.comment.comment"
+            for="field_comment"
+            [ngbTooltip]="'leaveApplicationApp.comment.help.comment' | translate"
+            >Comment</label
+          >
           <input type="text" class="form-control" name="comment" id="field_comment" data-cy="comment" formControlName="comment" />
           <div *ngIf="editForm.get('comment')!.invalid && (editForm.get('comment')!.dirty || editForm.get('comment')!.touched)">
             <small

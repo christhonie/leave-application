@@ -10,7 +10,7 @@
         Added the entity Role.
     -->
     <changeSet id="20210430144453-1" author="jhipster">
-        <createTable tableName="role">
+        <createTable tableName="role" remarks="Represent a role a user may have within the application.">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>

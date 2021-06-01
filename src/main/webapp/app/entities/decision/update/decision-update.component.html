@@ -1,0 +1,166 @@
+<div class="row justify-content-center">
+  <div class="col-8">
+    <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-decision-heading"
+        data-cy="DecisionCreateUpdateHeading"
+        jhiTranslate="leaveApplicationApp.decision.home.createOrEditLabel"
+      >
+        Create or edit a Decision
+      </h2>
+
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+
+        <div class="form-group" [hidden]="editForm.get('id')!.value == null">
+          <label class="form-control-label" jhiTranslate="global.field.id" for="field_id">ID</label>
+          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </div>
+
+        <div class="form-group">
+          <label
+            class="form-control-label"
+            jhiTranslate="leaveApplicationApp.decision.choice"
+            for="field_choice"
+            [ngbTooltip]="'leaveApplicationApp.decision.help.choice' | translate"
+            >Choice</label
+          >
+          <select class="form-control" name="choice" formControlName="choice" id="field_choice" data-cy="choice">
+            <option [ngValue]="null">{{ 'leaveApplicationApp.DecisionChoice.null' | translate }}</option>
+            <option value="APPROVE">{{ 'leaveApplicationApp.DecisionChoice.APPROVE' | translate }}</option>
+            <option value="REJECT">{{ 'leaveApplicationApp.DecisionChoice.REJECT' | translate }}</option>
+            <option value="WITHDRAW">{{ 'leaveApplicationApp.DecisionChoice.WITHDRAW' | translate }}</option>
+          </select>
+          <div *ngIf="editForm.get('choice')!.invalid && (editForm.get('choice')!.dirty || editForm.get('choice')!.touched)">
+            <small class="form-text text-danger" *ngIf="editForm.get('choice')?.errors?.required" jhiTranslate="entity.validation.required">
+              This field is required.
+            </small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label
+            class="form-control-label"
+            jhiTranslate="leaveApplicationApp.decision.decidedOn"
+            for="field_decidedOn"
+            [ngbTooltip]="'leaveApplicationApp.decision.help.decidedOn' | translate"
+            >Decided On</label
+          >
+          <div class="d-flex">
+            <input
+              id="field_decidedOn"
+              data-cy="decidedOn"
+              type="datetime-local"
+              class="form-control"
+              name="decidedOn"
+              formControlName="decidedOn"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          <div *ngIf="editForm.get('decidedOn')!.invalid && (editForm.get('decidedOn')!.dirty || editForm.get('decidedOn')!.touched)">
+            <small
+              class="form-text text-danger"
+              *ngIf="editForm.get('decidedOn')?.errors?.required"
+              jhiTranslate="entity.validation.required"
+            >
+              This field is required.
+            </small>
+            <small
+              class="form-text text-danger"
+              [hidden]="!editForm.get('decidedOn')?.errors?.ZonedDateTimelocal"
+              jhiTranslate="entity.validation.ZonedDateTimelocal"
+            >
+              This field should be a date and time.
+            </small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" jhiTranslate="leaveApplicationApp.decision.comment" for="field_comment">Comment</label>
+          <select class="form-control" id="field_comment" data-cy="comment" name="comment" formControlName="comment">
+            <option [ngValue]="null"></option>
+            <option
+              [ngValue]="commentOption.id === editForm.get('comment')!.value?.id ? editForm.get('comment')!.value : commentOption"
+              *ngFor="let commentOption of commentsCollection; trackBy: trackCommentById"
+            >
+              {{ commentOption.comment }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" jhiTranslate="leaveApplicationApp.decision.user" for="field_user">User</label>
+          <select class="form-control" id="field_user" data-cy="user" name="user" formControlName="user">
+            <option *ngIf="!editForm.get('user')!.value" [ngValue]="null" selected></option>
+            <option
+              [ngValue]="userOption.id === editForm.get('user')!.value?.id ? editForm.get('user')!.value : userOption"
+              *ngFor="let userOption of usersSharedCollection; trackBy: trackUserById"
+            >
+              {{ userOption.login }}
+            </option>
+          </select>
+        </div>
+        <div *ngIf="editForm.get(['user'])!.invalid && (editForm.get(['user'])!.dirty || editForm.get(['user'])!.touched)">
+          <small class="form-text text-danger" *ngIf="editForm.get(['user'])?.errors?.required" jhiTranslate="entity.validation.required">
+            This field is required.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-control-label" jhiTranslate="leaveApplicationApp.decision.leaveApplication" for="field_leaveApplication"
+            >Leave Application</label
+          >
+          <select
+            class="form-control"
+            id="field_leaveApplication"
+            data-cy="leaveApplication"
+            name="leaveApplication"
+            formControlName="leaveApplication"
+          >
+            <option *ngIf="!editForm.get('leaveApplication')!.value" [ngValue]="null" selected></option>
+            <option
+              [ngValue]="
+                leaveApplicationOption.id === editForm.get('leaveApplication')!.value?.id
+                  ? editForm.get('leaveApplication')!.value
+                  : leaveApplicationOption
+              "
+              *ngFor="let leaveApplicationOption of leaveApplicationsSharedCollection; trackBy: trackLeaveApplicationById"
+            >
+              {{ leaveApplicationOption.id }}
+            </option>
+          </select>
+        </div>
+        <div
+          *ngIf="
+            editForm.get(['leaveApplication'])!.invalid &&
+            (editForm.get(['leaveApplication'])!.dirty || editForm.get(['leaveApplication'])!.touched)
+          "
+        >
+          <small
+            class="form-text text-danger"
+            *ngIf="editForm.get(['leaveApplication'])?.errors?.required"
+            jhiTranslate="entity.validation.required"
+          >
+            This field is required.
+          </small>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -2,35 +2,53 @@
 // People and groups 
 //*************************************
 
+/**
+ * Represent a role a user may have within the application.
+ */
 entity Role {
 	name String maxlength(50) required
 }
 relationship ManyToMany {
+	/** The user(s) linked to the role. */
 	Role{user(login)} to User
 }
 
+/**
+ * A team combines one or more Staff members under a (User) manager.
+ */
 entity Team {
 	name String maxlength(50) required
 }
 relationship ManyToOne {
+	/** The manager of the team. */
   Team{manager(login)} to User
 }
 
+/**
+ * An employee of the company. 
+ * The person can be linked to zero or more teams and may be linked to a User of the system.
+ */
 entity Staff {
 	position String maxlength(50)
+	/** The unique employee number assigned by the company or payroll system. */
 	employeeID String maxlength(50) required
+	/** When the person started at the organisation. This is used by some LeaveEntitlement calculations. */
 	startDate LocalDate required
+	/** A read-only field consisting out of the first name and last name of the person. */
 	name String maxlength(100)
 	firstName String maxlength(50) required
 	lastName String maxlength(50) required
 	email String maxlength(100)
+	/** Preferably the cellphone number. This can be used for sending messages to the person. */
 	contractNumber String maxlength(50)
 	gender String maxlength(2) required
 }
 relationship ManyToMany {
+	/** The team(s) the person is linked to. This is used for approvals and escalations. */
 	Staff{team(name)} to Team{member(name)}
 }
 relationship ManyToOne {
+	/** The system user, used to access the front-end applications, linked to the person. */
 	Staff{user(login)} to User
 }
 
@@ -38,44 +56,72 @@ relationship ManyToOne {
 // Master data
 //*************************************
 
+/**
+ * A possible status of the LeaveApplication. The system defines a number of default statuses which cannot be changed.
+ */
 entity LeaveStatus {
+  /** A unique name for the status. This value is used in the BPMN process and should not be changed once created. */
 	name String maxlength(50) required
 	description String maxlength(200)
 }
 
+/**
+ * A type of leave supported by the system.
+ * Each type can be linked to a business process, which is invoked when a new application is created.
+ */
 entity LeaveType {
+  /** A unique name for the leave type. */
 	name String maxlength(50) required
 	description String maxlength(200)
-    processName String maxlength(200)
+	/** The process ID to invoke for a new leave application. */
+  processName String maxlength(200)
 }
 
 //*************************************
 // Leave
 //*************************************
 
+/**
+ * An entitlement represents an instance when leave days are assigned to zero, one or more Staff members.
+ * Entitlements are typically assigned at the start of an entitlement period, such as the first day of the month.
+ * Also see {@link EntitlementValue} for how the days are assigned to the {@link Staff} members.
+ */
 entity LeaveEntitlement {
+  /** The date the entitlement is applied to the Staff member. */
 	entitlementDate LocalDate required
+	/** @depricated Use the EntitlementValue */
 	days BigDecimal required
 }
 relationship ManyToOne {
+  /** The leave type this entitlement applies to.*/
 	LeaveEntitlement{leaveType(name) required} to LeaveType
-  	LeaveEntitlement{staff(name) required} to Staff
+  /** The staff member the leave is assigned to.*/
+ 	LeaveEntitlement{staff(name) required} to Staff
 }
 
+/**
+ * The allocation of leave days for a given {@link LeaveEntitlement} and {@link Staff} member.
+ */
 entity EntitlementValue {
+  /** The value, in days, assigned to a {@link Staff} member.*/
 	entitlementValue BigDecimal required
 }
 relationship OneToOne {
+  /** The LeaveEntitlement this value is related to.*/
 	EntitlementValue{entitlement required} to LeaveEntitlement
+  /** The staff member this value is assigned to.*/
 	EntitlementValue{staff(name) required} to Staff
 }
 
+/**
+ * An application for leave by a {@link Staff} member.
+ */
 entity LeaveApplication {
-    /* The first date of leave. */
+  /* The first date of leave. */
 	startDate LocalDate required
 	/* The last date of leave (inclusive).*/
 	endDate LocalDate required
-    /* This field will be set by the back-end when saving a new application. */ 
+  /* This field will be set by the back-end when saving a new application. */ 
 	appliedDate ZonedDateTime required
 	/* This indicates when the final decision of the process was made. It is set by the back-end when the application is approved, rejected or withdrawn. */
 	updateDate ZonedDateTime 
@@ -85,37 +131,55 @@ entity LeaveApplication {
 	deleted Boolean required
 }
 relationship ManyToOne {
+  /** The leave type of this application. This field cannot be changed once the record is created.*/
 	LeaveApplication{leaveType(name) required} to LeaveType
-	/* Read only. The status is set by the back-end based on the API operation being called. */
+	/* The status is set by the back-end based on the API operation being called. It can also be set by administrative users.*/
 	LeaveApplication{leaveStatus(name)} to LeaveStatus
+  /** The Staff member the leave is assigned to. This field cannot be changed once the record is created.*/
 	LeaveApplication{staff(name) required} to Staff
 }
 
+/**
+ * Comments assigned to a Decision or a LeaveApplication.
+ */
 entity Comment {
+  /** A free text message up to 5000 characters. */
 	comment String maxlength(5000) required
 }
 relationship ManyToOne {
+  /** The leave application the comment is related to.*/
 	Comment{leaveApplication required} to LeaveApplication
+  /** The user who created the comment. This is set by the system and is read-only.*/
 	Comment{user(login) required} to User
 }
 
+/**
+ * Possible values of a Decision.
+ */
 enum DecisionChoice {
 	APPROVE,
-    REJECT,
-    WITHDRAW
+  REJECT,
+  WITHDRAW
 }
  
-entity Decisions {
+/**
+ * A decision made against a LeaveApplication.
+ */
+entity Decision {
+  /** The choice made against the leave application. */
   choice DecisionChoice required
+  /** The date and time of the decision. */
   decidedOn Instant required
 }
 relationship ManyToOne {
-	Decisions{user(login) required} to User
-    Decisions{leaveApplication required} to LeaveApplication 
+  /** The user who made the decision. This is set by the system and is read-only.*/
+	Decision{user(login) required} to User
+  /** The leave application the decision was made against.*/
+  Decision{leaveApplication required} to LeaveApplication 
 }
 relationship OneToOne {
-    /** Optional comment DTO */
-    Decisions{comment(comment)} to Comment
+  /** An optional comment linked to the decision. */
+  Decision{comment(comment)} to Comment
 }
 
 // Set pagination options

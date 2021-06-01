@@ -4,6 +4,7 @@
     {
       "fieldName": "entitlementValue",
       "fieldType": "BigDecimal",
+      "javadoc": "The value, in days, assigned to a {@link Staff} member.",
       "fieldValidateRules": ["required"]
     }
   ],
@@ -13,8 +14,8 @@
       "otherEntityName": "leaveEntitlement",
       "otherEntityRelationshipName": "entitlementValue",
       "relationshipValidateRules": "required",
+      "javadoc": "The LeaveEntitlement this value is related to.",
       "relationshipName": "entitlement",
-      "otherEntityField": "id",
       "ownerSide": true
     },
     {
@@ -22,6 +23,7 @@
       "otherEntityName": "staff",
       "otherEntityRelationshipName": "entitlementValue",
       "relationshipValidateRules": "required",
+      "javadoc": "The staff member this value is assigned to.",
       "relationshipName": "staff",
       "otherEntityField": "name",
       "ownerSide": true
@@ -37,5 +39,6 @@
   "readOnly": false,
   "embedded": false,
   "clientRootFolder": "",
-  "applications": "*"
+  "applications": "*",
+  "javadoc": "The allocation of leave days for a given {@link LeaveEntitlement} and {@link Staff} member."
 }
