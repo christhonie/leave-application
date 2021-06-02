@@ -168,7 +168,7 @@ public class MessageHander {
             runtimeService
                 .createMessageCorrelation(MESSAGE_CANCEL)
                 .processInstanceBusinessKey(leaveApplication.getId().toString())
-                .correlateWithResult();
+                .correlateAll();
         } catch (MismatchingMessageCorrelationException e) {
             //Process was not found, or there might have been multiple instance (which should not normally happen)
             //Raise an exception to indicate this.
