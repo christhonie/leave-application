@@ -33,7 +33,7 @@ export class DecisionUpdateComponent implements OnInit {
     choice: [null, [Validators.required]],
     decidedOn: [null, [Validators.required]],
     comment: [],
-    user: [null, Validators.required],
+    user: [],
     leaveApplication: [null, Validators.required],
   });
 
