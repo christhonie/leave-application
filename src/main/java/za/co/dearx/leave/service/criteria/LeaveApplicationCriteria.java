@@ -169,7 +169,11 @@ public class LeaveApplicationCriteria implements Serializable, Criteria {
     }
 
     public void setDeleted(BooleanFilter deleted) {
-        this.deleted = deleted;
+     	if(deleted == null) {
+    		this.deleted.setSpecified(false);
+    	}else {
+    		this.deleted = deleted;
+        }
     }
 
     public LongFilter getLeaveTypeId() {
