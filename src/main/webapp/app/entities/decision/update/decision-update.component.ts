@@ -24,7 +24,6 @@ export class DecisionUpdateComponent implements OnInit {
   isSaving = false;
 
   commentsCollection: IComment[] = [];
-  usersSharedCollection: IUser[] = [];
   leaveApplicationsSharedCollection: ILeaveApplication[] = [];
 
   editForm = this.fb.group({
@@ -107,7 +106,6 @@ export class DecisionUpdateComponent implements OnInit {
       choice: decision.choice,
       decidedOn: decision.decidedOn ? decision.decidedOn.format(DATE_TIME_FORMAT) : null,
       comment: decision.comment,
-      user: decision.user,
       leaveApplication: decision.leaveApplication,
     });
 
@@ -148,7 +146,6 @@ export class DecisionUpdateComponent implements OnInit {
       choice: this.editForm.get(['choice'])!.value,
       decidedOn: this.editForm.get(['decidedOn'])!.value ? dayjs(this.editForm.get(['decidedOn'])!.value, DATE_TIME_FORMAT) : undefined,
       comment: this.editForm.get(['comment'])!.value,
-      user: this.editForm.get(['user'])!.value,
       leaveApplication: this.editForm.get(['leaveApplication'])!.value,
     };
   }
