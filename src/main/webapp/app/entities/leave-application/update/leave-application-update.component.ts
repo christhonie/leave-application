@@ -27,9 +27,6 @@ export class LeaveApplicationUpdateComponent implements OnInit {
   leaveTypesSharedCollection: ILeaveType[] = [];
   leaveStatusesSharedCollection: ILeaveStatus[] = [];
   staffSharedCollection: IStaff[] = [];
-  daysField: any = 0;
-  startDate: any = [];
-  endDate: any = [];
 
   editForm = this.fb.group({
     id: [],
@@ -119,7 +116,7 @@ export class LeaveApplicationUpdateComponent implements OnInit {
       endDate: leaveApplication.endDate,
       appliedDate: leaveApplication.appliedDate ? leaveApplication.appliedDate.format(DATE_TIME_FORMAT) : null,
       updateDate: leaveApplication.updateDate ? leaveApplication.updateDate.format(DATE_TIME_FORMAT) : null,
-      days: leaveApplication.startDate && leaveApplication.endDate ? leaveApplication.startDate.diff(leaveApplication.endDate, 'day') : 0,
+      days: leaveApplication.days,
       deleted: leaveApplication.deleted,
       leaveType: leaveApplication.leaveType,
       leaveStatus: leaveApplication.leaveStatus,
