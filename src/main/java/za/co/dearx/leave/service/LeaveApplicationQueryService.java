@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tech.jhipster.service.QueryService;
+import tech.jhipster.service.filter.BooleanFilter;
 import za.co.dearx.leave.domain.*; // for static metamodels
 import za.co.dearx.leave.domain.LeaveApplication;
 import za.co.dearx.leave.repository.LeaveApplicationRepository;
@@ -106,6 +107,10 @@ public class LeaveApplicationQueryService extends QueryService<LeaveApplication>
             }
             if (criteria.getDeleted() != null) {
                 specification = specification.and(buildSpecification(criteria.getDeleted(), LeaveApplication_.deleted));
+            } else {
+            	BooleanFilter deleted = new BooleanFilter();
+            	deleted.setEquals(false);
+            	specification = specification.and(buildSpecification(deleted, LeaveApplication_.deleted));
             }
             if (criteria.getLeaveTypeId() != null) {
                 specification =
