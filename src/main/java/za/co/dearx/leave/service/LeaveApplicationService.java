@@ -1,5 +1,7 @@
 package za.co.dearx.leave.service;
 
+import java.math.BigDecimal;
+import java.time.Period;
 import java.util.Optional;
 import javax.validation.Valid;
 import org.camunda.bpm.engine.RuntimeService;
@@ -81,6 +83,7 @@ public class LeaveApplicationService {
             }
         }
 
+        leaveApplication = this.setLeaveDays(leaveApplication);
         leaveApplication = leaveApplicationRepository.save(leaveApplication);
 
         //When mapping a new LeaveApplication the LeaveType will not be fully set. Retrieve full record
@@ -117,7 +120,7 @@ public class LeaveApplicationService {
                 }
             }
         }
-
+        leaveApplication = this.setLeaveDays(leaveApplication);
         leaveApplication = leaveApplicationRepository.save(leaveApplication);
 
         //Start a new business process, if defined
@@ -256,5 +259,16 @@ public class LeaveApplicationService {
                     }
                 }
             );
+    }
+
+    /**
+     * Calculate number of days applied
+     *
+     * @param leave application entity
+     */
+    private LeaveApplication setLeaveDays(LeaveApplication leaveApplication) {
+        Period difference = Period.between(leaveApplication.getStartDate(), leaveApplication.getEndDate());
+        leaveApplication.days(BigDecimal.valueOf(difference.getDays()));
+        return leaveApplication;
     }
 }
