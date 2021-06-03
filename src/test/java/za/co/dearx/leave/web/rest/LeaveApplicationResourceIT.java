@@ -11,6 +11,7 @@ import static za.co.dearx.leave.web.rest.TestUtil.sameNumber;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -60,9 +61,9 @@ class LeaveApplicationResourceIT {
     private static final ZonedDateTime UPDATED_UPDATE_DATE = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
     private static final ZonedDateTime SMALLER_UPDATE_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
 
-    private static final BigDecimal DEFAULT_DAYS = new BigDecimal(1);
-    private static final BigDecimal UPDATED_DAYS = new BigDecimal(2);
-    private static final BigDecimal SMALLER_DAYS = new BigDecimal(1 - 1);
+    private static final BigDecimal DEFAULT_DAYS = BigDecimal.valueOf(Period.between(DEFAULT_START_DATE, DEFAULT_END_DATE).getDays());
+    private static final BigDecimal UPDATED_DAYS = BigDecimal.valueOf(Period.between(UPDATED_START_DATE, UPDATED_END_DATE).getDays());
+    private static final BigDecimal SMALLER_DAYS = BigDecimal.valueOf(Period.between(SMALLER_START_DATE, SMALLER_END_DATE).getDays());
 
     private static final Boolean DEFAULT_DELETED = false;
     private static final Boolean DELETED = true;
