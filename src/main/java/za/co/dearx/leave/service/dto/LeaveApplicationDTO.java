@@ -28,7 +28,6 @@ public class LeaveApplicationDTO implements Serializable {
 
     private ZonedDateTime updateDate;
 
-    @NotNull
     private BigDecimal days;
 
     @NotNull

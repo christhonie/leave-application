@@ -11,9 +11,11 @@ import static za.co.dearx.leave.web.rest.TestUtil.sameNumber;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -48,9 +50,9 @@ class LeaveApplicationResourceIT {
     private static final LocalDate UPDATED_START_DATE = LocalDate.now(ZoneId.systemDefault());
     private static final LocalDate SMALLER_START_DATE = LocalDate.ofEpochDay(-1L);
 
-    private static final LocalDate DEFAULT_END_DATE = LocalDate.ofEpochDay(0L);
-    private static final LocalDate UPDATED_END_DATE = LocalDate.now(ZoneId.systemDefault());
-    private static final LocalDate SMALLER_END_DATE = LocalDate.ofEpochDay(-1L);
+    private static final LocalDate DEFAULT_END_DATE = DEFAULT_START_DATE.plus(1, ChronoUnit.DAYS);
+    private static final LocalDate UPDATED_END_DATE = UPDATED_START_DATE.plus(2, ChronoUnit.DAYS);
+    private static final LocalDate SMALLER_END_DATE = SMALLER_START_DATE;
 
     private static final ZonedDateTime DEFAULT_APPLIED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
     private static final ZonedDateTime UPDATED_APPLIED_DATE = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
@@ -60,9 +62,9 @@ class LeaveApplicationResourceIT {
     private static final ZonedDateTime UPDATED_UPDATE_DATE = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
     private static final ZonedDateTime SMALLER_UPDATE_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
 
-    private static final BigDecimal DEFAULT_DAYS = new BigDecimal(1);
-    private static final BigDecimal UPDATED_DAYS = new BigDecimal(2);
-    private static final BigDecimal SMALLER_DAYS = new BigDecimal(1 - 1);
+    private static final BigDecimal DEFAULT_DAYS = BigDecimal.valueOf(Period.between(DEFAULT_START_DATE, DEFAULT_END_DATE).getDays());
+    private static final BigDecimal UPDATED_DAYS = BigDecimal.valueOf(Period.between(UPDATED_START_DATE, UPDATED_END_DATE).getDays());
+    private static final BigDecimal SMALLER_DAYS = BigDecimal.valueOf(Period.between(SMALLER_START_DATE, SMALLER_END_DATE).getDays());
 
     private static final Boolean DEFAULT_DELETED = false;
     private static final Boolean DELETED = true;
@@ -301,8 +303,8 @@ class LeaveApplicationResourceIT {
     @Transactional
     void checkDaysIsRequired() throws Exception {
         int databaseSizeBeforeTest = leaveApplicationRepository.findAll().size();
-        // set the field null
-        leaveApplication.setDays(null);
+        // This field cannot be set null directly, so we set either start or end date to null
+        leaveApplication.setStartDate(null);
 
         // Create the LeaveApplication, which fails.
         LeaveApplicationDTO leaveApplicationDTO = leaveApplicationMapper.toDto(leaveApplication);

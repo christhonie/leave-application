@@ -62,6 +62,19 @@ export class LeaveApplicationUpdateComponent implements OnInit {
 
       this.loadRelationshipsOptions();
     });
+
+    this.onChanges();
+  }
+
+  onChanges(): void {
+    this.editForm.get('startDate')?.valueChanges.subscribe(val => {
+      const endDate = this.editForm.get(['endDate'])!.value;
+      this.editForm.get(['days'])!.setValue(val && endDate ? +endDate.diff(val, 'day') + 1 : 0);
+    });
+    this.editForm.get('endDate')?.valueChanges.subscribe(val => {
+      const startDate = this.editForm.get(['startDate'])!.value;
+      this.editForm.get(['days'])!.setValue(startDate && val ? +val.diff(startDate, 'day') + 1 : 0);
+    });
   }
 
   previousState(): void {
