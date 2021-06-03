@@ -70,7 +70,7 @@ jobs:
                 password: ${{ secrets.ACR_PASSWORD }}
                 login-server: dearxcontainerregistry.azurecr.io
             - name: Build and publish docker image
-              if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
+              if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
               run: |
                 GIT_TAG=:${GITHUB_REF#refs/tags/}
                 DOCKER_TAG=${GIT_TAG#:refs/heads/main}
