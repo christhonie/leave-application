@@ -133,20 +133,6 @@
         </div>
 
         <div class="form-group">
-          <label class="form-control-label" jhiTranslate="leaveApplicationApp.leaveApplication.deleted" for="field_deleted">Deleted</label>
-          <input type="checkbox" class="form-check" name="deleted" id="field_deleted" data-cy="deleted" formControlName="deleted" />
-          <div *ngIf="editForm.get('deleted')!.invalid && (editForm.get('deleted')!.dirty || editForm.get('deleted')!.touched)">
-            <small
-              class="form-text text-danger"
-              *ngIf="editForm.get('deleted')?.errors?.required"
-              jhiTranslate="entity.validation.required"
-            >
-              This field is required.
-            </small>
-          </div>
-        </div>
-
-        <div class="form-group">
           <label class="form-control-label" jhiTranslate="leaveApplicationApp.leaveApplication.leaveType" for="field_leaveType"
             >Leave Type</label
           >
