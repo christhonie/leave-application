@@ -15,6 +15,7 @@ import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -49,9 +50,9 @@ class LeaveApplicationResourceIT {
     private static final LocalDate UPDATED_START_DATE = LocalDate.now(ZoneId.systemDefault());
     private static final LocalDate SMALLER_START_DATE = LocalDate.ofEpochDay(-1L);
 
-    private static final LocalDate DEFAULT_END_DATE = LocalDate.ofEpochDay(0L);
-    private static final LocalDate UPDATED_END_DATE = LocalDate.now(ZoneId.systemDefault());
-    private static final LocalDate SMALLER_END_DATE = LocalDate.ofEpochDay(-1L);
+    private static final LocalDate DEFAULT_END_DATE = DEFAULT_START_DATE.plus(1, ChronoUnit.DAYS);
+    private static final LocalDate UPDATED_END_DATE = UPDATED_START_DATE.plus(2, ChronoUnit.DAYS);
+    private static final LocalDate SMALLER_END_DATE = SMALLER_START_DATE;
 
     private static final ZonedDateTime DEFAULT_APPLIED_DATE = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
     private static final ZonedDateTime UPDATED_APPLIED_DATE = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
@@ -302,8 +303,8 @@ class LeaveApplicationResourceIT {
     @Transactional
     void checkDaysIsRequired() throws Exception {
         int databaseSizeBeforeTest = leaveApplicationRepository.findAll().size();
-        // set the field null
-        leaveApplication.setDays(null);
+        // This field cannot be set null directly, so we set either start or end date to null
+        leaveApplication.setStartDate(null);
 
         // Create the LeaveApplication, which fails.
         LeaveApplicationDTO leaveApplicationDTO = leaveApplicationMapper.toDto(leaveApplication);

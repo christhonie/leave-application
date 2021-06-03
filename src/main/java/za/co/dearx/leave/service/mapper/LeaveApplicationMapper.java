@@ -18,4 +18,12 @@ public interface LeaveApplicationMapper extends EntityMapper<LeaveApplicationDTO
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
     LeaveApplicationDTO toDtoId(LeaveApplication leaveApplication);
+
+    @Mapping(target = "days", ignore = true)
+    LeaveApplication toEntity(LeaveApplicationDTO dto);
+
+    @Named("partialUpdate")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "days", ignore = true)
+    void partialUpdate(@MappingTarget LeaveApplication entity, LeaveApplicationDTO dto);
 }
