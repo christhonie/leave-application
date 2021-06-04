@@ -32,7 +32,6 @@
     <table class="table table-striped" aria-describedby="page-heading">
       <thead>
         <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" [callback]="loadPage.bind(this)">
-          <th scope="col"><span jhiTranslate="global.field.id">ID</span></th>
           <th scope="col" jhiSortBy="name">
             <span jhiTranslate="leaveApplicationApp.leaveStatus.name">Name</span> <fa-icon icon="sort"></fa-icon>
           </th>
@@ -44,7 +43,6 @@
       </thead>
       <tbody>
         <tr *ngFor="let leaveStatus of leaveStatuses; trackBy: trackId" data-cy="entityTable">
-          <td>{{ leaveStatus.id }}</td>
           <td>
             <a [routerLink]="['/leave-status', leaveStatus.id, 'view']"> {{ leaveStatus.name }}</a>
           </td>
