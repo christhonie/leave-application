@@ -10,12 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import za.co.dearx.leave.bpmn.MessageHander;
 import za.co.dearx.leave.bpmn.exception.NoMessageCatchException;
-import za.co.dearx.leave.config.Constants;
 import za.co.dearx.leave.domain.LeaveApplication;
 import za.co.dearx.leave.domain.LeaveStatus;
 import za.co.dearx.leave.domain.LeaveType;
+import za.co.dearx.leave.domain.Staff;
 import za.co.dearx.leave.repository.LeaveApplicationRepository;
 import za.co.dearx.leave.repository.StaffRepository;
+import za.co.dearx.leave.security.AuthoritiesConstants;
 import za.co.dearx.leave.security.SecurityUtils;
 import za.co.dearx.leave.service.dto.LeaveApplicationDTO;
 import za.co.dearx.leave.service.exception.NotFoundException;
@@ -70,8 +71,9 @@ public class LeaveApplicationService {
      * @param leaveApplicationDTO the entity to save.
      * @return the persisted entity.
      * @throws ValidationException when no LeaveStatus was specified and there is also no default LeaveStatus defined.
+     * @throws NotFoundException
      */
-    public LeaveApplicationDTO create(LeaveApplicationDTO leaveApplicationDTO) throws ValidationException {
+    public LeaveApplicationDTO create(LeaveApplicationDTO leaveApplicationDTO) throws ValidationException, NotFoundException {
         log.debug("Request to create LeaveApplication : {}", leaveApplicationDTO);
         final LeaveApplication leaveApplication = leaveApplicationMapper.toEntity(leaveApplicationDTO);
 
@@ -87,12 +89,20 @@ public class LeaveApplicationService {
             }
         }
 
-        // Use SecurityUtils find the current user's username then looking up a Staff memeber using the username
-        // Defaults to the admin user since it's currently the only user that will not be a staff memeber
-        // TODO: Figure out what to do with other non-staff users
-        staffRepository
-            .findBySpecificUsername(SecurityUtils.getCurrentUserLogin().orElse(Constants.ADMIN))
-            .ifPresent(staff -> leaveApplication.setStaff(staff));
+        Staff staffMemeber;
+        String username;
+        if (SecurityUtils.hasCurrentUserThisAuthority(AuthoritiesConstants.ADMIN)) {
+            username = "admin";
+        } else {
+            username = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new NotFoundException("Could not determine logged in user"));
+        }
+
+        staffMemeber =
+            staffRepository
+                .findBySpecificUsername(username)
+                .orElseThrow(() -> new NotFoundException("There is no staff member linked to the current user"));
+
+        leaveApplication.setStaff(staffMemeber);
 
         LeaveApplication savedleaveApplication = leaveApplicationRepository.save(leaveApplication);
 
