@@ -12,9 +12,6 @@ import { IComment, Comment } from '../comment.model';
 import { ILeaveApplication } from 'app/entities/leave-application/leave-application.model';
 import { LeaveApplicationService } from 'app/entities/leave-application/service/leave-application.service';
 
-import { IUser } from 'app/entities/user/user.model';
-import { UserService } from 'app/entities/user/user.service';
-
 import { CommentUpdateComponent } from './comment-update.component';
 
 describe('Component Tests', () => {
@@ -24,7 +21,6 @@ describe('Component Tests', () => {
     let activatedRoute: ActivatedRoute;
     let commentService: CommentService;
     let leaveApplicationService: LeaveApplicationService;
-    let userService: UserService;
 
     beforeEach(() => {
       TestBed.configureTestingModule({
@@ -39,7 +35,6 @@ describe('Component Tests', () => {
       activatedRoute = TestBed.inject(ActivatedRoute);
       commentService = TestBed.inject(CommentService);
       leaveApplicationService = TestBed.inject(LeaveApplicationService);
-      userService = TestBed.inject(UserService);
 
       comp = fixture.componentInstance;
     });
@@ -67,38 +62,16 @@ describe('Component Tests', () => {
         expect(comp.leaveApplicationsSharedCollection).toEqual(expectedCollection);
       });
 
-      it('Should call User query and add missing value', () => {
-        const comment: IComment = { id: 456 };
-        const user: IUser = { id: 38932 };
-        comment.user = user;
-
-        const userCollection: IUser[] = [{ id: 48070 }];
-        spyOn(userService, 'query').and.returnValue(of(new HttpResponse({ body: userCollection })));
-        const additionalUsers = [user];
-        const expectedCollection: IUser[] = [...additionalUsers, ...userCollection];
-        spyOn(userService, 'addUserToCollectionIfMissing').and.returnValue(expectedCollection);
-
-        activatedRoute.data = of({ comment });
-        comp.ngOnInit();
-
-        expect(userService.query).toHaveBeenCalled();
-        expect(userService.addUserToCollectionIfMissing).toHaveBeenCalledWith(userCollection, ...additionalUsers);
-        expect(comp.usersSharedCollection).toEqual(expectedCollection);
-      });
-
       it('Should update editForm', () => {
         const comment: IComment = { id: 456 };
         const leaveApplication: ILeaveApplication = { id: 48170 };
         comment.leaveApplication = leaveApplication;
-        const user: IUser = { id: 42031 };
-        comment.user = user;
 
         activatedRoute.data = of({ comment });
         comp.ngOnInit();
 
         expect(comp.editForm.value).toEqual(expect.objectContaining(comment));
         expect(comp.leaveApplicationsSharedCollection).toContain(leaveApplication);
-        expect(comp.usersSharedCollection).toContain(user);
       });
     });
 
@@ -171,14 +144,6 @@ describe('Component Tests', () => {
         it('Should return tracked LeaveApplication primary key', () => {
           const entity = { id: 123 };
           const trackResult = comp.trackLeaveApplicationById(0, entity);
-          expect(trackResult).toEqual(entity.id);
-        });
-      });
-
-      describe('trackUserById', () => {
-        it('Should return tracked User primary key', () => {
-          const entity = { id: 123 };
-          const trackResult = comp.trackUserById(0, entity);
           expect(trackResult).toEqual(entity.id);
         });
       });
