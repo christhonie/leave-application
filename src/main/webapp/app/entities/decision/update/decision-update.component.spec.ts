@@ -64,12 +64,6 @@ describe('Component Tests', () => {
         expect(comp.commentsCollection).toEqual(expectedCollection);
       });
 
-      it('Should call User query and add missing value', () => {
-        const decision: IDecision = { id: 456 };
-        activatedRoute.data = of({ decision });
-        comp.ngOnInit();
-      });
-
       it('Should call LeaveApplication query and add missing value', () => {
         const decision: IDecision = { id: 456 };
         const leaveApplication: ILeaveApplication = { id: 98150 };
