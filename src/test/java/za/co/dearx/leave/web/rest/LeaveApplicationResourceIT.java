@@ -3,6 +3,7 @@ package za.co.dearx.leave.web.rest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static za.co.dearx.leave.web.rest.TestUtil.sameInstant;
@@ -187,6 +188,7 @@ class LeaveApplicationResourceIT {
             .perform(
                 post(ENTITY_API_URL)
                     .with(csrf())
+                    .with(user("admin"))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveApplicationDTO))
             )
