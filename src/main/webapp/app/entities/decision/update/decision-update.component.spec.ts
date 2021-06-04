@@ -12,8 +12,6 @@ import { IDecision, Decision } from '../decision.model';
 import { IComment } from 'app/entities/comment/comment.model';
 import { CommentService } from 'app/entities/comment/service/comment.service';
 
-import { IUser } from 'app/entities/user/user.model';
-import { UserService } from 'app/entities/user/user.service';
 import { ILeaveApplication } from 'app/entities/leave-application/leave-application.model';
 import { LeaveApplicationService } from 'app/entities/leave-application/service/leave-application.service';
 
@@ -26,7 +24,7 @@ describe('Component Tests', () => {
     let activatedRoute: ActivatedRoute;
     let decisionService: DecisionService;
     let commentService: CommentService;
-    let userService: UserService;
+
     let leaveApplicationService: LeaveApplicationService;
 
     beforeEach(() => {
@@ -42,7 +40,6 @@ describe('Component Tests', () => {
       activatedRoute = TestBed.inject(ActivatedRoute);
       decisionService = TestBed.inject(DecisionService);
       commentService = TestBed.inject(CommentService);
-      userService = TestBed.inject(UserService);
       leaveApplicationService = TestBed.inject(LeaveApplicationService);
 
       comp = fixture.componentInstance;
@@ -65,25 +62,6 @@ describe('Component Tests', () => {
         expect(commentService.query).toHaveBeenCalled();
         expect(commentService.addCommentToCollectionIfMissing).toHaveBeenCalledWith(commentCollection, comment);
         expect(comp.commentsCollection).toEqual(expectedCollection);
-      });
-
-      it('Should call User query and add missing value', () => {
-        const decision: IDecision = { id: 456 };
-        const user: IUser = { id: 27699 };
-        decision.user = user;
-
-        const userCollection: IUser[] = [{ id: 87926 }];
-        spyOn(userService, 'query').and.returnValue(of(new HttpResponse({ body: userCollection })));
-        const additionalUsers = [user];
-        const expectedCollection: IUser[] = [...additionalUsers, ...userCollection];
-        spyOn(userService, 'addUserToCollectionIfMissing').and.returnValue(expectedCollection);
-
-        activatedRoute.data = of({ decision });
-        comp.ngOnInit();
-
-        expect(userService.query).toHaveBeenCalled();
-        expect(userService.addUserToCollectionIfMissing).toHaveBeenCalledWith(userCollection, ...additionalUsers);
-        expect(comp.usersSharedCollection).toEqual(expectedCollection);
       });
 
       it('Should call LeaveApplication query and add missing value', () => {
@@ -112,8 +90,6 @@ describe('Component Tests', () => {
         const decision: IDecision = { id: 456 };
         const comment: IComment = { id: 94002 };
         decision.comment = comment;
-        const user: IUser = { id: 47918 };
-        decision.user = user;
         const leaveApplication: ILeaveApplication = { id: 19592 };
         decision.leaveApplication = leaveApplication;
 
@@ -122,7 +98,6 @@ describe('Component Tests', () => {
 
         expect(comp.editForm.value).toEqual(expect.objectContaining(decision));
         expect(comp.commentsCollection).toContain(comment);
-        expect(comp.usersSharedCollection).toContain(user);
         expect(comp.leaveApplicationsSharedCollection).toContain(leaveApplication);
       });
     });

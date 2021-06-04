@@ -33,20 +33,20 @@
       <thead>
         <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" [callback]="loadPage.bind(this)">
           <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort"></fa-icon></th>
+          <th scope="col" jhiSortBy="leaveApplication.id">
+            <span jhiTranslate="leaveApplicationApp.decision.leaveApplication">Leave Application</span> <fa-icon icon="sort"></fa-icon>
+          </th>
           <th scope="col" jhiSortBy="choice">
-            <span jhiTranslate="leaveApplicationApp.decision.choice">Choice</span> <fa-icon icon="sort"></fa-icon>
+            <span jhiTranslate="leaveApplicationApp.decision.choice">Decision</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col" jhiSortBy="decidedOn">
             <span jhiTranslate="leaveApplicationApp.decision.decidedOn">Decided On</span> <fa-icon icon="sort"></fa-icon>
           </th>
-          <th scope="col" jhiSortBy="comment.comment">
-            <span jhiTranslate="leaveApplicationApp.decision.comment">Comment</span> <fa-icon icon="sort"></fa-icon>
-          </th>
           <th scope="col" jhiSortBy="user.login">
             <span jhiTranslate="leaveApplicationApp.decision.user">User</span> <fa-icon icon="sort"></fa-icon>
           </th>
-          <th scope="col" jhiSortBy="leaveApplication.id">
-            <span jhiTranslate="leaveApplicationApp.decision.leaveApplication">Leave Application</span> <fa-icon icon="sort"></fa-icon>
+          <th scope="col" jhiSortBy="comment.comment">
+            <span jhiTranslate="leaveApplicationApp.decision.comment">Comment</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col"></th>
         </tr>
@@ -56,21 +56,22 @@
           <td>
             <a [routerLink]="['/decision', decision.id, 'view']">{{ decision.id }}</a>
           </td>
-          <td jhiTranslate="{{ 'leaveApplicationApp.DecisionChoice.' + decision.choice }}">{{ decision.choice }}</td>
-          <td>{{ decision.decidedOn | formatMediumDatetime }}</td>
-          <td>
-            <div *ngIf="decision.comment">
-              <a [routerLink]="['/comment', decision.comment?.id, 'view']">{{ decision.comment?.comment }}</a>
-            </div>
-          </td>
-          <td>
-            {{ decision.user?.login }}
-          </td>
           <td>
             <div *ngIf="decision.leaveApplication">
               <a [routerLink]="['/leave-application', decision.leaveApplication?.id, 'view']">{{ decision.leaveApplication?.id }}</a>
             </div>
           </td>
+          <td jhiTranslate="{{ 'leaveApplicationApp.DecisionChoice.' + decision.choice }}">{{ decision.choice }}</td>
+          <td>{{ decision.decidedOn | formatMediumDatetime }}</td>
+          <td>
+            {{ decision.user?.login }}
+          </td>
+          <td>
+            <div *ngIf="decision.comment">
+              <a [routerLink]="['/comment', decision.comment?.id, 'view']">{{ decision.comment?.comment }}</a>
+            </div>
+          </td>
+
           <td class="text-right">
             <div class="btn-group">
               <button

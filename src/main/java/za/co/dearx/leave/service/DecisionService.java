@@ -34,16 +34,20 @@ public class DecisionService {
 
     private final LeaveApplicationService leaveApplicationService;
 
+    private final UserService userService;
+
     public DecisionService(
         DecisionRepository decisionRepository,
         DecisionMapper decisionMapper,
         MessageHander messageHandler,
-        LeaveApplicationService leaveApplicationService
+        LeaveApplicationService leaveApplicationService,
+        UserService userService
     ) {
         this.decisionRepository = decisionRepository;
         this.decisionMapper = decisionMapper;
         this.messageHandler = messageHandler;
         this.leaveApplicationService = leaveApplicationService;
+        this.userService = userService;
     }
 
     /**
@@ -55,6 +59,11 @@ public class DecisionService {
     public DecisionDTO save(DecisionDTO decisionDTO) {
         log.debug("Request to save Decision : {}", decisionDTO);
         Decision decision = decisionMapper.toEntity(decisionDTO);
+
+        if (decision.getId() == null) {
+            //This is a new record
+            userService.getUserWithAuthorities().ifPresent(user -> decision.setUser(user));
+        }
 
         //Load latest LeaveApplication from database
         if (decision.getLeaveApplication() != null) leaveApplicationService
