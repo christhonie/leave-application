@@ -83,7 +83,6 @@ describe('Component Tests', () => {
 
         expect(userService.query).toHaveBeenCalled();
         expect(userService.addUserToCollectionIfMissing).toHaveBeenCalledWith(userCollection, ...additionalUsers);
-        expect(comp.usersSharedCollection).toEqual(expectedCollection);
       });
 
       it('Should call LeaveApplication query and add missing value', () => {
@@ -122,7 +121,6 @@ describe('Component Tests', () => {
 
         expect(comp.editForm.value).toEqual(expect.objectContaining(decision));
         expect(comp.commentsCollection).toContain(comment);
-        expect(comp.usersSharedCollection).toContain(user);
         expect(comp.leaveApplicationsSharedCollection).toContain(leaveApplication);
       });
     });
