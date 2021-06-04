@@ -26,13 +26,11 @@ export class CommentUpdateComponent implements OnInit {
     id: [],
     comment: [null, [Validators.required, Validators.maxLength(5000)]],
     leaveApplication: [null, Validators.required],
-    user: [null, Validators.required],
   });
 
   constructor(
     protected commentService: CommentService,
     protected leaveApplicationService: LeaveApplicationService,
-    protected userService: UserService,
     protected activatedRoute: ActivatedRoute,
     protected fb: FormBuilder
   ) {}
@@ -63,10 +61,6 @@ export class CommentUpdateComponent implements OnInit {
     return item.id!;
   }
 
-  trackUserById(index: number, item: IUser): number {
-    return item.id!;
-  }
-
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IComment>>): void {
     result.pipe(finalize(() => this.onSaveFinalize())).subscribe(
       () => this.onSaveSuccess(),
@@ -91,7 +85,6 @@ export class CommentUpdateComponent implements OnInit {
       id: comment.id,
       comment: comment.comment,
       leaveApplication: comment.leaveApplication,
-      user: comment.user,
     });
 
     this.leaveApplicationsSharedCollection = this.leaveApplicationService.addLeaveApplicationToCollectionIfMissing(
@@ -114,12 +107,6 @@ export class CommentUpdateComponent implements OnInit {
         )
       )
       .subscribe((leaveApplications: ILeaveApplication[]) => (this.leaveApplicationsSharedCollection = leaveApplications));
-
-    this.userService
-      .query()
-      .pipe(map((res: HttpResponse<IUser[]>) => res.body ?? []))
-      .pipe(map((users: IUser[]) => this.userService.addUserToCollectionIfMissing(users, this.editForm.get('user')!.value)))
-      .subscribe((users: IUser[]) => (this.usersSharedCollection = users));
   }
 
   protected createFromForm(): IComment {
@@ -128,7 +115,6 @@ export class CommentUpdateComponent implements OnInit {
       id: this.editForm.get(['id'])!.value,
       comment: this.editForm.get(['comment'])!.value,
       leaveApplication: this.editForm.get(['leaveApplication'])!.value,
-      user: this.editForm.get(['user'])!.value,
     };
   }
 }
