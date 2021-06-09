@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { CalendarModule  } from 'primeng/calendar';
 
 import { SharedModule } from 'app/shared/shared.module';
 import { LeaveApplicationComponent } from './list/leave-application.component';
@@ -8,7 +9,7 @@ import { LeaveApplicationDeleteDialogComponent } from './delete/leave-applicatio
 import { LeaveApplicationRoutingModule } from './route/leave-application-routing.module';
 
 @NgModule({
-  imports: [SharedModule, LeaveApplicationRoutingModule],
+  imports: [SharedModule, LeaveApplicationRoutingModule, CalendarModule],
   declarations: [
     LeaveApplicationComponent,
     LeaveApplicationDetailComponent,
