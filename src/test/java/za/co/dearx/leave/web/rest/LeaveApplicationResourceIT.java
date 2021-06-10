@@ -128,7 +128,7 @@ class LeaveApplicationResourceIT {
         // Add required entity
         Staff staff;
         if (TestUtil.findAll(em, Staff.class).isEmpty()) {
-            staff = StaffResourceIT.createEntity(em);
+            staff = StaffResourceIT.createEntityWithUser(em);
             em.persist(staff);
             em.flush();
         } else {
@@ -190,7 +190,7 @@ class LeaveApplicationResourceIT {
             .perform(
                 post(ENTITY_API_URL)
                     .with(csrf())
-                    //                    .with(user("admin"))
+                    .with(user(UserResourceIT.DEFAULT_LOGIN))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(leaveApplicationDTO))
             )
