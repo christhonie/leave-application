@@ -130,6 +130,7 @@ class StaffResourceIT {
             .contractNumber(DEFAULT_CONTRACT_NUMBER)
             .gender(DEFAULT_GENDER);
         User user = UserResourceIT.createEntity(em);
+        user.setLogin(UserResourceIT.DEFAULT_LOGIN);
         em.persist(user);
         em.flush();
         staff.setUser(user);
