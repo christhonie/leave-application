@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.ZonedDateTime;
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -86,12 +87,13 @@ public class LeaveApplication implements Serializable {
     }
 
     public LeaveApplication startDate(LocalDate startDate) {
-        this.startDate = startDate;
+        setStartDate(startDate);
         return this;
     }
 
     public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
+        calculateDays();
     }
 
     public LocalDate getEndDate() {
@@ -99,12 +101,13 @@ public class LeaveApplication implements Serializable {
     }
 
     public LeaveApplication endDate(LocalDate endDate) {
-        this.endDate = endDate;
+        setEndDate(endDate);
         return this;
     }
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+        calculateDays();
     }
 
     public ZonedDateTime getAppliedDate() {
@@ -138,12 +141,27 @@ public class LeaveApplication implements Serializable {
     }
 
     public LeaveApplication days(BigDecimal days) {
-        this.days = days;
+        setDays(days);
         return this;
     }
 
+    /**
+     * Calling this method has no effect.
+     * This value is set using {@link #setStartDate(LocalDate)} and/or {@link #setEndDate(LocalDate)}.
+     *
+     * @param days
+     */
     public void setDays(BigDecimal days) {
-        this.days = days;
+        //Do not allow direct setting.
+    }
+
+    private void calculateDays() {
+        if (startDate != null && endDate != null) {
+            Period difference = Period.between(startDate, endDate);
+            this.days = BigDecimal.valueOf(difference.getDays());
+        } else {
+            days = null;
+        }
     }
 
     public Boolean getDeleted() {
