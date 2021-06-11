@@ -13,10 +13,9 @@ import { ILeaveType } from 'app/entities/leave-type/leave-type.model';
 import { LeaveTypeService } from 'app/entities/leave-type/service/leave-type.service';
 import { ILeaveStatus } from 'app/entities/leave-status/leave-status.model';
 import { LeaveStatusService } from 'app/entities/leave-status/service/leave-status.service';
+import { LeaveApplicationUpdateComponent } from './leave-application-update.component';
 import { IStaff } from 'app/entities/staff/staff.model';
 import { StaffService } from 'app/entities/staff/service/staff.service';
-
-import { LeaveApplicationUpdateComponent } from './leave-application-update.component';
 
 describe('Component Tests', () => {
   describe('LeaveApplication Management Update Component', () => {

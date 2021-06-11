@@ -119,6 +119,24 @@ class StaffResourceIT {
         return staff;
     }
 
+    public static Staff createEntityWithUser(EntityManager em) {
+        Staff staff = new Staff()
+            .position(DEFAULT_POSITION)
+            .employeeID(DEFAULT_EMPLOYEE_ID)
+            .startDate(DEFAULT_START_DATE)
+            .firstName(DEFAULT_FIRST_NAME)
+            .lastName(DEFAULT_LAST_NAME)
+            .email(DEFAULT_EMAIL)
+            .contractNumber(DEFAULT_CONTRACT_NUMBER)
+            .gender(DEFAULT_GENDER);
+        User user = UserResourceIT.createEntity(em);
+        user.setLogin(UserResourceIT.DEFAULT_LOGIN);
+        em.persist(user);
+        em.flush();
+        staff.setUser(user);
+        return staff;
+    }
+
     /**
      * Create an updated entity for this test.
      *

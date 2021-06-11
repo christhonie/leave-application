@@ -15,7 +15,10 @@ import za.co.dearx.leave.domain.Staff;
 @Repository
 public interface StaffRepository extends JpaRepository<Staff, Long>, JpaSpecificationExecutor<Staff> {
     @Query("select staff from Staff staff where staff.user.login = ?#{principal.username}")
-    List<Staff> findByUserIsCurrentUser();
+    Optional<Staff> findByUserIsCurrentUser();
+
+    @Query("select staff from Staff staff where staff.user.login = :username")
+    Optional<Staff> findBySpecificUsername(@Param("username") String username);
 
     @Query(
         value = "select distinct staff from Staff staff left join fetch staff.teams",

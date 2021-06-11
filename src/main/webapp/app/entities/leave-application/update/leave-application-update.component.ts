@@ -38,7 +38,7 @@ export class LeaveApplicationUpdateComponent implements OnInit {
     deleted: [null, [Validators.required]],
     leaveType: [null, Validators.required],
     leaveStatus: [],
-    staff: [null, Validators.required],
+    staff: [],
   });
 
   constructor(

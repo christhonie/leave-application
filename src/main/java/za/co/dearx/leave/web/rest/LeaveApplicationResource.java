@@ -25,8 +25,10 @@ import za.co.dearx.leave.service.LeaveApplicationQueryService;
 import za.co.dearx.leave.service.LeaveApplicationService;
 import za.co.dearx.leave.service.criteria.LeaveApplicationCriteria;
 import za.co.dearx.leave.service.dto.LeaveApplicationDTO;
+import za.co.dearx.leave.service.exception.NotFoundException;
 import za.co.dearx.leave.service.exception.ValidationException;
 import za.co.dearx.leave.web.rest.errors.BadRequestAlertException;
+import za.co.dearx.leave.web.rest.errors.UserNotFoundException;
 
 /**
  * REST controller for managing {@link za.co.dearx.leave.domain.LeaveApplication}.
@@ -81,6 +83,8 @@ public class LeaveApplicationResource {
                 .body(result);
         } catch (ValidationException e) {
             return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).build();
+        } catch (NotFoundException e) {
+            throw new BadRequestAlertException(e.getMessage(), ENTITY_NAME, "staffnotfound");
         }
     }
 
