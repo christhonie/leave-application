@@ -66,6 +66,16 @@
         <dd>
           <span>{{ staff.gender }}</span>
         </dd>
+        <dt>
+          <span
+            jhiTranslate="leaveApplicationApp.staff.annualLeaveEntitlement"
+            [ngbTooltip]="'leaveApplicationApp.staff.help.annualLeaveEntitlement' | translate"
+            >Annual Leave Entitlement</span
+          >
+        </dt>
+        <dd>
+          <span>{{ staff.annualLeaveEntitlement }}</span>
+        </dd>
         <dt><span jhiTranslate="leaveApplicationApp.staff.user">User</span></dt>
         <dd>
           <span>{{ staff.user?.login }}</span>

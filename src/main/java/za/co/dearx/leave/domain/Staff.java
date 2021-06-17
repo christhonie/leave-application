@@ -43,6 +43,13 @@ public class Staff implements Serializable {
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
 
+    /**
+     * A read-only field consisting out of the first name and last name of the person.
+     */
+    @Size(max = 100)
+    @Column(name = "name", length = 100)
+    private String name;
+
     @NotNull
     @Size(max = 50)
     @Column(name = "first_name", length = 50, nullable = false)
@@ -68,6 +75,12 @@ public class Staff implements Serializable {
     @Size(max = 2)
     @Column(name = "gender", length = 2, nullable = false)
     private String gender;
+
+    /**
+     * The number of annual leave days an employee is entitled to according to there employment contract,\nThis should be populated using {@link EntitlementValue} table according to the linked user
+     */
+    @Column(name = "annual_leave_entitlement")
+    private Long annualLeaveEntitlement;
 
     /**
      * The system user, used to access the front-end applications, linked to the person.
@@ -144,6 +157,15 @@ public class Staff implements Serializable {
         ); else return firstName + lastName;
     }
 
+    public Staff name(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getFirstName() {
         return this.firstName;
     }
@@ -207,6 +229,19 @@ public class Staff implements Serializable {
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public Long getAnnualLeaveEntitlement() {
+        return this.annualLeaveEntitlement;
+    }
+
+    public Staff annualLeaveEntitlement(Long annualLeaveEntitlement) {
+        this.annualLeaveEntitlement = annualLeaveEntitlement;
+        return this;
+    }
+
+    public void setAnnualLeaveEntitlement(Long annualLeaveEntitlement) {
+        this.annualLeaveEntitlement = annualLeaveEntitlement;
     }
 
     public User getUser() {
@@ -280,6 +315,7 @@ public class Staff implements Serializable {
             ", email='" + getEmail() + "'" +
             ", contractNumber='" + getContractNumber() + "'" +
             ", gender='" + getGender() + "'" +
+            ", annualLeaveEntitlement=" + getAnnualLeaveEntitlement() +
             "}";
     }
 }

@@ -57,6 +57,11 @@
       "fieldType": "String",
       "fieldValidateRules": ["maxlength", "required"],
       "fieldValidateRulesMaxlength": "2"
+    },
+    {
+      "fieldName": "annualLeaveEntitlement",
+      "fieldType": "Long",
+      "javadoc": "The number of annual leave days an employee is entitled to according to there employment contract,\\nThis should be populated using {@link EntitlementValue} table according to the linked user"
     }
   ],
   "relationships": [

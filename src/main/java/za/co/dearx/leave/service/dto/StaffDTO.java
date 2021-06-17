@@ -69,6 +69,14 @@ public class StaffDTO implements Serializable {
     @Size(max = 2)
     private String gender;
 
+    /**
+     * The number of annual leave days an employee is entitled to according to there employment contract,\nThis should be populated using {@link EntitlementValue} table according to the linked user
+     */
+    @ApiModelProperty(
+        value = "The number of annual leave days an employee is entitled to according to there employment contract,\nThis should be populated using {@link EntitlementValue} table according to the linked user"
+    )
+    private Long annualLeaveEntitlement;
+
     private UserDTO user;
 
     private Set<TeamDTO> teams = new HashSet<>();
@@ -153,6 +161,14 @@ public class StaffDTO implements Serializable {
         this.gender = gender;
     }
 
+    public Long getAnnualLeaveEntitlement() {
+        return annualLeaveEntitlement;
+    }
+
+    public void setAnnualLeaveEntitlement(Long annualLeaveEntitlement) {
+        this.annualLeaveEntitlement = annualLeaveEntitlement;
+    }
+
     public UserDTO getUser() {
         return user;
     }
@@ -204,6 +220,7 @@ public class StaffDTO implements Serializable {
             ", email='" + getEmail() + "'" +
             ", contractNumber='" + getContractNumber() + "'" +
             ", gender='" + getGender() + "'" +
+            ", annualLeaveEntitlement=" + getAnnualLeaveEntitlement() +
             ", user=" + getUser() +
             ", teams=" + getTeams() +
             "}";

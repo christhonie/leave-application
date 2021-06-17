@@ -13,6 +13,7 @@ export interface IStaff {
   email?: string | null;
   contractNumber?: string | null;
   gender?: string;
+  annualLeaveEntitlement?: number | null;
   user?: IUser | null;
   teams?: ITeam[] | null;
 }
@@ -29,6 +30,7 @@ export class Staff implements IStaff {
     public email?: string | null,
     public contractNumber?: string | null,
     public gender?: string,
+    public annualLeaveEntitlement?: number | null,
     public user?: IUser | null,
     public teams?: ITeam[] | null
   ) {}

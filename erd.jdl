@@ -42,6 +42,11 @@ entity Staff {
 	/** Preferably the cellphone number. This can be used for sending messages to the person. */
 	contractNumber String maxlength(50)
 	gender String maxlength(2) required
+	/** 
+	* The number of annual leave days an employee is entitled to according to there employment contract, 
+	* This should be populated using {@link EntitlementValue} table according to the linked user
+	*/
+	annualLeaveEntitlement Long
 }
 relationship ManyToMany {
 	/** The team(s) the person is linked to. This is used for approvals and escalations. */

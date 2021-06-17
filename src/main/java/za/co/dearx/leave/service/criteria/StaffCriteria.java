@@ -33,6 +33,8 @@ public class StaffCriteria implements Serializable, Criteria {
 
     private LocalDateFilter startDate;
 
+    private StringFilter name;
+
     private StringFilter firstName;
 
     private StringFilter lastName;
@@ -42,6 +44,8 @@ public class StaffCriteria implements Serializable, Criteria {
     private StringFilter contractNumber;
 
     private StringFilter gender;
+
+    private LongFilter annualLeaveEntitlement;
 
     private LongFilter userId;
 
@@ -54,11 +58,13 @@ public class StaffCriteria implements Serializable, Criteria {
         this.position = other.position == null ? null : other.position.copy();
         this.employeeID = other.employeeID == null ? null : other.employeeID.copy();
         this.startDate = other.startDate == null ? null : other.startDate.copy();
+        this.name = other.name == null ? null : other.name.copy();
         this.firstName = other.firstName == null ? null : other.firstName.copy();
         this.lastName = other.lastName == null ? null : other.lastName.copy();
         this.email = other.email == null ? null : other.email.copy();
         this.contractNumber = other.contractNumber == null ? null : other.contractNumber.copy();
         this.gender = other.gender == null ? null : other.gender.copy();
+        this.annualLeaveEntitlement = other.annualLeaveEntitlement == null ? null : other.annualLeaveEntitlement.copy();
         this.userId = other.userId == null ? null : other.userId.copy();
         this.teamId = other.teamId == null ? null : other.teamId.copy();
     }
@@ -126,6 +132,21 @@ public class StaffCriteria implements Serializable, Criteria {
 
     public void setStartDate(LocalDateFilter startDate) {
         this.startDate = startDate;
+    }
+
+    public StringFilter getName() {
+        return name;
+    }
+
+    public StringFilter name() {
+        if (name == null) {
+            name = new StringFilter();
+        }
+        return name;
+    }
+
+    public void setName(StringFilter name) {
+        this.name = name;
     }
 
     public StringFilter getFirstName() {
@@ -203,6 +224,21 @@ public class StaffCriteria implements Serializable, Criteria {
         this.gender = gender;
     }
 
+    public LongFilter getAnnualLeaveEntitlement() {
+        return annualLeaveEntitlement;
+    }
+
+    public LongFilter annualLeaveEntitlement() {
+        if (annualLeaveEntitlement == null) {
+            annualLeaveEntitlement = new LongFilter();
+        }
+        return annualLeaveEntitlement;
+    }
+
+    public void setAnnualLeaveEntitlement(LongFilter annualLeaveEntitlement) {
+        this.annualLeaveEntitlement = annualLeaveEntitlement;
+    }
+
     public LongFilter getUserId() {
         return userId;
     }
@@ -247,11 +283,13 @@ public class StaffCriteria implements Serializable, Criteria {
             Objects.equals(position, that.position) &&
             Objects.equals(employeeID, that.employeeID) &&
             Objects.equals(startDate, that.startDate) &&
+            Objects.equals(name, that.name) &&
             Objects.equals(firstName, that.firstName) &&
             Objects.equals(lastName, that.lastName) &&
             Objects.equals(email, that.email) &&
             Objects.equals(contractNumber, that.contractNumber) &&
             Objects.equals(gender, that.gender) &&
+            Objects.equals(annualLeaveEntitlement, that.annualLeaveEntitlement) &&
             Objects.equals(userId, that.userId) &&
             Objects.equals(teamId, that.teamId)
         );
@@ -259,24 +297,40 @@ public class StaffCriteria implements Serializable, Criteria {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, position, employeeID, startDate, firstName, lastName, email, contractNumber, gender, userId, teamId);
+        return Objects.hash(
+            id,
+            position,
+            employeeID,
+            startDate,
+            name,
+            firstName,
+            lastName,
+            email,
+            contractNumber,
+            gender,
+            annualLeaveEntitlement,
+            userId,
+            teamId
+        );
     }
 
     // prettier-ignore
     @Override
     public String toString() {
         return "StaffCriteria{" +
-                (id != null ? "id=" + id + ", " : "") +
-                (position != null ? "position=" + position + ", " : "") +
-                (employeeID != null ? "employeeID=" + employeeID + ", " : "") +
-                (startDate != null ? "startDate=" + startDate + ", " : "") +
-                (firstName != null ? "firstName=" + firstName + ", " : "") +
-                (lastName != null ? "lastName=" + lastName + ", " : "") +
-                (email != null ? "email=" + email + ", " : "") +
-                (contractNumber != null ? "contractNumber=" + contractNumber + ", " : "") +
-                (gender != null ? "gender=" + gender + ", " : "") +
-                (userId != null ? "userId=" + userId + ", " : "") +
-                (teamId != null ? "teamId=" + teamId + ", " : "") +
+            (id != null ? "id=" + id + ", " : "") +
+            (position != null ? "position=" + position + ", " : "") +
+            (employeeID != null ? "employeeID=" + employeeID + ", " : "") +
+            (startDate != null ? "startDate=" + startDate + ", " : "") +
+            (name != null ? "name=" + name + ", " : "") +
+            (firstName != null ? "firstName=" + firstName + ", " : "") +
+            (lastName != null ? "lastName=" + lastName + ", " : "") +
+            (email != null ? "email=" + email + ", " : "") +
+            (contractNumber != null ? "contractNumber=" + contractNumber + ", " : "") +
+            (gender != null ? "gender=" + gender + ", " : "") +
+            (annualLeaveEntitlement != null ? "annualLeaveEntitlement=" + annualLeaveEntitlement + ", " : "") +
+            (userId != null ? "userId=" + userId + ", " : "") +
+            (teamId != null ? "teamId=" + teamId + ", " : "") +
             "}";
     }
 }

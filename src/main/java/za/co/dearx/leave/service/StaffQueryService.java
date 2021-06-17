@@ -95,6 +95,9 @@ public class StaffQueryService extends QueryService<Staff> {
             if (criteria.getStartDate() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getStartDate(), Staff_.startDate));
             }
+            if (criteria.getName() != null) {
+                specification = specification.and(buildStringSpecification(criteria.getName(), Staff_.name));
+            }
             if (criteria.getFirstName() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getFirstName(), Staff_.firstName));
             }
@@ -109,6 +112,10 @@ public class StaffQueryService extends QueryService<Staff> {
             }
             if (criteria.getGender() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getGender(), Staff_.gender));
+            }
+            if (criteria.getAnnualLeaveEntitlement() != null) {
+                specification =
+                    specification.and(buildRangeSpecification(criteria.getAnnualLeaveEntitlement(), Staff_.annualLeaveEntitlement));
             }
             if (criteria.getUserId() != null) {
                 specification =

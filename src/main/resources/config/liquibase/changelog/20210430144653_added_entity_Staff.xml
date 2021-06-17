@@ -44,6 +44,19 @@
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
     </changeSet>
+    
+    <changeSet id="20210617144653-2" author="Jéan-Leigh Jantjes">
+        <addColumn tableName="staff">
+            <column name="name" type="varchar(100)" remarks="A read-only field consisting out of the first name and last name of the person.">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+        <addColumn tableName="staff">
+            <column name="annual_leave_entitlement" type="bigint" remarks="The number of annual leave days an employee is entitled to according to there employment contract,\nThis should be populated using {@link EntitlementValue} table according to the linked user">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
 
     <changeSet id="20210430144653-1-relations" author="jhipster">
 
@@ -78,11 +91,13 @@
             <column name="position" type="string"/>
             <column name="employee_id" type="string"/>
             <column name="start_date" type="date"/>
+            <column name="name" type="string"/>
             <column name="first_name" type="string"/>
             <column name="last_name" type="string"/>
             <column name="email" type="string"/>
             <column name="contract_number" type="string"/>
             <column name="gender" type="string"/>
+            <column name="annual_leave_entitlement" type="numeric"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

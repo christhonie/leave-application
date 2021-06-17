@@ -27,13 +27,15 @@
       "email": "Email",
       "contractNumber": "Contract Number",
       "gender": "Gender",
+      "annualLeaveEntitlement": "Annual Leave Entitlement",
       "user": "User",
       "team": "Team",
       "help": {
         "employeeID": "The unique employee number assigned by the company or payroll system.",
         "startDate": "When the person started at the organisation. This is used by some LeaveEntitlement calculations.",
         "name": "A read-only field consisting out of the first name and last name of the person.",
-        "contractNumber": "Preferably the cellphone number. This can be used for sending messages to the person."
+        "contractNumber": "Preferably the cellphone number. This can be used for sending messages to the person.",
+        "annualLeaveEntitlement": "The number of annual leave days an employee is entitled to according to there employment contract,\nThis should be populated using {@link EntitlementValue} table according to the linked user"
       }
     }
   }

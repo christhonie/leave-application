@@ -74,6 +74,10 @@ class StaffResourceIT {
     private static final String DEFAULT_GENDER = "AA";
     private static final String UPDATED_GENDER = "BB";
 
+    private static final Long DEFAULT_ANNUAL_LEAVE_ENTITLEMENT = 1L;
+    private static final Long UPDATED_ANNUAL_LEAVE_ENTITLEMENT = 2L;
+    private static final Long SMALLER_ANNUAL_LEAVE_ENTITLEMENT = 1L - 1L;
+
     private static final String ENTITY_API_URL = "/api/staff";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
@@ -111,26 +115,35 @@ class StaffResourceIT {
             .position(DEFAULT_POSITION)
             .employeeID(DEFAULT_EMPLOYEE_ID)
             .startDate(DEFAULT_START_DATE)
+            .name(DEFAULT_NAME)
             .firstName(DEFAULT_FIRST_NAME)
             .lastName(DEFAULT_LAST_NAME)
             .email(DEFAULT_EMAIL)
             .contractNumber(DEFAULT_CONTRACT_NUMBER)
-            .gender(DEFAULT_GENDER);
+            .gender(DEFAULT_GENDER)
+            .annualLeaveEntitlement(DEFAULT_ANNUAL_LEAVE_ENTITLEMENT);
         return staff;
     }
 
+    /**
+     * Create an entity for this test and add a user to the entity before returning
+     *
+     * This is a static method, as tests for other entities might also need it,
+     * if they test an entity which requires the current entity.
+     */
     public static Staff createEntityWithUser(EntityManager em) {
         Staff staff = new Staff()
             .position(DEFAULT_POSITION)
             .employeeID(DEFAULT_EMPLOYEE_ID)
             .startDate(DEFAULT_START_DATE)
+            .name(DEFAULT_NAME)
             .firstName(DEFAULT_FIRST_NAME)
             .lastName(DEFAULT_LAST_NAME)
             .email(DEFAULT_EMAIL)
             .contractNumber(DEFAULT_CONTRACT_NUMBER)
-            .gender(DEFAULT_GENDER);
+            .gender(DEFAULT_GENDER)
+            .annualLeaveEntitlement(DEFAULT_ANNUAL_LEAVE_ENTITLEMENT);
         User user = UserResourceIT.createEntity(em);
-        user.setLogin(UserResourceIT.DEFAULT_LOGIN);
         em.persist(user);
         em.flush();
         staff.setUser(user);
@@ -148,11 +161,13 @@ class StaffResourceIT {
             .position(UPDATED_POSITION)
             .employeeID(UPDATED_EMPLOYEE_ID)
             .startDate(UPDATED_START_DATE)
+            .name(UPDATED_NAME)
             .firstName(UPDATED_FIRST_NAME)
             .lastName(UPDATED_LAST_NAME)
             .email(UPDATED_EMAIL)
             .contractNumber(UPDATED_CONTRACT_NUMBER)
-            .gender(UPDATED_GENDER);
+            .gender(UPDATED_GENDER)
+            .annualLeaveEntitlement(UPDATED_ANNUAL_LEAVE_ENTITLEMENT);
         return staff;
     }
 
@@ -189,6 +204,7 @@ class StaffResourceIT {
         assertThat(testStaff.getEmail()).isEqualTo(DEFAULT_EMAIL);
         assertThat(testStaff.getContractNumber()).isEqualTo(DEFAULT_CONTRACT_NUMBER);
         assertThat(testStaff.getGender()).isEqualTo(DEFAULT_GENDER);
+        assertThat(testStaff.getAnnualLeaveEntitlement()).isEqualTo(DEFAULT_ANNUAL_LEAVE_ENTITLEMENT);
     }
 
     @Test
@@ -350,7 +366,8 @@ class StaffResourceIT {
             .andExpect(jsonPath("$.[*].lastName").value(hasItem(DEFAULT_LAST_NAME)))
             .andExpect(jsonPath("$.[*].email").value(hasItem(DEFAULT_EMAIL)))
             .andExpect(jsonPath("$.[*].contractNumber").value(hasItem(DEFAULT_CONTRACT_NUMBER)))
-            .andExpect(jsonPath("$.[*].gender").value(hasItem(DEFAULT_GENDER)));
+            .andExpect(jsonPath("$.[*].gender").value(hasItem(DEFAULT_GENDER)))
+            .andExpect(jsonPath("$.[*].annualLeaveEntitlement").value(hasItem(DEFAULT_ANNUAL_LEAVE_ENTITLEMENT.intValue())));
     }
 
     @SuppressWarnings({ "unchecked" })
@@ -391,7 +408,8 @@ class StaffResourceIT {
             .andExpect(jsonPath("$.lastName").value(DEFAULT_LAST_NAME))
             .andExpect(jsonPath("$.email").value(DEFAULT_EMAIL))
             .andExpect(jsonPath("$.contractNumber").value(DEFAULT_CONTRACT_NUMBER))
-            .andExpect(jsonPath("$.gender").value(DEFAULT_GENDER));
+            .andExpect(jsonPath("$.gender").value(DEFAULT_GENDER))
+            .andExpect(jsonPath("$.annualLeaveEntitlement").value(DEFAULT_ANNUAL_LEAVE_ENTITLEMENT.intValue()));
     }
 
     @Test
@@ -674,7 +692,85 @@ class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByFirstNameIsEqualToSomething() throws Exception {
+    void getAllStaffByNameIsEqualToSomething() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        // Get all the staffList where name equals to DEFAULT_NAME
+        defaultStaffShouldBeFound("name.equals=" + DEFAULT_NAME);
+
+        // Get all the staffList where name equals to UPDATED_NAME
+        defaultStaffShouldNotBeFound("name.equals=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllStaffByNameIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        // Get all the staffList where name not equals to DEFAULT_NAME
+        defaultStaffShouldNotBeFound("name.notEquals=" + DEFAULT_NAME);
+
+        // Get all the staffList where name not equals to UPDATED_NAME
+        defaultStaffShouldBeFound("name.notEquals=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllStaffByNameIsInShouldWork() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        // Get all the staffList where name in DEFAULT_NAME or UPDATED_NAME
+        defaultStaffShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
+
+        // Get all the staffList where name equals to UPDATED_NAME
+        defaultStaffShouldNotBeFound("name.in=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllStaffByNameIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        // Get all the staffList where name is not null
+        defaultStaffShouldBeFound("name.specified=true");
+
+        // Get all the staffList where name is null
+        defaultStaffShouldNotBeFound("name.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllStaffByNameContainsSomething() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        // Get all the staffList where name contains DEFAULT_NAME
+        defaultStaffShouldBeFound("name.contains=" + DEFAULT_NAME);
+
+        // Get all the staffList where name contains UPDATED_NAME
+        defaultStaffShouldNotBeFound("name.contains=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllStaffByNameNotContainsSomething() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        // Get all the staffList where name does not contain DEFAULT_NAME
+        defaultStaffShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
+
+        // Get all the staffList where name does not contain UPDATED_NAME
+        defaultStaffShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllStaffByFirstNameIsEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -1064,6 +1160,110 @@ class StaffResourceIT {
 
     @Test
     @Transactional
+    void getAllStaffByAnnualLeaveEntitlementIsEqualToSomething() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        // Get all the staffList where annualLeaveEntitlement equals to DEFAULT_ANNUAL_LEAVE_ENTITLEMENT
+        defaultStaffShouldBeFound("annualLeaveEntitlement.equals=" + DEFAULT_ANNUAL_LEAVE_ENTITLEMENT);
+
+        // Get all the staffList where annualLeaveEntitlement equals to UPDATED_ANNUAL_LEAVE_ENTITLEMENT
+        defaultStaffShouldNotBeFound("annualLeaveEntitlement.equals=" + UPDATED_ANNUAL_LEAVE_ENTITLEMENT);
+    }
+
+    @Test
+    @Transactional
+    void getAllStaffByAnnualLeaveEntitlementIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        // Get all the staffList where annualLeaveEntitlement not equals to DEFAULT_ANNUAL_LEAVE_ENTITLEMENT
+        defaultStaffShouldNotBeFound("annualLeaveEntitlement.notEquals=" + DEFAULT_ANNUAL_LEAVE_ENTITLEMENT);
+
+        // Get all the staffList where annualLeaveEntitlement not equals to UPDATED_ANNUAL_LEAVE_ENTITLEMENT
+        defaultStaffShouldBeFound("annualLeaveEntitlement.notEquals=" + UPDATED_ANNUAL_LEAVE_ENTITLEMENT);
+    }
+
+    @Test
+    @Transactional
+    void getAllStaffByAnnualLeaveEntitlementIsInShouldWork() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        // Get all the staffList where annualLeaveEntitlement in DEFAULT_ANNUAL_LEAVE_ENTITLEMENT or UPDATED_ANNUAL_LEAVE_ENTITLEMENT
+        defaultStaffShouldBeFound("annualLeaveEntitlement.in=" + DEFAULT_ANNUAL_LEAVE_ENTITLEMENT + "," + UPDATED_ANNUAL_LEAVE_ENTITLEMENT);
+
+        // Get all the staffList where annualLeaveEntitlement equals to UPDATED_ANNUAL_LEAVE_ENTITLEMENT
+        defaultStaffShouldNotBeFound("annualLeaveEntitlement.in=" + UPDATED_ANNUAL_LEAVE_ENTITLEMENT);
+    }
+
+    @Test
+    @Transactional
+    void getAllStaffByAnnualLeaveEntitlementIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        // Get all the staffList where annualLeaveEntitlement is not null
+        defaultStaffShouldBeFound("annualLeaveEntitlement.specified=true");
+
+        // Get all the staffList where annualLeaveEntitlement is null
+        defaultStaffShouldNotBeFound("annualLeaveEntitlement.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllStaffByAnnualLeaveEntitlementIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        // Get all the staffList where annualLeaveEntitlement is greater than or equal to DEFAULT_ANNUAL_LEAVE_ENTITLEMENT
+        defaultStaffShouldBeFound("annualLeaveEntitlement.greaterThanOrEqual=" + DEFAULT_ANNUAL_LEAVE_ENTITLEMENT);
+
+        // Get all the staffList where annualLeaveEntitlement is greater than or equal to UPDATED_ANNUAL_LEAVE_ENTITLEMENT
+        defaultStaffShouldNotBeFound("annualLeaveEntitlement.greaterThanOrEqual=" + UPDATED_ANNUAL_LEAVE_ENTITLEMENT);
+    }
+
+    @Test
+    @Transactional
+    void getAllStaffByAnnualLeaveEntitlementIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        // Get all the staffList where annualLeaveEntitlement is less than or equal to DEFAULT_ANNUAL_LEAVE_ENTITLEMENT
+        defaultStaffShouldBeFound("annualLeaveEntitlement.lessThanOrEqual=" + DEFAULT_ANNUAL_LEAVE_ENTITLEMENT);
+
+        // Get all the staffList where annualLeaveEntitlement is less than or equal to SMALLER_ANNUAL_LEAVE_ENTITLEMENT
+        defaultStaffShouldNotBeFound("annualLeaveEntitlement.lessThanOrEqual=" + SMALLER_ANNUAL_LEAVE_ENTITLEMENT);
+    }
+
+    @Test
+    @Transactional
+    void getAllStaffByAnnualLeaveEntitlementIsLessThanSomething() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        // Get all the staffList where annualLeaveEntitlement is less than DEFAULT_ANNUAL_LEAVE_ENTITLEMENT
+        defaultStaffShouldNotBeFound("annualLeaveEntitlement.lessThan=" + DEFAULT_ANNUAL_LEAVE_ENTITLEMENT);
+
+        // Get all the staffList where annualLeaveEntitlement is less than UPDATED_ANNUAL_LEAVE_ENTITLEMENT
+        defaultStaffShouldBeFound("annualLeaveEntitlement.lessThan=" + UPDATED_ANNUAL_LEAVE_ENTITLEMENT);
+    }
+
+    @Test
+    @Transactional
+    void getAllStaffByAnnualLeaveEntitlementIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        // Get all the staffList where annualLeaveEntitlement is greater than DEFAULT_ANNUAL_LEAVE_ENTITLEMENT
+        defaultStaffShouldNotBeFound("annualLeaveEntitlement.greaterThan=" + DEFAULT_ANNUAL_LEAVE_ENTITLEMENT);
+
+        // Get all the staffList where annualLeaveEntitlement is greater than SMALLER_ANNUAL_LEAVE_ENTITLEMENT
+        defaultStaffShouldBeFound("annualLeaveEntitlement.greaterThan=" + SMALLER_ANNUAL_LEAVE_ENTITLEMENT);
+    }
+
+    @Test
+    @Transactional
     void getAllStaffByUserIsEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
@@ -1117,7 +1317,8 @@ class StaffResourceIT {
             .andExpect(jsonPath("$.[*].lastName").value(hasItem(DEFAULT_LAST_NAME)))
             .andExpect(jsonPath("$.[*].email").value(hasItem(DEFAULT_EMAIL)))
             .andExpect(jsonPath("$.[*].contractNumber").value(hasItem(DEFAULT_CONTRACT_NUMBER)))
-            .andExpect(jsonPath("$.[*].gender").value(hasItem(DEFAULT_GENDER)));
+            .andExpect(jsonPath("$.[*].gender").value(hasItem(DEFAULT_GENDER)))
+            .andExpect(jsonPath("$.[*].annualLeaveEntitlement").value(hasItem(DEFAULT_ANNUAL_LEAVE_ENTITLEMENT.intValue())));
 
         // Check, that the count call also returns 1
         restStaffMockMvc
@@ -1169,11 +1370,13 @@ class StaffResourceIT {
             .position(UPDATED_POSITION)
             .employeeID(UPDATED_EMPLOYEE_ID)
             .startDate(UPDATED_START_DATE)
+            .name(UPDATED_NAME)
             .firstName(UPDATED_FIRST_NAME)
             .lastName(UPDATED_LAST_NAME)
             .email(UPDATED_EMAIL)
             .contractNumber(UPDATED_CONTRACT_NUMBER)
-            .gender(UPDATED_GENDER);
+            .gender(UPDATED_GENDER)
+            .annualLeaveEntitlement(UPDATED_ANNUAL_LEAVE_ENTITLEMENT);
         StaffDTO staffDTO = staffMapper.toDto(updatedStaff);
 
         restStaffMockMvc
@@ -1198,6 +1401,7 @@ class StaffResourceIT {
         assertThat(testStaff.getEmail()).isEqualTo(UPDATED_EMAIL);
         assertThat(testStaff.getContractNumber()).isEqualTo(UPDATED_CONTRACT_NUMBER);
         assertThat(testStaff.getGender()).isEqualTo(UPDATED_GENDER);
+        assertThat(testStaff.getAnnualLeaveEntitlement()).isEqualTo(UPDATED_ANNUAL_LEAVE_ENTITLEMENT);
     }
 
     @Test
@@ -1308,6 +1512,7 @@ class StaffResourceIT {
         assertThat(testStaff.getEmail()).isEqualTo(DEFAULT_EMAIL);
         assertThat(testStaff.getContractNumber()).isEqualTo(DEFAULT_CONTRACT_NUMBER);
         assertThat(testStaff.getGender()).isEqualTo(DEFAULT_GENDER);
+        assertThat(testStaff.getAnnualLeaveEntitlement()).isEqualTo(DEFAULT_ANNUAL_LEAVE_ENTITLEMENT);
     }
 
     @Test
@@ -1326,11 +1531,13 @@ class StaffResourceIT {
             .position(UPDATED_POSITION)
             .employeeID(UPDATED_EMPLOYEE_ID)
             .startDate(UPDATED_START_DATE)
+            .name(UPDATED_NAME)
             .firstName(UPDATED_FIRST_NAME)
             .lastName(UPDATED_LAST_NAME)
             .email(UPDATED_EMAIL)
             .contractNumber(UPDATED_CONTRACT_NUMBER)
-            .gender(UPDATED_GENDER);
+            .gender(UPDATED_GENDER)
+            .annualLeaveEntitlement(UPDATED_ANNUAL_LEAVE_ENTITLEMENT);
 
         restStaffMockMvc
             .perform(
@@ -1354,6 +1561,7 @@ class StaffResourceIT {
         assertThat(testStaff.getEmail()).isEqualTo(UPDATED_EMAIL);
         assertThat(testStaff.getContractNumber()).isEqualTo(UPDATED_CONTRACT_NUMBER);
         assertThat(testStaff.getGender()).isEqualTo(UPDATED_GENDER);
+        assertThat(testStaff.getAnnualLeaveEntitlement()).isEqualTo(UPDATED_ANNUAL_LEAVE_ENTITLEMENT);
     }
 
     @Test

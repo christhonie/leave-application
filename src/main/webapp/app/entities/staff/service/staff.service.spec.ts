@@ -35,6 +35,7 @@ describe('Service Tests', () => {
         email: 'AAAAAAA',
         contractNumber: 'AAAAAAA',
         gender: 'AAAAAAA',
+        annualLeaveEntitlement: 0,
       };
     });
 
@@ -90,6 +91,7 @@ describe('Service Tests', () => {
             email: 'BBBBBB',
             contractNumber: 'BBBBBB',
             gender: 'BBBBBB',
+            annualLeaveEntitlement: 1,
           },
           elemDefault
         );
@@ -146,6 +148,7 @@ describe('Service Tests', () => {
             email: 'BBBBBB',
             contractNumber: 'BBBBBB',
             gender: 'BBBBBB',
+            annualLeaveEntitlement: 1,
           },
           elemDefault
         );
@@ -202,7 +205,7 @@ describe('Service Tests', () => {
         });
 
         it('should add only unique Staff to an array', () => {
-          const staffArray: IStaff[] = [{ id: 123 }, { id: 456 }, { id: 39140 }];
+          const staffArray: IStaff[] = [{ id: 123 }, { id: 456 }, { id: 48141 }];
           const staffCollection: IStaff[] = [{ id: 123 }];
           expectedResult = service.addStaffToCollectionIfMissing(staffCollection, ...staffArray);
           expect(expectedResult).toHaveLength(3);
