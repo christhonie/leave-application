@@ -1,0 +1,20 @@
+//*************************************
+// SAP Business Tracing 
+//*************************************
+
+/**
+ * An observed public holiday represents a date in South Africa where the holiday causes a work day to be impacted.
+ */
+ entity PublicHoliday {
+    name String 
+    date LocalDate 
+}
+// Set pagination options
+paginate all with pagination
+
+// Set service options to all except few
+service all with serviceClass
+dto all with mapstruct
+
+// Set entity filtering
+filter all
