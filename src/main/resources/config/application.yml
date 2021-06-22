@@ -195,7 +195,6 @@ camunda.bpm:
   filter:
     create: All tasks
 
-leaveApplication:
-  calendarific:
-    baseUrl: https://calendarific.com/api/v2
-    apiKey: faacddb83743c8c138310fa359e4afa694500ad6
+calendarific:
+  baseUrl: https://calendarific.com/api/v2
+  apiKey: faacddb83743c8c138310fa359e4afa694500ad6

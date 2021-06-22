@@ -72,6 +72,17 @@ export class PublicHolidayComponent implements OnInit {
     });
   }
 
+  reload(year: number): void {
+    this.publicHolidayService.reload(year).subscribe(
+      () => {
+        this.loadPage();
+      },
+      () => {
+        this.onError();
+      }
+    );
+  }
+
   protected sort(): string[] {
     const result = [this.predicate + ',' + (this.ascending ? 'asc' : 'desc')];
     if (this.predicate !== 'id') {

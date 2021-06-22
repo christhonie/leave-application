@@ -11,11 +11,21 @@
       <button
         id="jh-create-entity"
         data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-public-holiday"
+        class="btn btn-primary jh-create-entity create-public-holiday mr-2"
         [routerLink]="['/public-holiday/new']"
       >
         <fa-icon icon="plus"></fa-icon>
         <span jhiTranslate="leaveApplicationApp.publicHoliday.home.createLabel"> Create a new Public Holiday </span>
+      </button>
+
+      <button
+        id="jh-reload-publicHolidays"
+        data-cy="reloadPublicHolidaysButton"
+        class="btn btn-primary jh-create-entity create-public-holiday"
+        (click)="reload(2021)"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="leaveApplicationApp.publicHoliday.home.reloadHolidays">Reload Public Holidays </span>
       </button>
     </div>
   </h2>

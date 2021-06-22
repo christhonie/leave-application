@@ -204,7 +204,7 @@ public class PublicHolidayResource {
     }
 
     @GetMapping("/public-holidays/reload")
-    public ResponseEntity<Void> reloadPublicHolidays(@RequestParam Long yearToLoad) {
+    public ResponseEntity<Void> reloadPublicHolidays(@RequestParam Integer yearToLoad) {
         log.debug("REST request to reload PublicHolidays");
         try {
             publicHolidayService.reloadData(yearToLoad);

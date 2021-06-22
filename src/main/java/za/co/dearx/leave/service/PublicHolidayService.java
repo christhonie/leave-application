@@ -2,7 +2,10 @@ package za.co.dearx.leave.service;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,11 +37,11 @@ public class PublicHolidayService {
 
     private final PublicHolidayMapper publicHolidayMapper;
 
-    @Value("${leaveApplication.calendarific.baseUrl}")
-    private String calendarificBaseUrl;
+    @Value("${calendarific.baseUrl}")
+    String calendarificBaseUrl;
 
-    @Value("${leaveApplication.calendarific.apiKey}")
-    private String calendarificApiKey;
+    @Value("${calendarific.apiKey}")
+    String calendarificApiKey;
 
     public PublicHolidayService(PublicHolidayRepository publicHolidayRepository, PublicHolidayMapper publicHolidayMapper) {
         this.publicHolidayRepository = publicHolidayRepository;
@@ -113,7 +116,7 @@ public class PublicHolidayService {
         publicHolidayRepository.deleteById(id);
     }
 
-    public void reloadData(long year) throws RestClientException, URISyntaxException {
+    public void reloadData(int year) throws RestClientException, URISyntaxException {
         RestTemplate client = new RestTemplate();
 
         StringBuffer sb = new StringBuffer();
@@ -127,13 +130,27 @@ public class PublicHolidayService {
 
         ResponseEntity<GetHolidaysResponseDTO> response = client.getForEntity(new URI(sb.toString()), GetHolidaysResponseDTO.class);
 
+        List<PublicHoliday> holidays = new ArrayList<PublicHoliday>();
+
         for (Holiday holiday : response.getBody().response.holidays) {
             PublicHoliday newRecord = new PublicHoliday();
             newRecord.setName(holiday.name);
             LocalDate date = LocalDate.of(holiday.date.datetime.year, holiday.date.datetime.month, holiday.date.datetime.day);
             newRecord.setDate(date);
-            publicHolidayRepository.save(newRecord);
+            holidays.add(newRecord);
         }
+
+        LocalDate yearEndDate;
+        // Check to see if this is a leap year
+        try {
+            yearEndDate = LocalDate.ofYearDay(year, 366);
+        } catch (DateTimeException e) {
+            yearEndDate = LocalDate.ofYearDay(year, 365);
+        }
+
+        publicHolidayRepository.deleteAllHolidaysForYear(LocalDate.ofYearDay(year, 1), yearEndDate);
+
+        publicHolidayRepository.saveAll(holidays);
     }
 
     public void calculateWorkingDays() {

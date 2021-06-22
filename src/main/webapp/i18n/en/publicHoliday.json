@@ -6,7 +6,8 @@
         "refreshListLabel": "Refresh list",
         "createLabel": "Create a new Public Holiday",
         "createOrEditLabel": "Create or edit a Public Holiday",
-        "notFound": "No Public Holidays found"
+        "notFound": "No Public Holidays found",
+        "reloadHolidays": "Reload Public Holidays"
       },
       "created": "A new Public Holiday is created with identifier {{ param }}",
       "updated": "A Public Holiday is updated with identifier {{ param }}",

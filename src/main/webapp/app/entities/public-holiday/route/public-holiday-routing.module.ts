@@ -33,6 +33,14 @@ const publicHolidayRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
   {
+    path: 'reload',
+    component: PublicHolidayUpdateComponent,
+    resolve: {
+      publicHoliday: PublicHolidayRoutingResolveService,
+    },
+    canActivate: [UserRouteAccessService],
+  },
+  {
     path: ':id/edit',
     component: PublicHolidayUpdateComponent,
     resolve: {

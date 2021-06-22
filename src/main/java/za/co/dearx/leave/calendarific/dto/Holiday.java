@@ -11,4 +11,12 @@ public class Holiday {
     public List<String> type;
     public String locations;
     public String states;
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (!(obj instanceof Holiday)) return false;
+        Holiday other = (Holiday) obj;
+        return this.date.iso.equals(other.date.iso);
+    }
 }
