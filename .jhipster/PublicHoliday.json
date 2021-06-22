@@ -1,0 +1,25 @@
+{
+  "name": "PublicHoliday",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "date",
+      "fieldType": "LocalDate"
+    }
+  ],
+  "relationships": [],
+  "javadoc": "An observed public holiday represents a date in South Africa where the holiday causes a work day to be impacted.",
+  "entityTableName": "public_holiday",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceClass",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20210620184949"
+}
