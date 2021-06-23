@@ -225,17 +225,17 @@ public class PublicHolidayResource {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/public-holidays/working-days")
-    public ResponseEntity<Integer> calculateWorkingDays(@RequestParam LocalDate startDate, @RequestParam LocalDate endDate) {
+    @GetMapping("/public-holidays/work-days")
+    public ResponseEntity<Integer> calculateWorkDays(@RequestParam LocalDate startDate, @RequestParam LocalDate endDate) {
         log.debug("REST request to reload PublicHolidays");
+        int workingDays = 0;
         try {
-            int workingDays = publicHolidayService.calculateWorkingDays(startDate, endDate);
-            System.out.println(workingDays);
+            workingDays = publicHolidayService.calculateWorkDays(startDate, endDate);
         } catch (RestClientException e) {
             log.error("Could not reload public holiday data from Calendarrific API", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
         // TODO: Ensure correct response is returned
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().body(workingDays);
     }
 }

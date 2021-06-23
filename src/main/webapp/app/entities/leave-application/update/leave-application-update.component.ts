@@ -16,6 +16,7 @@ import { ILeaveStatus } from 'app/entities/leave-status/leave-status.model';
 import { LeaveStatusService } from 'app/entities/leave-status/service/leave-status.service';
 import { IStaff } from 'app/entities/staff/staff.model';
 import { StaffService } from 'app/entities/staff/service/staff.service';
+import { PublicHolidayService } from '../../public-holiday/service/public-holiday.service';
 
 @Component({
   selector: 'jhi-leave-application-update',
@@ -47,7 +48,8 @@ export class LeaveApplicationUpdateComponent implements OnInit {
     protected leaveStatusService: LeaveStatusService,
     protected staffService: StaffService,
     protected activatedRoute: ActivatedRoute,
-    protected fb: FormBuilder
+    protected fb: FormBuilder,
+    protected publicHolidayService: PublicHolidayService
   ) {}
 
   ngOnInit(): void {
@@ -69,11 +71,14 @@ export class LeaveApplicationUpdateComponent implements OnInit {
   onChanges(): void {
     this.editForm.get('startDate')?.valueChanges.subscribe(val => {
       const endDate = this.editForm.get(['endDate'])!.value;
-      this.editForm.get(['days'])!.setValue(val && endDate ? +endDate.diff(val, 'day') + 1 : 0);
+      // this.editForm.get(['days'])!.setValue(val && endDate ? +endDate.diff(val, 'day') + 1 : 0);
     });
     this.editForm.get('endDate')?.valueChanges.subscribe(val => {
       const startDate = this.editForm.get(['startDate'])!.value;
-      this.editForm.get(['days'])!.setValue(startDate && val ? +val.diff(startDate, 'day') + 1 : 0);
+      this.publicHolidayService.calculdateWorkDaysBetween(startDate, val).subscribe((res: HttpResponse<number>) => {
+        this.editForm.get(['days'])!.setValue(res.body);
+      });
+      // this.editForm.get(['days'])!.setValue(startDate && val ? +val.diff(startDate, 'day') + 1 : 0);
     });
   }
 

@@ -61,6 +61,13 @@ export class PublicHolidayService {
     return this.http.get(`${this.resourceUrl}/reload`, { observe: 'response' });
   }
 
+  calculdateWorkDaysBetween(startDate: dayjs.Dayjs, endDate: dayjs.Dayjs): Observable<HttpResponse<number>> {
+    return this.http.get<number>(
+      `${this.resourceUrl}/work-days?startDate=${startDate.format('YYYY-MM-DD')}&endDate=${endDate.format('YYYY-MM-DD')}`,
+      { observe: 'response' }
+    );
+  }
+
   addPublicHolidayToCollectionIfMissing(
     publicHolidayCollection: IPublicHoliday[],
     ...publicHolidaysToCheck: (IPublicHoliday | null | undefined)[]
