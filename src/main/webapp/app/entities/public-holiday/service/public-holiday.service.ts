@@ -57,8 +57,8 @@ export class PublicHolidayService {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 
-  reload(year: number): Observable<HttpResponse<{}>> {
-    return this.http.get(`${this.resourceUrl}/reload?yearToLoad=${year}`, { observe: 'response' });
+  reload(): Observable<HttpResponse<{}>> {
+    return this.http.get(`${this.resourceUrl}/reload`, { observe: 'response' });
   }
 
   addPublicHolidayToCollectionIfMissing(

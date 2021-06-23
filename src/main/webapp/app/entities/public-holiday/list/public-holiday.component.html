@@ -17,16 +17,26 @@
         <fa-icon icon="plus"></fa-icon>
         <span jhiTranslate="leaveApplicationApp.publicHoliday.home.createLabel"> Create a new Public Holiday </span>
       </button>
-
+    </div>
+    <div class="form-group" *jhiHasAnyAuthority="'ROLE_ADMIN'">
       <button
         id="jh-reload-publicHolidays"
         data-cy="reloadPublicHolidaysButton"
         class="btn btn-primary jh-create-entity create-public-holiday"
-        (click)="reload(2021)"
+        (click)="reload()"
       >
         <fa-icon icon="plus"></fa-icon>
         <span jhiTranslate="leaveApplicationApp.publicHoliday.home.reloadHolidays">Reload Public Holidays </span>
       </button>
+
+      <!-- <label class="form-control-label"
+        for="field_year">Year to reload</label>
+      <select id="field_year" data-cy="year" name="year">
+        <option
+          *ngFor="let year of surroundingFiveYears;">
+          {{ year }}
+        </option>
+      </select> -->
     </div>
   </h2>
 
@@ -42,12 +52,13 @@
     <table class="table table-striped" aria-describedby="page-heading">
       <thead>
         <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" [callback]="loadPage.bind(this)">
-          <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort"></fa-icon></th>
           <th scope="col" jhiSortBy="name">
-            <span jhiTranslate="leaveApplicationApp.publicHoliday.name">Name</span> <fa-icon icon="sort"></fa-icon>
+            <span jhiTranslate="leaveApplicationApp.publicHoliday.name">Name</span>
+            <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col" jhiSortBy="date">
-            <span jhiTranslate="leaveApplicationApp.publicHoliday.date">Date</span> <fa-icon icon="sort"></fa-icon>
+            <span jhiTranslate="leaveApplicationApp.publicHoliday.date">Date</span>
+            <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col"></th>
         </tr>
@@ -55,9 +66,8 @@
       <tbody>
         <tr *ngFor="let publicHoliday of publicHolidays; trackBy: trackId" data-cy="entityTable">
           <td>
-            <a [routerLink]="['/public-holiday', publicHoliday.id, 'view']">{{ publicHoliday.id }}</a>
+            <a [routerLink]="['/public-holiday', publicHoliday.id, 'view']">{{ publicHoliday.name }}</a>
           </td>
-          <td>{{ publicHoliday.name }}</td>
           <td>{{ publicHoliday.date | formatMediumDate }}</td>
           <td class="text-right">
             <div class="btn-group">

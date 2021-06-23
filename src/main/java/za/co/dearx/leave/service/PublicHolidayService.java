@@ -5,11 +5,15 @@ import java.net.URISyntaxException;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import liquibase.pro.packaged.iF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.convert.JodaTimeConverters.LocalDateTimeToDateConverter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +46,8 @@ public class PublicHolidayService {
 
     @Value("${calendarific.apiKey}")
     String calendarificApiKey;
+
+    private static final String OBSERVED_KEYWORD = "observed";
 
     public PublicHolidayService(PublicHolidayRepository publicHolidayRepository, PublicHolidayMapper publicHolidayMapper) {
         this.publicHolidayRepository = publicHolidayRepository;
@@ -130,14 +136,29 @@ public class PublicHolidayService {
 
         ResponseEntity<GetHolidaysResponseDTO> response = client.getForEntity(new URI(sb.toString()), GetHolidaysResponseDTO.class);
 
-        List<PublicHoliday> holidays = new ArrayList<PublicHoliday>();
+        List<PublicHoliday> dirtyList = new ArrayList<PublicHoliday>();
+        List<PublicHoliday> publicHolidays = new ArrayList<PublicHoliday>();
+        List<String> observedDayStrings = new ArrayList<String>();
 
         for (Holiday holiday : response.getBody().response.holidays) {
             PublicHoliday newRecord = new PublicHoliday();
+            String holidayNameString = holiday.name;
+
+            // Add observed days to a list so we can remove the "unobserved" ones later
+            if (holidayNameString.contains(OBSERVED_KEYWORD)) {
+                observedDayStrings.add(holidayNameString.replace(OBSERVED_KEYWORD, "").stripTrailing());
+            }
+
             newRecord.setName(holiday.name);
             LocalDate date = LocalDate.of(holiday.date.datetime.year, holiday.date.datetime.month, holiday.date.datetime.day);
             newRecord.setDate(date);
-            holidays.add(newRecord);
+            dirtyList.add(newRecord);
+        }
+
+        for (PublicHoliday holiday : dirtyList) {
+            if (!observedDayStrings.contains(holiday.getName())) {
+                publicHolidays.add(holiday);
+            }
         }
 
         LocalDate yearEndDate;
@@ -150,10 +171,30 @@ public class PublicHolidayService {
 
         publicHolidayRepository.deleteAllHolidaysForYear(LocalDate.ofYearDay(year, 1), yearEndDate);
 
-        publicHolidayRepository.saveAll(holidays);
+        publicHolidayRepository.saveAll(publicHolidays);
     }
 
-    public void calculateWorkingDays() {
+    public void reloadSurrounding5Years() throws RestClientException, URISyntaxException {
+        int currentYearLong = LocalDate.now().getYear();
+
+        for (int i = currentYearLong - 5; i <= currentYearLong + 5; i++) {
+            reloadData(i);
+        }
+    }
+
+    public List<LocalDate> getHolidaysBetween(LocalDate startDate, LocalDate endDate) {
+        List<LocalDate> datesBetween = new ArrayList<LocalDate>();
+        List<PublicHoliday> publicHolidaysBetween = publicHolidayRepository.findAllholidaysBetween(startDate, endDate).get();
+
+        for (PublicHoliday publicHoliday : publicHolidaysBetween) {
+            datesBetween.add(publicHoliday.getDate());
+        }
+
+        return datesBetween;
+    }
+
+    public void calculateWorkingDays(LocalDate startDate, LocalDate endDate) {
+        List<LocalDate> holidaysBetweenDates = getHolidaysBetween(startDate, endDate);
         // TODO Theunis' area
         // Get a range of dates between the passed in dates
         // Exclude weekends
