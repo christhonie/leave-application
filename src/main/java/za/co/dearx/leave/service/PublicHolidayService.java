@@ -193,8 +193,25 @@ public class PublicHolidayService {
         return datesBetween;
     }
 
-    public void calculateWorkingDays(LocalDate startDate, LocalDate endDate) {
+    public Integer calculateWorkingDays(LocalDate startDate, LocalDate endDate) {
         List<LocalDate> holidaysBetweenDates = getHolidaysBetween(startDate, endDate);
+        List<LocalDate> daysBetweenDates = new ArrayList<LocalDate>();
+        while (!startDate.isAfter(endDate)) {
+            daysBetweenDates.add(startDate);
+            startDate = startDate.plusDays(1);
+        }
+        for (LocalDate date : daysBetweenDates) {
+            // exclude weekends
+            if (date.getDayOfWeek().toString().equals("SUNDAY") || date.getDayOfWeek().toString().equals("SATERDAY")) {
+                daysBetweenDates.remove(date);
+            }
+            // exclude holidays
+            if (holidaysBetweenDates.contains(date)) {
+                daysBetweenDates.remove(date);
+            }
+        }
+        // return working days
+        return daysBetweenDates.size();
         // TODO Theunis' area
         // Get a range of dates between the passed in dates
         // Exclude weekends

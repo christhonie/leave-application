@@ -229,7 +229,8 @@ public class PublicHolidayResource {
     public ResponseEntity<Integer> calculateWorkingDays(@RequestParam LocalDate startDate, @RequestParam LocalDate endDate) {
         log.debug("REST request to reload PublicHolidays");
         try {
-            publicHolidayService.calculateWorkingDays(startDate, endDate);
+            int workingDays = publicHolidayService.calculateWorkingDays(startDate, endDate);
+            System.out.println(workingDays);
         } catch (RestClientException e) {
             log.error("Could not reload public holiday data from Calendarrific API", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
