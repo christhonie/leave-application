@@ -60,7 +60,7 @@
           <th scope="col" jhiSortBy="gender">
             <span jhiTranslate="leaveApplicationApp.staff.gender">Gender</span> <fa-icon icon="sort"></fa-icon>
           </th>
-          <th scope="col" jhiSortBy="annualLeaveEntitlement">
+          <th scope="col" jhiSortBy="annualLeaveEntitlement" *jhiHasAnyAuthority="'ROLE_ADMIN'">
             <span jhiTranslate="leaveApplicationApp.staff.annualLeaveEntitlement">Annual Leave Entitlement</span>
             <fa-icon icon="sort"></fa-icon>
           </th>
