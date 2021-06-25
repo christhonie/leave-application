@@ -10,8 +10,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import za.co.dearx.leave.domain.EntitlementValue;
+import za.co.dearx.leave.domain.LeaveEntitlement;
+import za.co.dearx.leave.domain.LeaveType;
 import za.co.dearx.leave.domain.Staff;
-import za.co.dearx.leave.repository.EntitlementValueRepository;
+import za.co.dearx.leave.repository.LeaveEntitlementRepository;
+import za.co.dearx.leave.repository.LeaveTypeRepository;
 import za.co.dearx.leave.repository.StaffRepository;
 import za.co.dearx.leave.service.dto.EntitlementValueDTO;
 import za.co.dearx.leave.service.dto.StaffDTO;
@@ -28,13 +31,21 @@ public class StaffService {
 
     private final StaffRepository staffRepository;
 
-    private final EntitlementValueRepository entitlementValueRepository;
+    private final LeaveTypeRepository leaveTypeRepository;
+
+    private final LeaveEntitlementRepository leaveEntitlementRepository;
 
     private final StaffMapper staffMapper;
 
-    public StaffService(StaffRepository staffRepository, StaffMapper staffMapper, EntitlementValueRepository entitlementValueRepository) {
+    public StaffService(
+        StaffRepository staffRepository,
+        StaffMapper staffMapper,
+        LeaveEntitlementRepository leaveEntitlementRepository,
+        LeaveTypeRepository leaveTypeRepository
+    ) {
         this.staffRepository = staffRepository;
-        this.entitlementValueRepository = entitlementValueRepository;
+        this.leaveTypeRepository = leaveTypeRepository;
+        this.leaveEntitlementRepository = leaveEntitlementRepository;
         this.staffMapper = staffMapper;
     }
 
@@ -75,16 +86,10 @@ public class StaffService {
     public StaffDTO updateLeaveEntitlement(StaffDTO staffDTO) {
         log.debug("Add Leave Entitlement Value of Staff Member: {}", staffDTO);
 
-        /**
-         *
-         * Update staffDTO to include leave entitlement Step 1: Find the staff member in
-         * the Entitlement Value Step 2: Grab the entitlement value from the DTO Step 3:
-         * Populate the StaffDTO with the leave entitlement value
-         */
-
-        EntitlementValue entitlementValue = entitlementValueRepository.findByStaff(staffMapper.toEntity(staffDTO));
-
-        staffDTO.setAnnualLeaveEntitlement(entitlementValue.getEntitlementValue());
+        Staff staff = staffMapper.toEntity(staffDTO);
+        LeaveType leaveType = leaveTypeRepository.findByName("Annual Leave");
+        LeaveEntitlement leaveEntitlement = leaveEntitlementRepository.findByStaffandLeaveType(staff.getId(), leaveType.getId());
+        staffDTO.setAnnualLeaveEntitlement(leaveEntitlement.getDays());
 
         return staffDTO;
     }
