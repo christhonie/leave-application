@@ -71,11 +71,9 @@ public class StaffDTO implements Serializable {
     private String gender;
 
     /**
-     * The number of annual leave days an employee is entitled to according to there employment contract,\nThis should be populated using {@link EntitlementValue} table according to the linked user
+     * The number of annual leave days an employee is entitled to according to there employment contract,
+     * This should be populated using {@link LeaveEntitlement} table according to the linked staff and leaveType
      */
-    @ApiModelProperty(
-        value = "The number of annual leave days an employee is entitled to according to there employment contract,\nThis should be populated using {@link EntitlementValue} table according to the linked user"
-    )
     private BigDecimal annualLeaveEntitlement;
 
     private UserDTO user;
