@@ -72,7 +72,6 @@ public class StaffDTO implements Serializable {
 
     /**
      * The number of annual leave days an employee is entitled to according to there employment contract,
-     * This should be populated using {@link LeaveEntitlement} table according to the linked staff and leaveType
      */
     private BigDecimal annualLeaveEntitlement;
 
