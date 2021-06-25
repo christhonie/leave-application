@@ -3,6 +3,7 @@ package za.co.dearx.leave.service.dto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Objects;
@@ -75,7 +76,7 @@ public class StaffDTO implements Serializable {
     @ApiModelProperty(
         value = "The number of annual leave days an employee is entitled to according to there employment contract,\nThis should be populated using {@link EntitlementValue} table according to the linked user"
     )
-    private Long annualLeaveEntitlement;
+    private BigDecimal annualLeaveEntitlement;
 
     private UserDTO user;
 
@@ -161,11 +162,11 @@ public class StaffDTO implements Serializable {
         this.gender = gender;
     }
 
-    public Long getAnnualLeaveEntitlement() {
+    public BigDecimal getAnnualLeaveEntitlement() {
         return annualLeaveEntitlement;
     }
 
-    public void setAnnualLeaveEntitlement(Long annualLeaveEntitlement) {
+    public void setAnnualLeaveEntitlement(BigDecimal annualLeaveEntitlement) {
         this.annualLeaveEntitlement = annualLeaveEntitlement;
     }
 

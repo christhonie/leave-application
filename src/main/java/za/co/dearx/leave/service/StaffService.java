@@ -1,15 +1,17 @@
 package za.co.dearx.leave.service;
 
+import camundajar.impl.scala.Option;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import camundajar.impl.scala.Option;
+import za.co.dearx.leave.domain.EntitlementValue;
 import za.co.dearx.leave.domain.Staff;
+import za.co.dearx.leave.repository.EntitlementValueRepository;
 import za.co.dearx.leave.repository.StaffRepository;
 import za.co.dearx.leave.service.dto.EntitlementValueDTO;
 import za.co.dearx.leave.service.dto.StaffDTO;
@@ -26,10 +28,13 @@ public class StaffService {
 
     private final StaffRepository staffRepository;
 
+    private final EntitlementValueRepository entitlementValueRepository;
+
     private final StaffMapper staffMapper;
 
-    public StaffService(StaffRepository staffRepository, StaffMapper staffMapper) {
+    public StaffService(StaffRepository staffRepository, StaffMapper staffMapper, EntitlementValueRepository entitlementValueRepository) {
         this.staffRepository = staffRepository;
+        this.entitlementValueRepository = entitlementValueRepository;
         this.staffMapper = staffMapper;
     }
 
@@ -66,32 +71,24 @@ public class StaffService {
             .map(staffRepository::save)
             .map(staffMapper::toDto);
     }
-    
-    public Optional<StaffDTO> updateLeaveEntitlement(StaffDTO staffDTO){  
-        log.debug("Add Leave Entitlement Value of Staff Member: {}", staffDTO);  	
 
-    	/**
-    	 * 
-    	 *  Update staffDTO to include leave entitlement
-    	 *  Step 1: Find the staff member in the Entitlement Value
-    	 *  Step 2: Grab the entitlement value from the DTO
-    	 *  Step 3: Populate the StaffDTO with the leave entitlement value  
-    	 */   	
-        return staffRepository
-                .findById(staffDTO.getId())
-                .map(
-                    existingStaff -> {
-                        staffMapper.partialUpdate(existingStaff, staffDTO);
-                        return existingStaff;
-                    }
-                )
-                .map(staffRepository::save)
-                .map(staffMapper::toDto);
-        
-//        return staffDTO;
-        }
-        
-     
+    public Optional<StaffDTO> updateLeaveEntitlement(StaffDTO staffDTO) {
+        log.debug("Add Leave Entitlement Value of Staff Member: {}", staffDTO);
+
+        /**
+         *
+         * Update staffDTO to include leave entitlement Step 1: Find the staff member in
+         * the Entitlement Value Step 2: Grab the entitlement value from the DTO Step 3:
+         * Populate the StaffDTO with the leave entitlement value
+         */
+
+        EntitlementValue entitlementValue = entitlementValueRepository.findByStaff(staffMapper.toEntity(staffDTO));
+
+        staffDTO.setAnnualLeaveEntitlement(entitlementValue.getEntitlementValue());
+
+        return Optional.of(staffDTO);
+    }
+
     /**
      * Get all the staff.
      *
