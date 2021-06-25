@@ -1,4 +1,4 @@
-package za.co.dearx.leave.calendarific.dto;
+package za.co.dearx.leave.client.calendarific.dto;
 
 public class Country {
 
