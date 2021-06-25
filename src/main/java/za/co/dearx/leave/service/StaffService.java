@@ -72,7 +72,7 @@ public class StaffService {
             .map(staffMapper::toDto);
     }
 
-    public Optional<StaffDTO> updateLeaveEntitlement(StaffDTO staffDTO) {
+    public StaffDTO updateLeaveEntitlement(StaffDTO staffDTO) {
         log.debug("Add Leave Entitlement Value of Staff Member: {}", staffDTO);
 
         /**
@@ -86,7 +86,7 @@ public class StaffService {
 
         staffDTO.setAnnualLeaveEntitlement(entitlementValue.getEntitlementValue());
 
-        return Optional.of(staffDTO);
+        return staffDTO;
     }
 
     /**
