@@ -7,6 +7,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -74,9 +75,9 @@ class StaffResourceIT {
     private static final String DEFAULT_GENDER = "AA";
     private static final String UPDATED_GENDER = "BB";
 
-    private static final Long DEFAULT_ANNUAL_LEAVE_ENTITLEMENT = 1L;
-    private static final Long UPDATED_ANNUAL_LEAVE_ENTITLEMENT = 2L;
-    private static final Long SMALLER_ANNUAL_LEAVE_ENTITLEMENT = 1L - 1L;
+    private static final BigDecimal DEFAULT_ANNUAL_LEAVE_ENTITLEMENT = new BigDecimal(1);
+    private static final BigDecimal UPDATED_ANNUAL_LEAVE_ENTITLEMENT = new BigDecimal(2);
+    private static final BigDecimal SMALLER_ANNUAL_LEAVE_ENTITLEMENT = new BigDecimal(1 - 1);
 
     private static final String ENTITY_API_URL = "/api/staff";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";

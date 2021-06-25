@@ -3,6 +3,7 @@ package za.co.dearx.leave.service.criteria;
 import java.io.Serializable;
 import java.util.Objects;
 import tech.jhipster.service.Criteria;
+import tech.jhipster.service.filter.BigDecimalFilter;
 import tech.jhipster.service.filter.BooleanFilter;
 import tech.jhipster.service.filter.DoubleFilter;
 import tech.jhipster.service.filter.Filter;
@@ -45,7 +46,7 @@ public class StaffCriteria implements Serializable, Criteria {
 
     private StringFilter gender;
 
-    private LongFilter annualLeaveEntitlement;
+    private BigDecimalFilter annualLeaveEntitlement;
 
     private LongFilter userId;
 
@@ -224,18 +225,18 @@ public class StaffCriteria implements Serializable, Criteria {
         this.gender = gender;
     }
 
-    public LongFilter getAnnualLeaveEntitlement() {
+    public BigDecimalFilter getAnnualLeaveEntitlement() {
         return annualLeaveEntitlement;
     }
 
-    public LongFilter annualLeaveEntitlement() {
+    public BigDecimalFilter annualLeaveEntitlement() {
         if (annualLeaveEntitlement == null) {
-            annualLeaveEntitlement = new LongFilter();
+            annualLeaveEntitlement = new BigDecimalFilter();
         }
         return annualLeaveEntitlement;
     }
 
-    public void setAnnualLeaveEntitlement(LongFilter annualLeaveEntitlement) {
+    public void setAnnualLeaveEntitlement(BigDecimalFilter annualLeaveEntitlement) {
         this.annualLeaveEntitlement = annualLeaveEntitlement;
     }
 

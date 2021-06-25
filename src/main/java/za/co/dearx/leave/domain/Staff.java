@@ -2,6 +2,7 @@ package za.co.dearx.leave.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -80,7 +81,7 @@ public class Staff implements Serializable {
      * The number of annual leave days an employee is entitled to according to there employment contract,\nThis should be populated using {@link EntitlementValue} table according to the linked user
      */
     @Column(name = "annual_leave_entitlement")
-    private Long annualLeaveEntitlement;
+    private BigDecimal annualLeaveEntitlement;
 
     /**
      * The system user, used to access the front-end applications, linked to the person.
@@ -231,16 +232,16 @@ public class Staff implements Serializable {
         this.gender = gender;
     }
 
-    public Long getAnnualLeaveEntitlement() {
+    public BigDecimal getAnnualLeaveEntitlement() {
         return this.annualLeaveEntitlement;
     }
 
-    public Staff annualLeaveEntitlement(Long annualLeaveEntitlement) {
+    public Staff annualLeaveEntitlement(BigDecimal annualLeaveEntitlement) {
         this.annualLeaveEntitlement = annualLeaveEntitlement;
         return this;
     }
 
-    public void setAnnualLeaveEntitlement(Long annualLeaveEntitlement) {
+    public void setAnnualLeaveEntitlement(BigDecimal annualLeaveEntitlement) {
         this.annualLeaveEntitlement = annualLeaveEntitlement;
     }
 
