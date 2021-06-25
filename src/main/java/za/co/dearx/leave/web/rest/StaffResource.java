@@ -182,6 +182,14 @@ public class StaffResource {
         Optional<StaffDTO> staffDTO = staffService.findOne(id);
         return ResponseUtil.wrapOrNotFound(staffDTO);
     }
+    
+    @GetMapping("/staffEntitlement/{id}")
+    public ResponseEntity<Optional<StaffDTO>> getStaffEntitlement(@PathVariable Long id) {
+    	Optional<StaffDTO> staffDTO;
+        staffDTO = staffService.findOne(id);
+        staffDTO = staffService.updateLeaveEntitlement(staffDTO);
+        return ResponseEntity.ok().body(staffDTO);
+    }
 
     /**
      * {@code DELETE  /staff/:id} : delete the "id" staff.

@@ -7,8 +7,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import camundajar.impl.scala.Option;
 import za.co.dearx.leave.domain.Staff;
 import za.co.dearx.leave.repository.StaffRepository;
+import za.co.dearx.leave.service.dto.EntitlementValueDTO;
 import za.co.dearx.leave.service.dto.StaffDTO;
 import za.co.dearx.leave.service.mapper.StaffMapper;
 
@@ -63,7 +66,32 @@ public class StaffService {
             .map(staffRepository::save)
             .map(staffMapper::toDto);
     }
+    
+    public Optional<StaffDTO> updateLeaveEntitlement(StaffDTO staffDTO){  
+        log.debug("Add Leave Entitlement Value of Staff Member: {}", staffDTO);  	
 
+    	/**
+    	 * 
+    	 *  Update staffDTO to include leave entitlement
+    	 *  Step 1: Find the staff member in the Entitlement Value
+    	 *  Step 2: Grab the entitlement value from the DTO
+    	 *  Step 3: Populate the StaffDTO with the leave entitlement value  
+    	 */   	
+        return staffRepository
+                .findById(staffDTO.getId())
+                .map(
+                    existingStaff -> {
+                        staffMapper.partialUpdate(existingStaff, staffDTO);
+                        return existingStaff;
+                    }
+                )
+                .map(staffRepository::save)
+                .map(staffMapper::toDto);
+        
+//        return staffDTO;
+        }
+        
+     
     /**
      * Get all the staff.
      *
