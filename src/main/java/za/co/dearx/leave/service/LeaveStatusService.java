@@ -1,14 +1,20 @@
 package za.co.dearx.leave.service;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+
+import org.joda.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import za.co.dearx.leave.domain.LeaveStatus;
 import za.co.dearx.leave.repository.LeaveStatusRepository;
+import za.co.dearx.leave.service.dto.LeaveApplicationDTO;
 import za.co.dearx.leave.service.dto.LeaveStatusDTO;
 import za.co.dearx.leave.service.exception.NotFoundException;
 import za.co.dearx.leave.service.mapper.LeaveStatusMapper;
@@ -107,5 +113,21 @@ public class LeaveStatusService {
 
     public LeaveStatus getDraft() throws NotFoundException {
         return findEntityByName("Draft").orElseThrow(() -> new NotFoundException("LeaveStatus", "Draft status not found"));
+    }
+
+    @Scheduled(cron = "5 0 * * *")
+    public void scheduleTaskUsingCronExpression() {
+        LeaveApplicationDTO leaveapp = new LeaveApplicationDTO();
+        LocalDate currentDate = LocalDate.now();
+        LocalDate startDate = leaveapp.getStartDate();
+        private List<LeaveApplicationDTO> status = null;
+
+        for (leaveapp: status
+             ) {
+            if (startDate.isAfter(currentDate))
+            {
+                leaveapp.setLeaveStatus("status");
+            }
+        }
     }
 }
