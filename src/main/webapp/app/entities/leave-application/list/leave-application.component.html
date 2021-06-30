@@ -100,6 +100,13 @@
                 <fa-icon icon="times"></fa-icon>
                 <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
               </button>
+
+              <button *ngIf="leaveApplication.leaveStatus?.name === 'Deleted' || leaveApplication.leaveStatus?.name === 'Rejected'"
+                type="submit" (click)="resubmitLeave(leaveApplication.id)" class="btn btn-secondary btn-sm">
+                <fa-icon icon="sync"></fa-icon>
+                <span class="d-none d-md-inline">Resubmit</span>
+              </button>
+
             </div>
           </td>
         </tr>

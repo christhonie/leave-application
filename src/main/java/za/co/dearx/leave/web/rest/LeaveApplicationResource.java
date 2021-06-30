@@ -265,4 +265,20 @@ public class LeaveApplicationResource {
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
+    
+    /**
+     * {@code Get  /leave-applications/resubmit} : get the "id" leaveApplication for resubmission.
+     *
+     * @param id the id of the leaveApplicationDTO to retrieve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the leaveApplicationDTO, or with status {@code 404 (Not Found)}.
+     */
+    @GetMapping("/leave-applications/resubmit/{id}")
+    public ResponseEntity<LeaveApplicationDTO> resubmitLeaveApp(@PathVariable Long id) {
+        log.debug("REST request to resubmit LeaveApplication : {}", id);
+        Optional<LeaveApplicationDTO> leaveApplicationDTO = leaveApplicationService.findOne(id);
+        Optional<LeaveApplicationDTO> newleaveAppDTO = leaveApplicationDTO;
+        newleaveAppDTO.get().setId(null);
+        newleaveAppDTO.get().setLeaveStatus(null);
+        return ResponseUtil.wrapOrNotFound(newleaveAppDTO);
+    }
 }

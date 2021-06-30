@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
 
 import * as dayjs from 'dayjs';
@@ -27,6 +27,7 @@ export class LeaveApplicationUpdateComponent implements OnInit {
   leaveTypesSharedCollection: ILeaveType[] = [];
   leaveStatusesSharedCollection: ILeaveStatus[] = [];
   staffSharedCollection: IStaff[] = [];
+  newLeaveApp: ILeaveApplication | undefined;
 
   editForm = this.fb.group({
     id: [],
@@ -51,18 +52,21 @@ export class LeaveApplicationUpdateComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.activatedRoute.data.subscribe(({ leaveApplication }) => {
-      if (leaveApplication.id === undefined) {
+    combineLatest(this.activatedRoute.data, this.activatedRoute.queryParamMap).subscribe(([leaveApplication, params]) => {
+      if (params.get('newLeaveApp')) {
+        let resubForm : any;
+        // eslint-disable-next-line prefer-const
+        resubForm = params.get('newLeaveApp');
+        this.updateForm(resubForm);
+        this.loadRelationshipsOptions();
+      } else if (leaveApplication.id === undefined ) {
         const today = dayjs().startOf('day');
         leaveApplication.appliedDate = today;
         leaveApplication.updateDate = today;
+        this.updateForm(leaveApplication);
+        this.loadRelationshipsOptions();
       }
-
-      this.updateForm(leaveApplication);
-
-      this.loadRelationshipsOptions();
-    });
-
+    }); 
     this.onChanges();
   }
 

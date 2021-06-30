@@ -61,6 +61,12 @@ export class LeaveApplicationService {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 
+  resubmit(id: number): Observable<EntityResponseType> {
+    return this.http
+      .get<ILeaveApplication>(`${this.resourceUrl}/resubmit/${id}`, { observe: 'response' })
+      .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
+  }
+
   addLeaveApplicationToCollectionIfMissing(
     leaveApplicationCollection: ILeaveApplication[],
     ...leaveApplicationsToCheck: (ILeaveApplication | null | undefined)[]

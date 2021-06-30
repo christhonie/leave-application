@@ -23,6 +23,7 @@ export class LeaveApplicationComponent implements OnInit {
   predicate!: string;
   ascending!: boolean;
   ngbPaginationPage = 1;
+  newLeaveApp: ILeaveApplication | undefined;
 
   constructor(
     protected leaveApplicationService: LeaveApplicationService,
@@ -72,6 +73,14 @@ export class LeaveApplicationComponent implements OnInit {
     });
   }
 
+  resubmitLeave(leaveAppId: any): void {
+    let newLeaveApp: any;
+     this.leaveApplicationService.resubmit(leaveAppId)
+      .subscribe((res: HttpResponse<ILeaveApplication>) => {
+                  this.newLeaveApp = res.body ?? undefined;});
+    this.router.navigate(['/leave-application', 'new'], { queryParams: { newLeaveApp } });
+  }
+
   protected sort(): string[] {
     const result = [this.predicate + ',' + (this.ascending ? 'asc' : 'desc')];
     if (this.predicate !== 'startDate') {
@@ -114,4 +123,5 @@ export class LeaveApplicationComponent implements OnInit {
   protected onError(): void {
     this.ngbPaginationPage = this.page ?? 1;
   }
+
 }
