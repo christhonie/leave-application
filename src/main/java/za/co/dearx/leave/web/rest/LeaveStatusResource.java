@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -201,5 +200,12 @@ public class LeaveStatusResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+    
+    @GetMapping("/leave-statuses/runScheduledTask")
+    public void runScheduledTask() {
+        log.debug("REST request to run scheduled task to check Leave application's start date");
+        leaveStatusService.scheduleTaskUsingCronExpression();
+        
     }
 }
