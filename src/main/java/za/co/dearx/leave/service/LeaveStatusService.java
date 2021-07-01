@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import za.co.dearx.leave.domain.LeaveApplication;
 import za.co.dearx.leave.domain.LeaveStatus;
 import za.co.dearx.leave.repository.LeaveStatusRepository;
 import za.co.dearx.leave.service.dto.LeaveApplicationDTO;
@@ -31,10 +33,13 @@ public class LeaveStatusService {
     private final LeaveStatusRepository leaveStatusRepository;
 
     private final LeaveStatusMapper leaveStatusMapper;
+    
+    private final LeaveApplicationService leaveAppService;
 
-    public LeaveStatusService(LeaveStatusRepository leaveStatusRepository, LeaveStatusMapper leaveStatusMapper) {
+    public LeaveStatusService(LeaveStatusRepository leaveStatusRepository, LeaveStatusMapper leaveStatusMapper, LeaveApplicationService leaveAppService) {
         this.leaveStatusRepository = leaveStatusRepository;
         this.leaveStatusMapper = leaveStatusMapper;
+        this.leaveAppService = leaveAppService;
     }
 
     /**
@@ -117,17 +122,26 @@ public class LeaveStatusService {
 
     @Scheduled(cron = "5 0 * * *")
     public void scheduleTaskUsingCronExpression() {
-        LeaveApplicationDTO leaveapp = new LeaveApplicationDTO();
+    	log.info("[Scheduled Task running to update Leave Statues]");
         LocalDate currentDate = LocalDate.now();
-        LocalDate startDate = leaveapp.getStartDate();
-        private List<LeaveApplicationDTO> status = null;
+        
+        Page<LeaveApplicationDTO> allLeaveApps = this.leaveAppService.findAll(null);
+        List<LeaveApplicationDTO> leaveAppList = allLeaveApps.getContent();
 
-        for (leaveapp: status
-             ) {
-            if (startDate.isAfter(currentDate))
+        for (LeaveApplicationDTO leaveApp: leaveAppList) {
+            if (leaveApp.getStartDate().isAfter(currentDate) && leaveApp.getLeaveStatus().getName().contains("Approved"))
             {
-                leaveapp.setLeaveStatus("status");
+            	log.info("Scheduled Task running to update Leave Status for: {}", leaveApp.toString());
+            	try {
+					LeaveApplication updatedLeaveApp = this.leaveAppService.updateStatus(leaveApp.getId(), "Taken");
+					log.info("Scheduled Task updated Leave Status for: {}", updatedLeaveApp.toString());
+				} catch (NotFoundException e) {
+					e.printStackTrace();
+				}
+            } else {
+            	continue;
             }
         }
+        log.info("[Scheduled Task Complete]");
     }
 }
