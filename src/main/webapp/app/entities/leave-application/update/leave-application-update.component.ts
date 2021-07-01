@@ -53,10 +53,10 @@ export class LeaveApplicationUpdateComponent implements OnInit {
 
   ngOnInit(): void {
     combineLatest(this.activatedRoute.data, this.activatedRoute.queryParamMap).subscribe(([leaveApplication, params]) => {
-      if (params.get('newLeaveApp')) {
+      if (leaveApplication.id !== undefined) {
         let resubForm : any;
         // eslint-disable-next-line prefer-const
-        resubForm = params.get('newLeaveApp');
+        resubForm = params.get('resubLeaveApp');
         this.updateForm(resubForm);
         this.loadRelationshipsOptions();
       } else if (leaveApplication.id === undefined ) {

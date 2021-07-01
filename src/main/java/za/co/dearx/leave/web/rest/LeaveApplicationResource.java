@@ -277,8 +277,6 @@ public class LeaveApplicationResource {
         log.debug("REST request to resubmit LeaveApplication : {}", id);
         Optional<LeaveApplicationDTO> leaveApplicationDTO = leaveApplicationService.findOne(id);
         Optional<LeaveApplicationDTO> newleaveAppDTO = leaveApplicationDTO;
-        newleaveAppDTO.get().setId(null);
-        newleaveAppDTO.get().setLeaveStatus(null);
         return ResponseUtil.wrapOrNotFound(newleaveAppDTO);
     }
 }
