@@ -107,7 +107,7 @@
             [ngbTooltip]="'leaveApplicationApp.staff.help.name' | translate"
             >Name</label
           >
-          <input type="text" class="form-control" name="name" id="field_name" data-cy="name" formControlName="name" />
+          <input type="text" class="form-control" name="name" id="field_name" data-cy="name" formControlName="name" readonly="true" />
           <div *ngIf="editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)">
             <small
               class="form-text text-danger"
@@ -238,6 +238,7 @@
             >Annual Leave Entitlement</label
           >
           <input
+            readonly="true"
             type="number"
             class="form-control"
             name="annualLeaveEntitlement"

@@ -76,24 +76,20 @@ public class StaffService {
             .map(
                 existingStaff -> {
                     staffMapper.partialUpdate(existingStaff, staffDTO);
-                    return updateLeaveEntitlement(existingStaff);
+                    return existingStaff;
                 }
             )
             .map(staffRepository::save)
             .map(staffMapper::toDto);
     }
 
-    public Staff updateLeaveEntitlement(Staff staff) {
-        log.debug("Add Leave Entitlement Value of Staff Member: {}", staff);
-
-        LeaveType leaveType = leaveTypeRepository.findByName("Annual Leave");
-        LeaveEntitlement leaveEntitlement = leaveEntitlementRepository.findByStaffandLeaveType(staff.getId(), leaveType.getId());
-        staff.setAnnualLeaveEntitlement(leaveEntitlement.getDays());
-
-        return staff;
-    }
-
-    public StaffDTO updateLeaveEntitlement(StaffDTO staffDTO) {
+    /**
+     * Updates the staff leave entitlement value using the staffDTO
+     *
+     * @param staffDTO
+     * @return
+     */
+    public Optional<StaffDTO> updateLeaveEntitlement(StaffDTO staffDTO) {
         log.debug("Add Leave Entitlement Value of Staff Member: {}", staffDTO);
 
         Staff staff = staffMapper.toEntity(staffDTO);
@@ -101,7 +97,16 @@ public class StaffService {
         LeaveEntitlement leaveEntitlement = leaveEntitlementRepository.findByStaffandLeaveType(staff.getId(), leaveType.getId());
         staffDTO.setAnnualLeaveEntitlement(leaveEntitlement.getDays());
 
-        return staffDTO;
+        return staffRepository
+            .findById(staffDTO.getId())
+            .map(
+                existingStaff -> {
+                    staffMapper.partialUpdate(existingStaff, staffDTO);
+                    return existingStaff;
+                }
+            )
+            .map(staffRepository::save)
+            .map(staffMapper::toDto);
     }
 
     /**

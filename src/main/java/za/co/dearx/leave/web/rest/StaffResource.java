@@ -183,13 +183,34 @@ public class StaffResource {
         return ResponseUtil.wrapOrNotFound(staffDTO);
     }
 
-    @GetMapping("/staffEntitlement/{id}")
+    /**
+     * {@code GET /staff/entitlement/:id} : gets the "id" staff member, with there annual leave entitlement
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/staff/entitlement/{id}")
     public ResponseEntity<StaffDTO> getStaffEntitlement(@PathVariable Long id) {
         StaffDTO staffDTO;
         staffDTO = staffService.findOne(id).orElse(null);
-        staffDTO = staffService.updateLeaveEntitlement(staffDTO);
 
-        return ResponseEntity.ok().body(staffDTO);
+        if (staffDTO.getId() == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!Objects.equals(id, staffDTO.getId())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+
+        if (!staffRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        Optional<StaffDTO> result = staffService.updateLeaveEntitlement(staffDTO);
+
+        return ResponseUtil.wrapOrNotFound(
+            result,
+            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, staffDTO.getId().toString())
+        );
     }
 
     /**

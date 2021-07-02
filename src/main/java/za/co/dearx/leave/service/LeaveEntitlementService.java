@@ -25,9 +25,16 @@ public class LeaveEntitlementService {
 
     private final LeaveEntitlementMapper leaveEntitlementMapper;
 
-    public LeaveEntitlementService(LeaveEntitlementRepository leaveEntitlementRepository, LeaveEntitlementMapper leaveEntitlementMapper) {
+    private final StaffService staffService;
+
+    public LeaveEntitlementService(
+        LeaveEntitlementRepository leaveEntitlementRepository,
+        LeaveEntitlementMapper leaveEntitlementMapper,
+        StaffService staffService
+    ) {
         this.leaveEntitlementRepository = leaveEntitlementRepository;
         this.leaveEntitlementMapper = leaveEntitlementMapper;
+        this.staffService = staffService;
     }
 
     /**
@@ -40,6 +47,8 @@ public class LeaveEntitlementService {
         log.debug("Request to save LeaveEntitlement : {}", leaveEntitlementDTO);
         LeaveEntitlement leaveEntitlement = leaveEntitlementMapper.toEntity(leaveEntitlementDTO);
         leaveEntitlement = leaveEntitlementRepository.save(leaveEntitlement);
+        // Updates the staff member annual leave entitlement value after leave is saved
+        leaveEntitlementDTO.setStaff(staffService.updateLeaveEntitlement(leaveEntitlementDTO.getStaff()).orElse(null));
         return leaveEntitlementMapper.toDto(leaveEntitlement);
     }
 
