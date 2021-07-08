@@ -145,6 +145,7 @@ class StaffResourceIT {
             .gender(DEFAULT_GENDER)
             .annualLeaveEntitlement(DEFAULT_ANNUAL_LEAVE_ENTITLEMENT);
         User user = UserResourceIT.createEntity(em);
+        user.setLogin(UserResourceIT.DEFAULT_LOGIN);
         em.persist(user);
         em.flush();
         staff.setUser(user);
