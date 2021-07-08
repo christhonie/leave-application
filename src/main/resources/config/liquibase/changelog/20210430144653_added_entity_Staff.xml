@@ -52,7 +52,7 @@
             </column>
         </addColumn>
         <addColumn tableName="staff">
-            <column name="annual_leave_entitlement" type="bigint" remarks="The number of annual leave days an employee is entitled to according to there employment contract,\nThis should be populated using {@link EntitlementValue} table according to the linked user">
+            <column name="annual_leave_entitlement" type="decimal" remarks="The number of annual leave days an employee is entitled to according to there employment contract,\nThis should be populated using {@link EntitlementValue} table according to the linked user">
                 <constraints nullable="true" />
             </column>
         </addColumn>
