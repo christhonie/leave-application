@@ -32,6 +32,12 @@
       "javadoc": "The staff member the leave is assigned to.",
       "relationshipName": "staff",
       "otherEntityField": "name"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "leaveDeduction",
+      "otherEntityRelationshipName": "entitlement",
+      "relationshipName": "deduction"
     }
   ],
   "changelogDate": "20210430144953",

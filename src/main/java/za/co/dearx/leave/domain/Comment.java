@@ -34,7 +34,7 @@ public class Comment implements Serializable {
      */
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = { "leaveType", "leaveStatus", "staff" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "leaveType", "leaveStatus", "staff", "deductions" }, allowSetters = true)
     private LeaveApplication leaveApplication;
 
     /**

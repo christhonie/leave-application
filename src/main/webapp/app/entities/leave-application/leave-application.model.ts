@@ -2,6 +2,7 @@ import * as dayjs from 'dayjs';
 import { ILeaveType } from 'app/entities/leave-type/leave-type.model';
 import { ILeaveStatus } from 'app/entities/leave-status/leave-status.model';
 import { IStaff } from 'app/entities/staff/staff.model';
+import { ILeaveDeduction } from 'app/entities/leave-deduction/leave-deduction.model';
 
 export interface ILeaveApplication {
   id?: number;
@@ -14,6 +15,7 @@ export interface ILeaveApplication {
   leaveType?: ILeaveType;
   leaveStatus?: ILeaveStatus | null;
   staff?: IStaff;
+  deductions?: ILeaveDeduction[] | null;
 }
 
 export class LeaveApplication implements ILeaveApplication {
@@ -27,7 +29,8 @@ export class LeaveApplication implements ILeaveApplication {
     public deleted?: boolean,
     public leaveType?: ILeaveType,
     public leaveStatus?: ILeaveStatus | null,
-    public staff?: IStaff
+    public staff?: IStaff,
+    public deductions?: ILeaveDeduction[] | null
   ) {
     this.deleted = this.deleted ?? false;
   }

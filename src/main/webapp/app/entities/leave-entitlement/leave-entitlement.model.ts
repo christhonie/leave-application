@@ -1,6 +1,7 @@
 import * as dayjs from 'dayjs';
 import { ILeaveType } from 'app/entities/leave-type/leave-type.model';
 import { IStaff } from 'app/entities/staff/staff.model';
+import { ILeaveDeduction } from 'app/entities/leave-deduction/leave-deduction.model';
 
 export interface ILeaveEntitlement {
   id?: number;
@@ -8,6 +9,7 @@ export interface ILeaveEntitlement {
   days?: number;
   leaveType?: ILeaveType;
   staff?: IStaff;
+  deductions?: ILeaveDeduction[] | null;
 }
 
 export class LeaveEntitlement implements ILeaveEntitlement {
@@ -16,7 +18,8 @@ export class LeaveEntitlement implements ILeaveEntitlement {
     public entitlementDate?: dayjs.Dayjs,
     public days?: number,
     public leaveType?: ILeaveType,
-    public staff?: IStaff
+    public staff?: IStaff,
+    public deductions?: ILeaveDeduction[] | null
   ) {}
 }
 

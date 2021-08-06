@@ -47,9 +47,10 @@
       "LeaveEntitlement",
       "LeaveApplication",
       "Comment",
-      "PublicHoliday"
+      "PublicHoliday",
+      "LeaveDeduction"
     ],
-    "lastLiquibaseTimestamp": 1624214989000
+    "lastLiquibaseTimestamp": 1628255957000
   },
   "git-provider": "GitHub",
   "git-company": "christhonie",

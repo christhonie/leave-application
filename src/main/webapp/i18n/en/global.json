@@ -23,6 +23,7 @@
         "comment": "Comment",
         "decision": "Decision",
         "publicHoliday": "Public Holiday",
+        "leaveDeduction": "Leave Deduction",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },
       "account": {

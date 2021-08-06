@@ -111,6 +111,15 @@ public class LeaveEntitlementQueryService extends QueryService<LeaveEntitlement>
                         buildSpecification(criteria.getStaffId(), root -> root.join(LeaveEntitlement_.staff, JoinType.LEFT).get(Staff_.id))
                     );
             }
+            if (criteria.getDeductionId() != null) {
+                specification =
+                    specification.and(
+                        buildSpecification(
+                            criteria.getDeductionId(),
+                            root -> root.join(LeaveEntitlement_.deductions, JoinType.LEFT).get(LeaveDeduction_.id)
+                        )
+                    );
+            }
         }
         return specification;
     }

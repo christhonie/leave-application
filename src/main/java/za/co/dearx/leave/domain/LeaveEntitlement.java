@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
@@ -51,6 +53,11 @@ public class LeaveEntitlement implements Serializable {
     @NotNull
     @JsonIgnoreProperties(value = { "user", "teams" }, allowSetters = true)
     private Staff staff;
+
+    @OneToMany(mappedBy = "entitlement")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "application", "entitlement" }, allowSetters = true)
+    private Set<LeaveDeduction> deductions = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public Long getId() {
@@ -116,6 +123,37 @@ public class LeaveEntitlement implements Serializable {
 
     public void setStaff(Staff staff) {
         this.staff = staff;
+    }
+
+    public Set<LeaveDeduction> getDeductions() {
+        return this.deductions;
+    }
+
+    public LeaveEntitlement deductions(Set<LeaveDeduction> leaveDeductions) {
+        this.setDeductions(leaveDeductions);
+        return this;
+    }
+
+    public LeaveEntitlement addDeduction(LeaveDeduction leaveDeduction) {
+        this.deductions.add(leaveDeduction);
+        leaveDeduction.setEntitlement(this);
+        return this;
+    }
+
+    public LeaveEntitlement removeDeduction(LeaveDeduction leaveDeduction) {
+        this.deductions.remove(leaveDeduction);
+        leaveDeduction.setEntitlement(null);
+        return this;
+    }
+
+    public void setDeductions(Set<LeaveDeduction> leaveDeductions) {
+        if (this.deductions != null) {
+            this.deductions.forEach(i -> i.setEntitlement(null));
+        }
+        if (leaveDeductions != null) {
+            leaveDeductions.forEach(i -> i.setEntitlement(this));
+        }
+        this.deductions = leaveDeductions;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

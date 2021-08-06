@@ -126,6 +126,20 @@ relationship ManyToOne {
 }
 
 /**
+ * A mechanism to track leave deducted from one or more LeaveEntitlements for each LeaveApplication, which helps track how much, if any, leave is still remaining.
+ */
+entity LeaveDeduction {
+	/* The number of days deducted from the LeaveEntitlement in the context of the LeaveApplication. */
+	days BigDecimal required
+}
+relationship ManyToOne {
+  /** The LeaveApplication for which this deduction applies. */
+	LeaveDeduction{application required} to LeaveApplication{deduction}
+  /** The LeaveEntitlement to reduce. */
+	LeaveDeduction{entitlement} to LeaveEntitlement{deduction}
+}
+
+/**
  * Comments assigned to a Decision or a LeaveApplication.
  */
 entity Comment {
