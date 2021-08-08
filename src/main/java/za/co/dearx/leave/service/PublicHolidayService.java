@@ -28,6 +28,7 @@ import za.co.dearx.leave.client.calendarific.dto.Holiday;
 import za.co.dearx.leave.domain.PublicHoliday;
 import za.co.dearx.leave.repository.PublicHolidayRepository;
 import za.co.dearx.leave.service.dto.PublicHolidayDTO;
+import za.co.dearx.leave.service.exception.UpdateException;
 import za.co.dearx.leave.service.mapper.PublicHolidayMapper;
 
 /**
@@ -36,6 +37,8 @@ import za.co.dearx.leave.service.mapper.PublicHolidayMapper;
 @Service
 @Transactional
 public class PublicHolidayService {
+
+    private static final String PUBLIC_HOLIDAY = "Public Holiday";
 
     private final Logger log = LoggerFactory.getLogger(PublicHolidayService.class);
 
@@ -124,7 +127,7 @@ public class PublicHolidayService {
         publicHolidayRepository.deleteById(id);
     }
 
-    public void reloadData(int year) throws RestClientException, URISyntaxException {
+    public void reloadData(int year) throws UpdateException {
         RestTemplate client = new RestTemplate();
 
         StringBuffer sb = new StringBuffer();
@@ -136,7 +139,27 @@ public class PublicHolidayService {
             .append(year)
             .append("&type=national");
 
-        ResponseEntity<GetHolidaysResponseDTO> response = client.getForEntity(new URI(sb.toString()), GetHolidaysResponseDTO.class);
+        URI url;
+        try {
+            url = new URI(sb.toString());
+        } catch (URISyntaxException e) {
+            log.error("Calendarific URL could not be built", e);
+            throw new UpdateException(
+                PUBLIC_HOLIDAY,
+                "URL for the Public Holiday service was invalid. Contact system administrator to review application configuration."
+            );
+        }
+
+        ResponseEntity<GetHolidaysResponseDTO> response;
+        try {
+            response = client.getForEntity(url, GetHolidaysResponseDTO.class);
+        } catch (RestClientException e) {
+            log.error("Calendarific service API call failed", e);
+            throw new UpdateException(
+                PUBLIC_HOLIDAY,
+                "Could not retrieve public holidays. Try again later or contact the system administrator if it persists."
+            );
+        }
 
         List<PublicHoliday> dirtyList = new ArrayList<PublicHoliday>();
         List<PublicHoliday> publicHolidays = new ArrayList<PublicHoliday>();
@@ -172,7 +195,7 @@ public class PublicHolidayService {
         publicHolidayRepository.saveAll(publicHolidays);
     }
 
-    public void reloadSurrounding5Years() throws RestClientException, URISyntaxException {
+    public void reloadSurrounding5Years() throws UpdateException {
         int currentYearLong = LocalDate.now().getYear();
 
         for (int i = currentYearLong - 5; i <= currentYearLong + 5; i++) {

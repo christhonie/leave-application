@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,6 +34,7 @@ import za.co.dearx.leave.service.PublicHolidayQueryService;
 import za.co.dearx.leave.service.PublicHolidayService;
 import za.co.dearx.leave.service.criteria.PublicHolidayCriteria;
 import za.co.dearx.leave.service.dto.PublicHolidayDTO;
+import za.co.dearx.leave.service.exception.UpdateException;
 import za.co.dearx.leave.web.rest.errors.BadRequestAlertException;
 
 /**
@@ -214,13 +214,13 @@ public class PublicHolidayResource {
     }
 
     @GetMapping("/public-holidays/reload")
-    public ResponseEntity<Void> reloadPublicHolidays() {
+    public ResponseEntity<String> reloadPublicHolidays() {
         log.debug("REST request to reload PublicHolidays");
         try {
             publicHolidayService.reloadSurrounding5Years();
-        } catch (RestClientException | URISyntaxException e) {
+        } catch (UpdateException e) {
             log.error("Could not reload public holiday data from Calendarrific API", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.FAILED_DEPENDENCY).body(e.getReason());
         }
         return ResponseEntity.noContent().build();
     }
