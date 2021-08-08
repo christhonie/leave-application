@@ -2,9 +2,9 @@ package za.co.dearx.leave.service;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.DateTimeException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -163,14 +163,10 @@ public class PublicHolidayService {
             }
         }
 
-        LocalDate yearEndDate;
-        // Check to see if this is a leap year
-        try {
-            yearEndDate = LocalDate.ofYearDay(year, 366);
-        } catch (DateTimeException e) {
-            yearEndDate = LocalDate.ofYearDay(year, 365);
-        }
-
+        //Get the last day of the year
+        final YearMonth yearMonth = YearMonth.of(year, 12);
+        final LocalDate yearEndDate = yearMonth.atEndOfMonth();
+        //Delete all
         publicHolidayRepository.deleteAllHolidaysForYear(LocalDate.ofYearDay(year, 1), yearEndDate);
 
         publicHolidayRepository.saveAll(publicHolidays);
