@@ -23,7 +23,6 @@ export class PublicHolidayComponent implements OnInit {
   predicate!: string;
   ascending!: boolean;
   ngbPaginationPage = 1;
-  surroundingFiveYears: number[] = [];
 
   constructor(
     protected publicHolidayService: PublicHolidayService,
@@ -35,11 +34,6 @@ export class PublicHolidayComponent implements OnInit {
   loadPage(page?: number, dontNavigate?: boolean): void {
     this.isLoading = true;
     const pageToLoad: number = page ?? this.page ?? 1;
-
-    // const fiveYearsAgo = new Date().getFullYear() - 5;
-    // for(let i = fiveYearsAgo; i <= fiveYearsAgo + 10; i++){
-    //   this.surroundingFiveYears.push(i);
-    // }
 
     this.publicHolidayService
       .query({

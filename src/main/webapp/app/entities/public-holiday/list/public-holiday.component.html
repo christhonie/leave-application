@@ -3,6 +3,17 @@
     <span jhiTranslate="leaveApplicationApp.publicHoliday.home.title">Public Holidays</span>
 
     <div class="d-flex justify-content-end">
+      <button
+        id="jh-reload-publicHolidays"
+        data-cy="reloadPublicHolidaysButton"
+        class="btn btn-info mr-2"
+        (click)="reload()"
+        *jhiHasAnyAuthority="'ROLE_ADMIN'"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="leaveApplicationApp.publicHoliday.home.reloadHolidays">Reload Public Holidays </span>
+      </button>
+
       <button class="btn btn-info mr-2" (click)="loadPage()" [disabled]="isLoading">
         <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
         <span jhiTranslate="leaveApplicationApp.publicHoliday.home.refreshListLabel">Refresh List</span>
@@ -17,26 +28,6 @@
         <fa-icon icon="plus"></fa-icon>
         <span jhiTranslate="leaveApplicationApp.publicHoliday.home.createLabel"> Create a new Public Holiday </span>
       </button>
-    </div>
-    <div class="form-group" *jhiHasAnyAuthority="'ROLE_ADMIN'">
-      <button
-        id="jh-reload-publicHolidays"
-        data-cy="reloadPublicHolidaysButton"
-        class="btn btn-primary jh-create-entity create-public-holiday"
-        (click)="reload()"
-      >
-        <fa-icon icon="plus"></fa-icon>
-        <span jhiTranslate="leaveApplicationApp.publicHoliday.home.reloadHolidays">Reload Public Holidays </span>
-      </button>
-
-      <!-- <label class="form-control-label"
-        for="field_year">Year to reload</label>
-      <select id="field_year" data-cy="year" name="year">
-        <option
-          *ngFor="let year of surroundingFiveYears;">
-          {{ year }}
-        </option>
-      </select> -->
     </div>
   </h2>
 
