@@ -1,0 +1,26 @@
+{
+  "leaveApplicationApp": {
+    "publicHoliday": {
+      "home": {
+        "title": "Public Holidays",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Public Holiday",
+        "createOrEditLabel": "Create or edit a Public Holiday",
+        "notFound": "No Public Holidays found",
+        "reloadHolidays": "Reload Public Holidays"
+      },
+      "created": "A new Public Holiday is created with identifier {{ param }}",
+      "updated": "A Public Holiday is updated with identifier {{ param }}",
+      "deleted": "A Public Holiday is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Public Holiday {{ id }}?"
+      },
+      "detail": {
+        "title": "Public Holiday"
+      },
+      "id": "ID",
+      "name": "Name",
+      "date": "Date"
+    }
+  }
+}

@@ -179,7 +179,8 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+application:
+  publicHolidayWindow: 2
 camunda.bpm:
   enabled: true
   webapp:
@@ -194,3 +195,7 @@ camunda.bpm:
     last-name: Oracle
   filter:
     create: All tasks
+
+calendarific:
+  baseUrl: https://calendarific.com/api/v2
+  apiKey: faacddb83743c8c138310fa359e4afa694500ad6

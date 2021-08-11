@@ -54,6 +54,11 @@ import { RouterModule } from '@angular/router';
         data: { pageTitle: 'leaveApplicationApp.decision.home.title' },
         loadChildren: () => import('./decision/decision.module').then(m => m.DecisionModule),
       },
+      {
+        path: 'public-holiday',
+        data: { pageTitle: 'leaveApplicationApp.publicHoliday.home.title' },
+        loadChildren: () => import('./public-holiday/public-holiday.module').then(m => m.PublicHolidayModule),
+      },
       /* jhipster-needle-add-entity-route - JHipster will add entity modules routes here */
     ]),
   ],

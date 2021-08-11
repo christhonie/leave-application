@@ -17,6 +17,7 @@
         "leaveApplication": "Leave Application",
         "comment": "Comment",
         "decision": "Decision",
+        "publicHoliday": "Public Holiday",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },
       "account": {

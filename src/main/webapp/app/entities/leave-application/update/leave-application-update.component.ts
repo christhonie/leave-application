@@ -16,6 +16,7 @@ import { ILeaveStatus } from 'app/entities/leave-status/leave-status.model';
 import { LeaveStatusService } from 'app/entities/leave-status/service/leave-status.service';
 import { IStaff } from 'app/entities/staff/staff.model';
 import { StaffService } from 'app/entities/staff/service/staff.service';
+import { PublicHolidayService } from '../../public-holiday/service/public-holiday.service';
 
 @Component({
   selector: 'jhi-leave-application-update',
@@ -41,24 +42,31 @@ export class LeaveApplicationUpdateComponent implements OnInit {
     staff: [],
   });
 
+  private _startDate?: dayjs.Dayjs;
+  private _endDate?: dayjs.Dayjs;
+
   constructor(
     protected leaveApplicationService: LeaveApplicationService,
     protected leaveTypeService: LeaveTypeService,
     protected leaveStatusService: LeaveStatusService,
     protected staffService: StaffService,
     protected activatedRoute: ActivatedRoute,
-    protected fb: FormBuilder
+    protected fb: FormBuilder,
+    protected publicHolidayService: PublicHolidayService
   ) {}
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ leaveApplication }) => {
+      // If this is a new record, then set some default dates
       if (leaveApplication.id === undefined) {
-        const today = dayjs().startOf('day');
-        leaveApplication.appliedDate = today;
-        leaveApplication.updateDate = today;
+        leaveApplication.appliedDate = dayjs().startOf('day');
       }
 
       this.updateForm(leaveApplication);
+      // Use internal fields to prevent setter to fire updates
+      this._startDate = leaveApplication.startDate;
+      this._endDate = leaveApplication.endDate;
+      this.recalcDays();
 
       this.loadRelationshipsOptions();
     });
@@ -67,14 +75,20 @@ export class LeaveApplicationUpdateComponent implements OnInit {
   }
 
   onChanges(): void {
-    this.editForm.get('startDate')?.valueChanges.subscribe(val => {
-      const endDate = this.editForm.get(['endDate'])!.value;
-      this.editForm.get(['days'])!.setValue(val && endDate ? +endDate.diff(val, 'day') + 1 : 0);
+    this.editForm.get('startDate')?.valueChanges.subscribe(value => {
+      this.startDate = value;
     });
-    this.editForm.get('endDate')?.valueChanges.subscribe(val => {
-      const startDate = this.editForm.get(['startDate'])!.value;
-      this.editForm.get(['days'])!.setValue(startDate && val ? +val.diff(startDate, 'day') + 1 : 0);
+    this.editForm.get('endDate')?.valueChanges.subscribe(value => {
+      this.endDate = value;
     });
+  }
+
+  recalcDays(): void {
+    if (this.startDate && this.endDate) {
+      this.publicHolidayService.calculdateWorkDaysBetween(this.startDate, this.endDate).subscribe((res: HttpResponse<number>) => {
+        this.editForm.get(['days'])!.setValue(res.body);
+      });
+    }
   }
 
   previousState(): void {
@@ -191,5 +205,34 @@ export class LeaveApplicationUpdateComponent implements OnInit {
       leaveStatus: this.editForm.get(['leaveStatus'])!.value,
       staff: this.editForm.get(['staff'])!.value,
     };
+  }
+
+  get startDate(): dayjs.Dayjs | undefined {
+    return this._startDate;
+  }
+
+  set startDate(value: dayjs.Dayjs | undefined) {
+    // Only apply changes if value changed
+    if (this._startDate !== value) {
+      // If start and end dates are the same (default, unedited state), then change end date too
+      if (this._startDate === this.endDate) {
+        this._endDate = value; // This will prevent the end date change also triggering recalcDays()
+        this.editForm.get(['endDate'])!.setValue(value);
+      }
+      this._startDate = value;
+      this.recalcDays();
+    }
+  }
+
+  get endDate(): dayjs.Dayjs | undefined {
+    return this._endDate;
+  }
+
+  set endDate(value: dayjs.Dayjs | undefined) {
+    // Only apply changes if value changed
+    if (this._endDate !== value) {
+      this._endDate = value;
+      this.recalcDays();
+    }
   }
 }
