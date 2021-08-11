@@ -155,17 +155,17 @@ jhipster:
   #   allow-credentials: true
   #   max-age: 1800
   mail:
-    from: LeaveApplication@localhost
+    from: hr@dearx.co.za
   api-docs:
     default-include-pattern: ${server.servlet.context-path:}/api/.*
     management-include-pattern: ${server.servlet.context-path:}/management/.*
     title: LeaveApplication API
     description: LeaveApplication API documentation
-    version: 0.0.1
+    version: #project.version#
     terms-of-service-url:
-    contact-name:
-    contact-url:
-    contact-email:
+    contact-name: DeARX Services
+    contact-url: https://dearx.co.za
+    contact-email: support@dearx.co.za
     license: unlicensed
     license-url:
   security:
@@ -181,6 +181,7 @@ jhipster:
 
 application:
   publicHolidayWindow: 2
+
 camunda.bpm:
   enabled: true
   webapp:
