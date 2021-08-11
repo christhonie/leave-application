@@ -56,9 +56,9 @@ export class LeaveApplicationUpdateComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.activatedRoute.data.subscribe((leaveApplication: ILeaveApplication) => {
+    this.activatedRoute.data.subscribe(({ leaveApplication }) => {
       // If this is a new record, then set some default dates
-      if (!leaveApplication.id) {
+      if (leaveApplication.id === undefined) {
         leaveApplication.appliedDate = dayjs().startOf('day');
       }
 
