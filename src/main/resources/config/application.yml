@@ -179,7 +179,8 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+application:
+  publicHolidayWindow: 2
 camunda.bpm:
   enabled: true
   webapp:

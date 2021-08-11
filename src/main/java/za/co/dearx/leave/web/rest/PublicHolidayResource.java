@@ -213,6 +213,11 @@ public class PublicHolidayResource {
             .build();
     }
 
+    /**
+     * {@code GET  /public-holidays/reload} : reloads all public holidays between a configured year window.
+     *
+     * @return status {@code 200 (OK)} if the holidays could successfully be loaded into the system.
+     */
     @GetMapping("/public-holidays/reload")
     public ResponseEntity<String> reloadPublicHolidays() {
         log.debug("REST request to reload PublicHolidays");
@@ -225,6 +230,13 @@ public class PublicHolidayResource {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * {@code GET  /public-holidays/work-days} : get number of working days between two dates.
+     *
+     * @param startDate of the calculation, inclusive.
+     * @param endDate of the calculation, inclusive.
+     * @return the number of working days with status {@code 200 (OK)}
+     */
     @GetMapping("/public-holidays/work-days")
     public ResponseEntity<Integer> calculateWorkDays(@RequestParam LocalDate startDate, @RequestParam LocalDate endDate) {
         log.debug("REST request to reload PublicHolidays");

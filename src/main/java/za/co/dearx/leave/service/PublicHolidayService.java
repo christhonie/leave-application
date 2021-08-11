@@ -6,16 +6,11 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import liquibase.pro.packaged.iF;
-import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.convert.JodaTimeConverters.LocalDateTimeToDateConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +20,8 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import za.co.dearx.leave.client.calendarific.dto.GetHolidaysResponseDTO;
 import za.co.dearx.leave.client.calendarific.dto.Holiday;
+import za.co.dearx.leave.config.ApplicationProperties;
+import za.co.dearx.leave.config.CalendarificProperties;
 import za.co.dearx.leave.domain.PublicHoliday;
 import za.co.dearx.leave.repository.PublicHolidayRepository;
 import za.co.dearx.leave.service.dto.PublicHolidayDTO;
@@ -46,11 +43,11 @@ public class PublicHolidayService {
 
     private final PublicHolidayMapper publicHolidayMapper;
 
-    @Value("${calendarific.baseUrl}")
-    String calendarificBaseUrl;
+    @Autowired
+    private CalendarificProperties calendarificProps;
 
-    @Value("${calendarific.apiKey}")
-    String calendarificApiKey;
+    @Autowired
+    private ApplicationProperties appProps;
 
     private static final String OBSERVED_KEYWORD = "observed";
 
@@ -132,9 +129,9 @@ public class PublicHolidayService {
 
         StringBuffer sb = new StringBuffer();
         sb
-            .append(calendarificBaseUrl)
+            .append(calendarificProps.baseUrl)
             .append("/api/v2/holidays?api_key=")
-            .append(calendarificApiKey)
+            .append(calendarificProps.apiKey)
             .append("&country=za&year=")
             .append(year)
             .append("&type=national");
@@ -198,7 +195,7 @@ public class PublicHolidayService {
     public void reloadSurrounding5Years() throws UpdateException {
         int currentYearLong = LocalDate.now().getYear();
 
-        for (int i = currentYearLong - 5; i <= currentYearLong + 5; i++) {
+        for (int i = currentYearLong - appProps.publicHolidayWindow; i <= currentYearLong + appProps.publicHolidayWindow; i++) {
             reloadData(i);
         }
     }
@@ -216,34 +213,17 @@ public class PublicHolidayService {
 
     public Integer calculateWorkDays(LocalDate startDate, LocalDate endDate) {
         List<LocalDate> holidaysBetweenDates = getHolidaysBetween(startDate, endDate);
-        List<LocalDate> daysBetweenDates = new ArrayList<LocalDate>();
+        int days = 0;
         while (!startDate.isAfter(endDate)) {
             if (
                 !startDate.getDayOfWeek().equals(DayOfWeek.SUNDAY) &&
                 !startDate.getDayOfWeek().equals(DayOfWeek.SATURDAY) &&
                 !holidaysBetweenDates.contains(startDate)
             ) {
-                daysBetweenDates.add(startDate);
+                days++;
             }
             startDate = startDate.plusDays(1);
         }
-        //        for (LocalDate date : daysBetweenDates) {
-        //            // exclude weekends
-        //            if (date.getDayOfWeek().toString().equals("SUNDAY") || date.getDayOfWeek().toString().equals("SATERDAY")) {
-        //                daysBetweenDates.remove(date);
-        //            }
-        //            // exclude holidays
-        //            if (holidaysBetweenDates.contains(date)) {
-        //                daysBetweenDates.remove(date);
-        //            }
-        //        }
-        // return working days
-        return daysBetweenDates.size();
-        // TODO Theunis' area
-        // Get a range of dates between the passed in dates
-        // Exclude weekends
-        // Use repository to find all holidays between two dates
-        // exclude holidays
-        // return number of working days
+        return days;
     }
 }
