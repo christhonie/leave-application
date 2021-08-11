@@ -1,20 +1,25 @@
 {
   "global": {
-    "title": "LeaveApplication",
+    "title": "Leave Application",
     "browsehappy": "You are using an <strong>outdated</strong> browser. Please <a href=\"http://browsehappy.com/?locale=en\">upgrade your browser</a> to improve your experience.",
     "menu": {
       "home": "Home",
       "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
+      "leave": {
+        "main": "Leave",
+        "apply": "Apply",
+        "history": "History"
+      },
+      "config": {
+        "main": "Config",
+        "type": "Leave Types",
+        "status": "Leave Status",
+        "staff": "Staff",
+        "team": "Teams",
+        "entitlement": "Leave Entitlement"
+      },
       "entities": {
         "main": "Entities",
-        "role": "Role",
-        "team": "Team",
-        "staff": "Staff",
-        "leaveStatus": "Leave Status",
-        "leaveType": "Leave Type",
-        "leaveEntitlement": "Leave Entitlement",
-        "entitlementValue": "Entitlement Value",
-        "leaveApplication": "Leave Application",
         "comment": "Comment",
         "decision": "Decision",
         "publicHoliday": "Public Holiday",
