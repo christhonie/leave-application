@@ -1,25 +1,17 @@
 package za.co.dearx.leave.service;
 
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import za.co.dearx.leave.domain.LeaveApplication;
 import za.co.dearx.leave.domain.LeaveStatus;
 import za.co.dearx.leave.repository.LeaveStatusRepository;
-import za.co.dearx.leave.service.criteria.LeaveApplicationCriteria;
-import za.co.dearx.leave.service.dto.LeaveApplicationDTO;
 import za.co.dearx.leave.service.dto.LeaveStatusDTO;
 import za.co.dearx.leave.service.exception.NotFoundException;
 import za.co.dearx.leave.service.mapper.LeaveStatusMapper;
@@ -37,16 +29,16 @@ public class LeaveStatusService {
 
     private final LeaveStatusMapper leaveStatusMapper;
     
-    private final LeaveApplicationService leaveAppService;
+    private final LeaveApplicationService leaveApplicationService;
     
-    private final LeaveApplicationQueryService leaveAppQService;
+    private final LeaveApplicationQueryService leaveAppQueryService;
 
-    public LeaveStatusService(LeaveStatusRepository leaveStatusRepository, LeaveStatusMapper leaveStatusMapper, @Lazy LeaveApplicationService leaveAppService
-    		, @Lazy LeaveApplicationQueryService leaveAppQService) {
+    public LeaveStatusService(LeaveStatusRepository leaveStatusRepository, LeaveStatusMapper leaveStatusMapper, @Lazy LeaveApplicationService leaveApplicationService
+    		, @Lazy LeaveApplicationQueryService leaveAppQueryService) {
         this.leaveStatusRepository = leaveStatusRepository;
         this.leaveStatusMapper = leaveStatusMapper;
-        this.leaveAppService = leaveAppService;
-        this.leaveAppQService = leaveAppQService;
+        this.leaveApplicationService = leaveApplicationService;
+        this.leaveAppQueryService = leaveAppQueryService;
     }
 
     /**
@@ -127,30 +119,5 @@ public class LeaveStatusService {
         return findEntityByName("Draft").orElseThrow(() -> new NotFoundException("LeaveStatus", "Draft status not found"));
     }
 
-    @Scheduled(cron = "0 0 1 * * ?")
-    public void scheduleTaskUsingCronExpression() {
-    	log.info("[Scheduled Task running to update Leave Statues]");
-        LocalDate currentDate = LocalDate.now();
-
-        List<LeaveApplicationDTO> leaveAppList = Collections.emptyList();
-        Pageable page = PageRequest.of(0, 20);
-        Page<LeaveApplicationDTO> allLeaveApps = this.leaveAppQService.findByCriteria(new LeaveApplicationCriteria(), page);
-        leaveAppList = allLeaveApps.getContent();
-
-        for (LeaveApplicationDTO leaveApp: leaveAppList) {
-            if (leaveApp.getStartDate().isBefore(currentDate) && leaveApp.getLeaveStatus().getName().contains("Approved"))
-            {
-            	log.info("[Scheduled Task running to update Leave Status for: {}]", leaveApp.toString());
-            	try {
-					LeaveApplication updatedLeaveApp = this.leaveAppService.updateStatus(leaveApp.getId(), "Taken");
-					log.info("[Scheduled Task updated Leave Status for: {}]", updatedLeaveApp.toString());
-				} catch (NotFoundException e) {
-					e.printStackTrace();
-				}
-            } else {
-            	continue;
-            }
-        }
-        log.info("[Scheduled Task Complete]");
-    }
+   
 }

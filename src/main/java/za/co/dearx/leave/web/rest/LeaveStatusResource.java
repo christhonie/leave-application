@@ -202,10 +202,5 @@ public class LeaveStatusResource {
             .build();
     }
     
-    @GetMapping("/leave-statuses/runScheduledTask")
-    public void runScheduledTask() {
-        log.debug("REST request to run scheduled task to check Leave application's start date");
-        leaveStatusService.scheduleTaskUsingCronExpression();
-        
-    }
+
 }
