@@ -91,7 +91,6 @@
             <column name="position" type="string"/>
             <column name="employee_id" type="string"/>
             <column name="start_date" type="date"/>
-            <column name="name" type="string"/>
             <column name="first_name" type="string"/>
             <column name="last_name" type="string"/>
             <column name="email" type="string"/>

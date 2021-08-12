@@ -44,13 +44,6 @@ public class Staff implements Serializable {
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
 
-    /**
-     * A read-only field consisting out of the first name and last name of the person.
-     */
-    @Size(max = 100)
-    @Column(name = "name", length = 100)
-    private String name;
-
     @NotNull
     @Size(max = 50)
     @Column(name = "first_name", length = 50, nullable = false)
@@ -156,15 +149,6 @@ public class Staff implements Serializable {
         if (firstName != null && !firstName.isEmpty() && lastName != null && !lastName.isEmpty()) return (
             firstName + " " + lastName
         ); else return firstName + lastName;
-    }
-
-    public Staff name(String name) {
-        this.name = name;
-        return this;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getFirstName() {
