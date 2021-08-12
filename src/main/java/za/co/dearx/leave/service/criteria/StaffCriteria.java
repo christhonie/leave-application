@@ -34,8 +34,6 @@ public class StaffCriteria implements Serializable, Criteria {
 
     private LocalDateFilter startDate;
 
-    private StringFilter name;
-
     private StringFilter firstName;
 
     private StringFilter lastName;
@@ -59,7 +57,6 @@ public class StaffCriteria implements Serializable, Criteria {
         this.position = other.position == null ? null : other.position.copy();
         this.employeeID = other.employeeID == null ? null : other.employeeID.copy();
         this.startDate = other.startDate == null ? null : other.startDate.copy();
-        this.name = other.name == null ? null : other.name.copy();
         this.firstName = other.firstName == null ? null : other.firstName.copy();
         this.lastName = other.lastName == null ? null : other.lastName.copy();
         this.email = other.email == null ? null : other.email.copy();
@@ -133,21 +130,6 @@ public class StaffCriteria implements Serializable, Criteria {
 
     public void setStartDate(LocalDateFilter startDate) {
         this.startDate = startDate;
-    }
-
-    public StringFilter getName() {
-        return name;
-    }
-
-    public StringFilter name() {
-        if (name == null) {
-            name = new StringFilter();
-        }
-        return name;
-    }
-
-    public void setName(StringFilter name) {
-        this.name = name;
     }
 
     public StringFilter getFirstName() {
@@ -284,7 +266,6 @@ public class StaffCriteria implements Serializable, Criteria {
             Objects.equals(position, that.position) &&
             Objects.equals(employeeID, that.employeeID) &&
             Objects.equals(startDate, that.startDate) &&
-            Objects.equals(name, that.name) &&
             Objects.equals(firstName, that.firstName) &&
             Objects.equals(lastName, that.lastName) &&
             Objects.equals(email, that.email) &&
@@ -303,7 +284,6 @@ public class StaffCriteria implements Serializable, Criteria {
             position,
             employeeID,
             startDate,
-            name,
             firstName,
             lastName,
             email,
@@ -323,7 +303,6 @@ public class StaffCriteria implements Serializable, Criteria {
             (position != null ? "position=" + position + ", " : "") +
             (employeeID != null ? "employeeID=" + employeeID + ", " : "") +
             (startDate != null ? "startDate=" + startDate + ", " : "") +
-            (name != null ? "name=" + name + ", " : "") +
             (firstName != null ? "firstName=" + firstName + ", " : "") +
             (lastName != null ? "lastName=" + lastName + ", " : "") +
             (email != null ? "email=" + email + ", " : "") +
