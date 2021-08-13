@@ -2,7 +2,7 @@
 
 This is a web based leave application developed by and for DeARX Services. This application forms part of the Java training series hosted by DeARX Cape Town and is being developed by the team for their 2021 practical project.
 
-The application is was generated using [JHipster 6.10.5][] as a starting point, and developed further by custom modifications. The application is based on [Java 11](https://www.oracle.com/java/) for the back-end and [Angular](https://angular.io/) for the front-end. It uses [Maven](https://maven.apache.org/) for dependency management in Java and [NPM](https://www.npmjs.com/) for the same in the front-end.
+The application is was generated using [JHipster][], first using version [6.10.5](https://www.jhipster.tech/2020/11/07/jhipster-release-6.10.5.html), the latest 6.x version, and was then upgraded to version [7.0.1](https://www.jhipster.tech/2021/04/02/jhipster-release-7.0.1.html). This was used as a starting point and was then futher developed by custom modifications. The application is based on [Java 11](https://www.oracle.com/java/) for the back-end and [Angular][] for the front-end. It uses [Maven][] for dependency management in Java and [NPM][] for the same in the front-end.
 
 ## Development
 
@@ -24,8 +24,15 @@ We use npm scripts and [Angular CLI][] with [Webpack][] as our build system.
 Run the following commands in two separate terminals to create a blissful development experience where your browser
 auto-refreshes when files change on your hard drive.
 
+Starting the Java back-end;
 ```
-./mvnw
+./mvnw -P!webapp
+```
+
+NOTE: The `-P` just tells Maven not to complile the front-end code, saving some time. No harm is done leaving it out.
+
+Compiling and staring the front-end;
+```
 npm start
 ```
 
@@ -39,19 +46,21 @@ The `npm run` command will list all of the scripts available to run for this pro
 
 The back-end application uses the Java 11 Java Development Kit, version 11 LTS or later. Ensure that your JAVA_HOME environent variable is set.
 
+### Environment variables
+
+Remember to setup your JAVA_HOME and MVN_HOME environment variables and include those (with the correct reference to the /bin directory) to your path. Ensure that any other Java install directories are removed from the path.
+
+### Optional installations
+
 ### JHipster
+
+JHipster should be installed when there is a need to generate or update entities using the code generator. This step is optional for most developers.
 
 Install JHipster using NPM;
 
 ```
 npm install -g generator-jhipster
 ```
-
-### Environment variables
-
-Remember to setup your JAVA_HOME and MVN_HOME environment variables and include those (with the correct reference to the /bin directory) to your path. Ensure that any other Java install directories are removed from the path.
-
-### Optional installations
 
 #### Yeoman
 
@@ -136,17 +145,19 @@ Migrating from SVN to Git: https://git.or.cz/course/svn.html
 The first build is best performed from the command line. Use the following command to get started;
 
 ```shell
-mvn clean install
+mvn clean compile test
 ```
 
-## Build instructions
+This will only compile the code and check for errors, as well as run the test packs.
+
+## Build instructions for production
 
 Always use the clean goal when building the project for deployment.
 
-Run the install goal from the root directory;
+Run the package goal from the root directory to create the JAR file for deployment.
 
 ```shell
-mvn clean install
+mvn clean package
 ```
 
 This will ensure that all the dependencies are compiled and installed on your local M2 Maven repository.
@@ -162,7 +173,7 @@ mvn spring-boot:run
 We use Cargo to deploy to the local DEV Tomcat instances. From the Core directory run;
 
 ```shell
-mvn -Pwar clean install cargo:redeploy
+mvn -Pwar clean package cargo:redeploy
 ```
 
 ## Release process
@@ -386,7 +397,7 @@ For more information refer to [Using Docker and Docker-Compose][], this page als
 
 To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`), this will let you generate configuration files for a number of Continuous Integration systems. Consult the [Setting up Continuous Integration][] page for more information.
 
-[jhipster homepage and latest documentation]: https://www.jhipster.tech
+[JHipster]: https://www.jhipster.tech
 [jhipster 7.0.1 archive]: https://www.jhipster.tech/documentation-archive/v7.0.1
 [using jhipster in development]: https://www.jhipster.tech/documentation-archive/v7.0.1/development/
 [using docker and docker-compose]: https://www.jhipster.tech/documentation-archive/v7.0.1/docker-compose
@@ -395,8 +406,11 @@ To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`)
 [code quality page]: https://www.jhipster.tech/documentation-archive/v7.0.1/code-quality/
 [setting up continuous integration]: https://www.jhipster.tech/documentation-archive/v7.0.1/setting-up-ci/
 [node.js]: https://nodejs.org/
+[Angular]: https://angular.io/
+[Angular CLI]: https://cli.angular.io/
+[Maven]: https://maven.apache.org/
+[NPM]: https://www.npmjs.com/
 [webpack]: https://webpack.github.io/
-[angular cli]: https://cli.angular.io/
 [browsersync]: https://www.browsersync.io/
 [jest]: https://facebook.github.io/jest/
 [jasmine]: https://jasmine.github.io/2.0/introduction.html
