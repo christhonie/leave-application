@@ -100,20 +100,6 @@ relationship ManyToOne {
 }
 
 /**
- * The allocation of leave days for a given {@link LeaveEntitlement} and {@link Staff} member.
- */
-entity EntitlementValue {
-  /** The value, in days, assigned to a {@link Staff} member.*/
-	entitlementValue BigDecimal required
-}
-relationship OneToOne {
-  /** The LeaveEntitlement this value is related to.*/
-	EntitlementValue{entitlement required} to LeaveEntitlement
-  /** The staff member this value is assigned to.*/
-	EntitlementValue{staff(name) required} to Staff
-}
-
-/**
  * An application for leave by a {@link Staff} member.
  */
 entity LeaveApplication {

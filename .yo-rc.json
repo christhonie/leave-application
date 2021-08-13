@@ -45,7 +45,6 @@
       "LeaveStatus",
       "LeaveType",
       "LeaveEntitlement",
-      "EntitlementValue",
       "LeaveApplication",
       "Comment",
       "PublicHoliday"

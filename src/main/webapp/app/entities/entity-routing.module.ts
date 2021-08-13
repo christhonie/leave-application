@@ -35,11 +35,6 @@ import { RouterModule } from '@angular/router';
         loadChildren: () => import('./leave-entitlement/leave-entitlement.module').then(m => m.LeaveEntitlementModule),
       },
       {
-        path: 'entitlement-value',
-        data: { pageTitle: 'leaveApplicationApp.entitlementValue.home.title' },
-        loadChildren: () => import('./entitlement-value/entitlement-value.module').then(m => m.EntitlementValueModule),
-      },
-      {
         path: 'leave-application',
         data: { pageTitle: 'leaveApplicationApp.leaveApplication.home.title' },
         loadChildren: () => import('./leave-application/leave-application.module').then(m => m.LeaveApplicationModule),

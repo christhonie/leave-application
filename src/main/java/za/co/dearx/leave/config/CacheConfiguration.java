@@ -59,7 +59,6 @@ public class CacheConfiguration {
             createCache(cm, za.co.dearx.leave.domain.LeaveStatus.class.getName());
             createCache(cm, za.co.dearx.leave.domain.LeaveType.class.getName());
             createCache(cm, za.co.dearx.leave.domain.LeaveEntitlement.class.getName());
-            createCache(cm, za.co.dearx.leave.domain.EntitlementValue.class.getName());
             createCache(cm, za.co.dearx.leave.domain.LeaveApplication.class.getName());
             createCache(cm, za.co.dearx.leave.domain.Comment.class.getName());
             createCache(cm, za.co.dearx.leave.domain.Decision.class.getName());
