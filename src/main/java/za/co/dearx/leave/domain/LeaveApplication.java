@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
@@ -67,6 +69,11 @@ public class LeaveApplication implements Serializable {
     @NotNull
     @JsonIgnoreProperties(value = { "user", "teams" }, allowSetters = true)
     private Staff staff;
+
+    @OneToMany(mappedBy = "application")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "application", "entitlement" }, allowSetters = true)
+    private Set<LeaveDeduction> deductions = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public Long getId() {
@@ -214,6 +221,37 @@ public class LeaveApplication implements Serializable {
 
     public void setStaff(Staff staff) {
         this.staff = staff;
+    }
+
+    public Set<LeaveDeduction> getDeductions() {
+        return this.deductions;
+    }
+
+    public LeaveApplication deductions(Set<LeaveDeduction> leaveDeductions) {
+        this.setDeductions(leaveDeductions);
+        return this;
+    }
+
+    public LeaveApplication addDeduction(LeaveDeduction leaveDeduction) {
+        this.deductions.add(leaveDeduction);
+        leaveDeduction.setApplication(this);
+        return this;
+    }
+
+    public LeaveApplication removeDeduction(LeaveDeduction leaveDeduction) {
+        this.deductions.remove(leaveDeduction);
+        leaveDeduction.setApplication(null);
+        return this;
+    }
+
+    public void setDeductions(Set<LeaveDeduction> leaveDeductions) {
+        if (this.deductions != null) {
+            this.deductions.forEach(i -> i.setApplication(null));
+        }
+        if (leaveDeductions != null) {
+            leaveDeductions.forEach(i -> i.setApplication(this));
+        }
+        this.deductions = leaveDeductions;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

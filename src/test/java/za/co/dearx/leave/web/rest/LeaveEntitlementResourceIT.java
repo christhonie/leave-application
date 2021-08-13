@@ -23,6 +23,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import za.co.dearx.leave.IntegrationTest;
+import za.co.dearx.leave.domain.LeaveDeduction;
 import za.co.dearx.leave.domain.LeaveEntitlement;
 import za.co.dearx.leave.domain.LeaveType;
 import za.co.dearx.leave.domain.Staff;
@@ -521,6 +522,25 @@ class LeaveEntitlementResourceIT {
 
         // Get all the leaveEntitlementList where staff equals to (staffId + 1)
         defaultLeaveEntitlementShouldNotBeFound("staffId.equals=" + (staffId + 1));
+    }
+
+    @Test
+    @Transactional
+    void getAllLeaveEntitlementsByDeductionIsEqualToSomething() throws Exception {
+        // Initialize the database
+        leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
+        LeaveDeduction deduction = LeaveDeductionResourceIT.createEntity(em);
+        em.persist(deduction);
+        em.flush();
+        leaveEntitlement.addDeduction(deduction);
+        leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
+        Long deductionId = deduction.getId();
+
+        // Get all the leaveEntitlementList where deduction equals to deductionId
+        defaultLeaveEntitlementShouldBeFound("deductionId.equals=" + deductionId);
+
+        // Get all the leaveEntitlementList where deduction equals to (deductionId + 1)
+        defaultLeaveEntitlementShouldNotBeFound("deductionId.equals=" + (deductionId + 1));
     }
 
     /**

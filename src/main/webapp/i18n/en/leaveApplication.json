@@ -26,7 +26,8 @@
       "deleted": "Deleted",
       "leaveType": "Leave Type",
       "leaveStatus": "Leave Status",
-      "staff": "Staff"
+      "staff": "Staff",
+      "deduction": "Deduction"
     }
   }
 }

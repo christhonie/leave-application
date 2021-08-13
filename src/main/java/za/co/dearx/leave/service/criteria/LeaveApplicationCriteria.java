@@ -47,6 +47,8 @@ public class LeaveApplicationCriteria implements Serializable, Criteria {
 
     private LongFilter staffId;
 
+    private LongFilter deductionId;
+
     public LeaveApplicationCriteria() {}
 
     public LeaveApplicationCriteria(LeaveApplicationCriteria other) {
@@ -60,6 +62,7 @@ public class LeaveApplicationCriteria implements Serializable, Criteria {
         this.leaveTypeId = other.leaveTypeId == null ? null : other.leaveTypeId.copy();
         this.leaveStatusId = other.leaveStatusId == null ? null : other.leaveStatusId.copy();
         this.staffId = other.staffId == null ? null : other.staffId.copy();
+        this.deductionId = other.deductionId == null ? null : other.deductionId.copy();
     }
 
     @Override
@@ -217,6 +220,21 @@ public class LeaveApplicationCriteria implements Serializable, Criteria {
         this.staffId = staffId;
     }
 
+    public LongFilter getDeductionId() {
+        return deductionId;
+    }
+
+    public LongFilter deductionId() {
+        if (deductionId == null) {
+            deductionId = new LongFilter();
+        }
+        return deductionId;
+    }
+
+    public void setDeductionId(LongFilter deductionId) {
+        this.deductionId = deductionId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -236,13 +254,26 @@ public class LeaveApplicationCriteria implements Serializable, Criteria {
             Objects.equals(deleted, that.deleted) &&
             Objects.equals(leaveTypeId, that.leaveTypeId) &&
             Objects.equals(leaveStatusId, that.leaveStatusId) &&
-            Objects.equals(staffId, that.staffId)
+            Objects.equals(staffId, that.staffId) &&
+            Objects.equals(deductionId, that.deductionId)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, startDate, endDate, appliedDate, updateDate, days, deleted, leaveTypeId, leaveStatusId, staffId);
+        return Objects.hash(
+            id,
+            startDate,
+            endDate,
+            appliedDate,
+            updateDate,
+            days,
+            deleted,
+            leaveTypeId,
+            leaveStatusId,
+            staffId,
+            deductionId
+        );
     }
 
     // prettier-ignore
@@ -259,6 +290,7 @@ public class LeaveApplicationCriteria implements Serializable, Criteria {
             (leaveTypeId != null ? "leaveTypeId=" + leaveTypeId + ", " : "") +
             (leaveStatusId != null ? "leaveStatusId=" + leaveStatusId + ", " : "") +
             (staffId != null ? "staffId=" + staffId + ", " : "") +
+            (deductionId != null ? "deductionId=" + deductionId + ", " : "") +
             "}";
     }
 }

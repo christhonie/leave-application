@@ -63,6 +63,9 @@ public class CacheConfiguration {
             createCache(cm, za.co.dearx.leave.domain.Comment.class.getName());
             createCache(cm, za.co.dearx.leave.domain.Decision.class.getName());
             createCache(cm, za.co.dearx.leave.domain.PublicHoliday.class.getName());
+            createCache(cm, za.co.dearx.leave.domain.LeaveEntitlement.class.getName() + ".deductions");
+            createCache(cm, za.co.dearx.leave.domain.LeaveApplication.class.getName() + ".deductions");
+            createCache(cm, za.co.dearx.leave.domain.LeaveDeduction.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }

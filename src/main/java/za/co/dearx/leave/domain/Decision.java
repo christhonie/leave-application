@@ -58,7 +58,7 @@ public class Decision implements Serializable {
      */
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = { "leaveType", "leaveStatus", "staff" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "leaveType", "leaveStatus", "staff", "deductions" }, allowSetters = true)
     private LeaveApplication leaveApplication;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

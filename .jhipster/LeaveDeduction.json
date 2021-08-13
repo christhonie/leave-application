@@ -1,0 +1,38 @@
+{
+  "name": "LeaveDeduction",
+  "fields": [
+    {
+      "fieldName": "days",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "leaveApplication",
+      "otherEntityRelationshipName": "deduction",
+      "relationshipValidateRules": "required",
+      "javadoc": "The LeaveApplication for which this deduction applies.",
+      "relationshipName": "application"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "leaveEntitlement",
+      "otherEntityRelationshipName": "deduction",
+      "javadoc": "The LeaveEntitlement to reduce.",
+      "relationshipName": "entitlement"
+    }
+  ],
+  "javadoc": "A mechanism to track leave deducted from one or more LeaveEntitlements for each LeaveApplication, which helps track how much, if any, leave is still remaining.",
+  "entityTableName": "leave_deduction",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceClass",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20210806131917"
+}

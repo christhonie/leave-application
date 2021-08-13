@@ -136,6 +136,15 @@ public class LeaveApplicationQueryService extends QueryService<LeaveApplication>
                         buildSpecification(criteria.getStaffId(), root -> root.join(LeaveApplication_.staff, JoinType.LEFT).get(Staff_.id))
                     );
             }
+            if (criteria.getDeductionId() != null) {
+                specification =
+                    specification.and(
+                        buildSpecification(
+                            criteria.getDeductionId(),
+                            root -> root.join(LeaveApplication_.deductions, JoinType.LEFT).get(LeaveDeduction_.id)
+                        )
+                    );
+            }
         }
         return specification;
     }

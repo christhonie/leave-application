@@ -56,6 +56,12 @@
       "javadoc": "The Staff member the leave is assigned to. This field cannot be changed once the record is created.",
       "relationshipName": "staff",
       "otherEntityField": "name"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "leaveDeduction",
+      "otherEntityRelationshipName": "application",
+      "relationshipName": "deduction"
     }
   ],
   "changelogDate": "20210430145153",

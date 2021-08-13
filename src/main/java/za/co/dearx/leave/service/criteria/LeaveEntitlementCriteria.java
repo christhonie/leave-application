@@ -36,6 +36,8 @@ public class LeaveEntitlementCriteria implements Serializable, Criteria {
 
     private LongFilter staffId;
 
+    private LongFilter deductionId;
+
     public LeaveEntitlementCriteria() {}
 
     public LeaveEntitlementCriteria(LeaveEntitlementCriteria other) {
@@ -44,6 +46,7 @@ public class LeaveEntitlementCriteria implements Serializable, Criteria {
         this.days = other.days == null ? null : other.days.copy();
         this.leaveTypeId = other.leaveTypeId == null ? null : other.leaveTypeId.copy();
         this.staffId = other.staffId == null ? null : other.staffId.copy();
+        this.deductionId = other.deductionId == null ? null : other.deductionId.copy();
     }
 
     @Override
@@ -126,6 +129,21 @@ public class LeaveEntitlementCriteria implements Serializable, Criteria {
         this.staffId = staffId;
     }
 
+    public LongFilter getDeductionId() {
+        return deductionId;
+    }
+
+    public LongFilter deductionId() {
+        if (deductionId == null) {
+            deductionId = new LongFilter();
+        }
+        return deductionId;
+    }
+
+    public void setDeductionId(LongFilter deductionId) {
+        this.deductionId = deductionId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -140,13 +158,14 @@ public class LeaveEntitlementCriteria implements Serializable, Criteria {
             Objects.equals(entitlementDate, that.entitlementDate) &&
             Objects.equals(days, that.days) &&
             Objects.equals(leaveTypeId, that.leaveTypeId) &&
-            Objects.equals(staffId, that.staffId)
+            Objects.equals(staffId, that.staffId) &&
+            Objects.equals(deductionId, that.deductionId)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, entitlementDate, days, leaveTypeId, staffId);
+        return Objects.hash(id, entitlementDate, days, leaveTypeId, staffId, deductionId);
     }
 
     // prettier-ignore
@@ -158,6 +177,7 @@ public class LeaveEntitlementCriteria implements Serializable, Criteria {
             (days != null ? "days=" + days + ", " : "") +
             (leaveTypeId != null ? "leaveTypeId=" + leaveTypeId + ", " : "") +
             (staffId != null ? "staffId=" + staffId + ", " : "") +
+            (deductionId != null ? "deductionId=" + deductionId + ", " : "") +
             "}";
     }
 }

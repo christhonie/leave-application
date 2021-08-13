@@ -31,6 +31,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import za.co.dearx.leave.IntegrationTest;
 import za.co.dearx.leave.domain.LeaveApplication;
+import za.co.dearx.leave.domain.LeaveDeduction;
 import za.co.dearx.leave.domain.LeaveStatus;
 import za.co.dearx.leave.domain.LeaveType;
 import za.co.dearx.leave.domain.Staff;
@@ -1032,6 +1033,25 @@ class LeaveApplicationResourceIT {
 
         // Get all the leaveApplicationList where staff equals to (staffId + 1)
         defaultLeaveApplicationShouldNotBeFound("staffId.equals=" + (staffId + 1));
+    }
+
+    @Test
+    @Transactional
+    void getAllLeaveApplicationsByDeductionIsEqualToSomething() throws Exception {
+        // Initialize the database
+        leaveApplicationRepository.saveAndFlush(leaveApplication);
+        LeaveDeduction deduction = LeaveDeductionResourceIT.createEntity(em);
+        em.persist(deduction);
+        em.flush();
+        leaveApplication.addDeduction(deduction);
+        leaveApplicationRepository.saveAndFlush(leaveApplication);
+        Long deductionId = deduction.getId();
+
+        // Get all the leaveApplicationList where deduction equals to deductionId
+        defaultLeaveApplicationShouldBeFound("deductionId.equals=" + deductionId);
+
+        // Get all the leaveApplicationList where deduction equals to (deductionId + 1)
+        defaultLeaveApplicationShouldNotBeFound("deductionId.equals=" + (deductionId + 1));
     }
 
     /**

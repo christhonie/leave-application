@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <!--
+        Added the constraints for entity LeaveDeduction.
+    -->
+    <changeSet id="20210806131917-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="application_id"
+                                 baseTableName="leave_deduction"
+                                 constraintName="fk_leave_deduction__application_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="leave_application"/>
+
+        <addForeignKeyConstraint baseColumnNames="entitlement_id"
+                                 baseTableName="leave_deduction"
+                                 constraintName="fk_leave_deduction__entitlement_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="leave_entitlement"/>
+    </changeSet>
+</databaseChangeLog>
