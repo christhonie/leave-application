@@ -149,7 +149,7 @@ public class LeaveApplication implements Serializable {
      * Calling this method has no effect.
      * This value is set using {@link #setStartDate(LocalDate)} and/or {@link #setEndDate(LocalDate)}.
      *
-     * @param days
+     * @param days Setting this value has no effect
      */
     public void setDays(BigDecimal days) {
         //Do not allow direct setting.

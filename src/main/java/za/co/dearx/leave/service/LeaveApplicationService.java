@@ -73,7 +73,7 @@ public class LeaveApplicationService {
      * @param leaveApplicationDTO the entity to save.
      * @return the persisted entity.
      * @throws ValidationException when no LeaveStatus was specified and there is also no default LeaveStatus defined.
-     * @throws NotFoundException
+     * @throws NotFoundException when the staff member referenced in the DTO could not be found
      */
     public LeaveApplicationDTO create(LeaveApplicationDTO leaveApplicationDTO) throws ValidationException, NotFoundException {
         log.debug("Request to create LeaveApplication : {}", leaveApplicationDTO);
