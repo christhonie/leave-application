@@ -21,21 +21,6 @@ npm install
 
 We use npm scripts and [Angular CLI][] with [Webpack][] as our build system.
 
-Run the following commands in two separate terminals to create a blissful development experience where your browser
-auto-refreshes when files change on your hard drive.
-
-Starting the Java back-end;
-```
-./mvnw -P!webapp
-```
-
-NOTE: The `-P` just tells Maven not to complile the front-end code, saving some time. No harm is done leaving it out.
-
-Compiling and staring the front-end;
-```
-npm start
-```
-
 Npm is also used to manage CSS and JavaScript dependencies used in this application. You can upgrade dependencies by
 specifying a newer version in [package.json](package.json). You can also run `npm update` and `npm install` to manage dependencies.
 Add the `help` flag on any command to see how you can use it. For example, `npm help update`.
@@ -140,9 +125,28 @@ What is Git?: https://www.atlassian.com/git/tutorials/what-is-git
 Git Sheet Sheet: https://www.atlassian.com/git/tutorials/atlassian-git-cheatsheet
 Migrating from SVN to Git: https://git.or.cz/course/svn.html
 
-## Your first build
+## Start the application for the first time in development mode
 
-The first build is best performed from the command line. Use the following command to get started;
+The application requires **both** the Java and Angular applications to be started separately. The Java application includes the Angular application, but it is cumbersome to have to restart it each time the Angular application changes. For this reason we start them separately.
+
+Run the following commands in two separate terminals to create a blissful development experience where your browser
+auto-refreshes when files change on your hard drive.
+
+Starting the Java back-end;
+```
+./mvnw -P!webapp
+```
+
+NOTE: The `-P` just tells Maven not to complile the front-end code, saving some time. No harm is done leaving it out.
+
+Compiling and staring the front-end;
+```
+npm start
+```
+
+## Your first build in Java
+
+The first build is best performed from the command line. This is used after making changes to the Java code. Use the following command to get started;
 
 ```shell
 mvn clean compile test
@@ -150,9 +154,9 @@ mvn clean compile test
 
 This will only compile the code and check for errors, as well as run the test packs.
 
-## Build instructions for production
+## Clean and build
 
-Always use the clean goal when building the project for deployment.
+Use the clean goal as the first step when the build produces unexpected errors. 
 
 Run the package goal from the root directory to create the JAR file for deployment.
 
@@ -160,12 +164,10 @@ Run the package goal from the root directory to create the JAR file for deployme
 mvn clean package
 ```
 
-This will ensure that all the dependencies are compiled and installed on your local M2 Maven repository.
-
 Applications should be run from your local PC to ensure that the code actually run. This process will also execute any included unit and integration tests.
 
 ```shell
-mvn spring-boot:run
+mvn
 ```
 
 ## Deployment to the development servers
