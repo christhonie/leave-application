@@ -82,10 +82,11 @@ public class StaffService {
     }
 
     /**
-     * Updates the staff leave entitlement value using the staffDTO
+     * Updates the staff leave entitlement value
      *
-     * @param staffDTO
-     * @return
+     * @param staff the staff member to update the entitlement days for
+     * @param days the number of days the staff member has of entitlement
+     * @return returns the DTO of the staff member that has been updated
      */
     public Optional<StaffDTO> updateLeaveEntitlement(Staff staff, BigDecimal days) {
         log.debug("Add number of Leave Entitlement days: {} to Staff Member: {}", staff, days);
