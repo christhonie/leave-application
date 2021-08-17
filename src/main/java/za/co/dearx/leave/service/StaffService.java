@@ -1,6 +1,7 @@
 package za.co.dearx.leave.service;
 
 import camundajar.impl.scala.Option;
+import java.math.BigDecimal;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +34,6 @@ public class StaffService {
 
     private final LeaveTypeRepository leaveTypeRepository;
 
-    private final LeaveEntitlementRepository leaveEntitlementRepository;
-
     private final StaffMapper staffMapper;
 
     public StaffService(
@@ -45,7 +44,6 @@ public class StaffService {
     ) {
         this.staffRepository = staffRepository;
         this.leaveTypeRepository = leaveTypeRepository;
-        this.leaveEntitlementRepository = leaveEntitlementRepository;
         this.staffMapper = staffMapper;
     }
 
@@ -89,19 +87,17 @@ public class StaffService {
      * @param staffDTO
      * @return
      */
-    public Optional<StaffDTO> updateLeaveEntitlement(StaffDTO staffDTO) {
-        log.debug("Add Leave Entitlement Value of Staff Member: {}", staffDTO);
+    public Optional<StaffDTO> updateLeaveEntitlement(Staff staff, BigDecimal days) {
+        log.debug("Add number of Leave Entitlement days: {} to Staff Member: {}", staff, days);
+        StaffDTO staffDTO = null;
 
-        Staff staff = staffMapper.toEntity(staffDTO);
-        LeaveType leaveType = leaveTypeRepository.findByName("Annual Leave");
-        LeaveEntitlement leaveEntitlement = leaveEntitlementRepository.findByStaffandLeaveType(staff.getId(), leaveType.getId());
-        staffDTO.setAnnualLeaveEntitlement(leaveEntitlement.getDays());
+        staff.setAnnualLeaveEntitlement(days);
 
         return staffRepository
-            .findById(staffDTO.getId())
+            .findById(staff.getId())
             .map(
                 existingStaff -> {
-                    staffMapper.partialUpdate(existingStaff, staffDTO);
+                    staffMapper.partialUpdate(staff, staffDTO);
                     return existingStaff;
                 }
             )

@@ -47,11 +47,6 @@
     
     <changeSet id="20210617144653-2" author="Jéan-Leigh Jantjes">
         <addColumn tableName="staff">
-            <column name="name" type="varchar(100)" remarks="A read-only field consisting out of the first name and last name of the person.">
-                <constraints nullable="true" />
-            </column>
-        </addColumn>
-        <addColumn tableName="staff">
             <column name="annual_leave_entitlement" type="decimal" remarks="The number of annual leave days an employee is entitled to according to there employment contract,\nThis should be populated using {@link EntitlementValue} table according to the linked user">
                 <constraints nullable="true" />
             </column>

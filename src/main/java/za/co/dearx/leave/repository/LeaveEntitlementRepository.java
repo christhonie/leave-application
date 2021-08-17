@@ -13,12 +13,4 @@ import za.co.dearx.leave.domain.Staff;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface LeaveEntitlementRepository extends JpaRepository<LeaveEntitlement, Long>, JpaSpecificationExecutor<LeaveEntitlement> {
-    @Query(
-        "select le from LeaveEntitlement le " +
-        "join le.staff s " +
-        "join le.leaveType lt " +
-        "where s.id = :staffId and lt.id = :leaveTypeId"
-    )
-    LeaveEntitlement findByStaffandLeaveType(@Param("staffId") Long staffId, @Param("leaveTypeId") Long leaveTypeId);
-}
+public interface LeaveEntitlementRepository extends JpaRepository<LeaveEntitlement, Long>, JpaSpecificationExecutor<LeaveEntitlement> {}
