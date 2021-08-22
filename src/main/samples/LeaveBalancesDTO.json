@@ -1,0 +1,18 @@
+[
+  {
+    "type": {
+      "id": 2,
+      "name": "Annual Leave"
+    },
+    "total": 15,
+    "pending": 1
+  },
+  {
+    "type": {
+      "id": 4,
+      "name": "Study Leave"
+    },
+    "total": 5,
+    "pending": 2
+  }
+]

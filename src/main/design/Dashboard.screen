@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model:Screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:model="http://wireframesketcher.com/1.0/model.ecore">
+  <widgets xsi:type="model:Panel" id="1" x="56" y="96" width="689" height="497" measuredWidth="689" measuredHeight="497"/>
+  <widgets xsi:type="model:Table" id="2" x="112" y="184" width="577" text="Type,Total, Pending,Available,(align:center). Actions&#xA;Annual Leave,15,1,14,[Apply] [View]&#xA;Study Leave,5,2,3,[Apply] [View]&#xA;" measuredWidth="577" measuredHeight="67" alternative="#eee">
+    <font/>
+    <items x="479" y="24" width="31" height="15" text="Apply"/>
+    <items x="513" y="24" width="25" height="15" text="View"/>
+    <items x="479" y="45" width="31" height="15" text="Apply"/>
+    <items x="513" y="45" width="25" height="15" text="View"/>
+  </widgets>
+  <widgets xsi:type="model:Label" id="3" x="112" y="118" text="Leave Balances" measuredWidth="288" measuredHeight="67">
+    <font size="43px"/>
+  </widgets>
+  <widgets xsi:type="model:Label" id="4" x="112" y="272" text="Pending applications" measuredWidth="396" measuredHeight="67">
+    <font size="43px"/>
+  </widgets>
+  <widgets xsi:type="model:Table" id="5" x="112" y="338" width="572" text="Start,Type,Days,Status,(align:center). Actions&#xA;2021/08/31,Annual Leave,1,Pending,[View]&#xA;2021/08/31,Study Leave,2,Approved,[View]" measuredWidth="572" measuredHeight="67" alternative="#eee">
+    <font/>
+    <items x="509" y="24" width="25" height="15" text="View"/>
+    <items x="509" y="45" width="25" height="15" text="View"/>
+  </widgets>
+  <widgets xsi:type="model:Label" id="6" x="112" y="432" text="Workflow tasks" measuredWidth="290" measuredHeight="67">
+    <font size="43px"/>
+  </widgets>
+  <widgets xsi:type="model:Table" id="7" x="114" y="488" width="567" text="Person,Start,Type,Days,Status,(align:center). Actions&#xA;Christhonie, 2021/08/31,Annual Leave,1,Pending,[Approve] [Reject]&#xA;Jason, 2021/08/31,Study Leave,2,Pending,[Approve] [Reject]" measuredWidth="567" measuredHeight="67" alternative="#eee">
+    <font/>
+    <items x="461" y="24" width="45" height="15" text="Approve"/>
+    <items x="509" y="24" width="32" height="15" text="Reject"/>
+    <items x="461" y="45" width="45" height="15" text="Approve"/>
+    <items x="509" y="45" width="32" height="15" text="Reject"/>
+  </widgets>
+  <hRuler/>
+  <vRuler/>
+  <font size="12px"/>
+</model:Screen>
