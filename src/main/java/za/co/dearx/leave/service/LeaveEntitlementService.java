@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import za.co.dearx.leave.domain.LeaveEntitlement;
+import za.co.dearx.leave.domain.LeaveType;
+import za.co.dearx.leave.domain.Staff;
 import za.co.dearx.leave.repository.LeaveEntitlementRepository;
 import za.co.dearx.leave.service.dto.LeaveEntitlementDTO;
 import za.co.dearx.leave.service.mapper.LeaveEntitlementMapper;
@@ -97,4 +99,19 @@ public class LeaveEntitlementService {
         log.debug("Request to delete LeaveEntitlement : {}", id);
         leaveEntitlementRepository.deleteById(id);
     }
+
+    /**
+     * Apply {@link LeaveEntitlement}s to all {@link Staff} members of all {@link LeaveType}s.
+     */
+    public void apply() {
+        // TODO Auto-generated method stub
+
+    }
+
+    /**
+     * Apply {@link LeaveEntitlement}s for a given {@link Staff} member and {@link LeaveType}.
+     * @param staff to which to apply the entitlement
+     * @param type of entitlement
+     */
+    private void apply(Staff staff, LeaveType type) {}
 }
