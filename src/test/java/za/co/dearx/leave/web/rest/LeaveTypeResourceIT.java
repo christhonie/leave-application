@@ -44,6 +44,10 @@ class LeaveTypeResourceIT {
     private static final String DEFAULT_PROCESS_NAME = "";
     private static final String UPDATED_PROCESS_NAME = "BBBBBBBBBB";
 
+    private static final Integer DEFAULT_DASHBOARD_ORDER = 1;
+    private static final Integer UPDATED_DASHBOARD_ORDER = 2;
+    private static final Integer SMALLER_DASHBOARD_ORDER = 1 - 1;
+
     private static final String ENTITY_API_URL = "/api/leave-types";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
@@ -71,7 +75,11 @@ class LeaveTypeResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static LeaveType createEntity(EntityManager em) {
-        LeaveType leaveType = new LeaveType().name(DEFAULT_NAME).description(DEFAULT_DESCRIPTION).processName(DEFAULT_PROCESS_NAME);
+        LeaveType leaveType = new LeaveType()
+            .name(DEFAULT_NAME)
+            .description(DEFAULT_DESCRIPTION)
+            .processName(DEFAULT_PROCESS_NAME)
+            .dashboardOrder(DEFAULT_DASHBOARD_ORDER);
         return leaveType;
     }
 
@@ -82,7 +90,11 @@ class LeaveTypeResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static LeaveType createUpdatedEntity(EntityManager em) {
-        LeaveType leaveType = new LeaveType().name(UPDATED_NAME).description(UPDATED_DESCRIPTION).processName(UPDATED_PROCESS_NAME);
+        LeaveType leaveType = new LeaveType()
+            .name(UPDATED_NAME)
+            .description(UPDATED_DESCRIPTION)
+            .processName(UPDATED_PROCESS_NAME)
+            .dashboardOrder(UPDATED_DASHBOARD_ORDER);
         return leaveType;
     }
 
@@ -113,6 +125,7 @@ class LeaveTypeResourceIT {
         assertThat(testLeaveType.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testLeaveType.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
 
+        assertThat(testLeaveType.getDashboardOrder()).isEqualTo(DEFAULT_DASHBOARD_ORDER);
         Condition<String> nullValue = new Condition<>(pn -> pn == null, "Null value");
         Condition<String> defaultValue = new Condition<>(pn -> pn.equals(DEFAULT_PROCESS_NAME), "Default value");
         assertThat(testLeaveType.getProcessName()).is(anyOf(nullValue, defaultValue));
@@ -179,7 +192,8 @@ class LeaveTypeResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(leaveType.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
-            .andExpect(jsonPath("$.[*].processName").value(hasItem(DEFAULT_PROCESS_NAME)));
+            .andExpect(jsonPath("$.[*].processName").value(hasItem(DEFAULT_PROCESS_NAME)))
+            .andExpect(jsonPath("$.[*].dashboardOrder").value(hasItem(DEFAULT_DASHBOARD_ORDER)));
     }
 
     @Test
@@ -196,7 +210,8 @@ class LeaveTypeResourceIT {
             .andExpect(jsonPath("$.id").value(leaveType.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
             .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION))
-            .andExpect(jsonPath("$.processName").value(DEFAULT_PROCESS_NAME));
+            .andExpect(jsonPath("$.processName").value(DEFAULT_PROCESS_NAME))
+            .andExpect(jsonPath("$.dashboardOrder").value(DEFAULT_DASHBOARD_ORDER));
     }
 
     @Test
@@ -451,6 +466,110 @@ class LeaveTypeResourceIT {
         defaultLeaveTypeShouldBeFound("processName.doesNotContain=" + UPDATED_PROCESS_NAME);
     }
 
+    @Test
+    @Transactional
+    void getAllLeaveTypesByDashboardOrderIsEqualToSomething() throws Exception {
+        // Initialize the database
+        leaveTypeRepository.saveAndFlush(leaveType);
+
+        // Get all the leaveTypeList where dashboardOrder equals to DEFAULT_DASHBOARD_ORDER
+        defaultLeaveTypeShouldBeFound("dashboardOrder.equals=" + DEFAULT_DASHBOARD_ORDER);
+
+        // Get all the leaveTypeList where dashboardOrder equals to UPDATED_DASHBOARD_ORDER
+        defaultLeaveTypeShouldNotBeFound("dashboardOrder.equals=" + UPDATED_DASHBOARD_ORDER);
+    }
+
+    @Test
+    @Transactional
+    void getAllLeaveTypesByDashboardOrderIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        leaveTypeRepository.saveAndFlush(leaveType);
+
+        // Get all the leaveTypeList where dashboardOrder not equals to DEFAULT_DASHBOARD_ORDER
+        defaultLeaveTypeShouldNotBeFound("dashboardOrder.notEquals=" + DEFAULT_DASHBOARD_ORDER);
+
+        // Get all the leaveTypeList where dashboardOrder not equals to UPDATED_DASHBOARD_ORDER
+        defaultLeaveTypeShouldBeFound("dashboardOrder.notEquals=" + UPDATED_DASHBOARD_ORDER);
+    }
+
+    @Test
+    @Transactional
+    void getAllLeaveTypesByDashboardOrderIsInShouldWork() throws Exception {
+        // Initialize the database
+        leaveTypeRepository.saveAndFlush(leaveType);
+
+        // Get all the leaveTypeList where dashboardOrder in DEFAULT_DASHBOARD_ORDER or UPDATED_DASHBOARD_ORDER
+        defaultLeaveTypeShouldBeFound("dashboardOrder.in=" + DEFAULT_DASHBOARD_ORDER + "," + UPDATED_DASHBOARD_ORDER);
+
+        // Get all the leaveTypeList where dashboardOrder equals to UPDATED_DASHBOARD_ORDER
+        defaultLeaveTypeShouldNotBeFound("dashboardOrder.in=" + UPDATED_DASHBOARD_ORDER);
+    }
+
+    @Test
+    @Transactional
+    void getAllLeaveTypesByDashboardOrderIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        leaveTypeRepository.saveAndFlush(leaveType);
+
+        // Get all the leaveTypeList where dashboardOrder is not null
+        defaultLeaveTypeShouldBeFound("dashboardOrder.specified=true");
+
+        // Get all the leaveTypeList where dashboardOrder is null
+        defaultLeaveTypeShouldNotBeFound("dashboardOrder.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllLeaveTypesByDashboardOrderIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        leaveTypeRepository.saveAndFlush(leaveType);
+
+        // Get all the leaveTypeList where dashboardOrder is greater than or equal to DEFAULT_DASHBOARD_ORDER
+        defaultLeaveTypeShouldBeFound("dashboardOrder.greaterThanOrEqual=" + DEFAULT_DASHBOARD_ORDER);
+
+        // Get all the leaveTypeList where dashboardOrder is greater than or equal to UPDATED_DASHBOARD_ORDER
+        defaultLeaveTypeShouldNotBeFound("dashboardOrder.greaterThanOrEqual=" + UPDATED_DASHBOARD_ORDER);
+    }
+
+    @Test
+    @Transactional
+    void getAllLeaveTypesByDashboardOrderIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        leaveTypeRepository.saveAndFlush(leaveType);
+
+        // Get all the leaveTypeList where dashboardOrder is less than or equal to DEFAULT_DASHBOARD_ORDER
+        defaultLeaveTypeShouldBeFound("dashboardOrder.lessThanOrEqual=" + DEFAULT_DASHBOARD_ORDER);
+
+        // Get all the leaveTypeList where dashboardOrder is less than or equal to SMALLER_DASHBOARD_ORDER
+        defaultLeaveTypeShouldNotBeFound("dashboardOrder.lessThanOrEqual=" + SMALLER_DASHBOARD_ORDER);
+    }
+
+    @Test
+    @Transactional
+    void getAllLeaveTypesByDashboardOrderIsLessThanSomething() throws Exception {
+        // Initialize the database
+        leaveTypeRepository.saveAndFlush(leaveType);
+
+        // Get all the leaveTypeList where dashboardOrder is less than DEFAULT_DASHBOARD_ORDER
+        defaultLeaveTypeShouldNotBeFound("dashboardOrder.lessThan=" + DEFAULT_DASHBOARD_ORDER);
+
+        // Get all the leaveTypeList where dashboardOrder is less than UPDATED_DASHBOARD_ORDER
+        defaultLeaveTypeShouldBeFound("dashboardOrder.lessThan=" + UPDATED_DASHBOARD_ORDER);
+    }
+
+    @Test
+    @Transactional
+    void getAllLeaveTypesByDashboardOrderIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        leaveTypeRepository.saveAndFlush(leaveType);
+
+        // Get all the leaveTypeList where dashboardOrder is greater than DEFAULT_DASHBOARD_ORDER
+        defaultLeaveTypeShouldNotBeFound("dashboardOrder.greaterThan=" + DEFAULT_DASHBOARD_ORDER);
+
+        // Get all the leaveTypeList where dashboardOrder is greater than SMALLER_DASHBOARD_ORDER
+        defaultLeaveTypeShouldBeFound("dashboardOrder.greaterThan=" + SMALLER_DASHBOARD_ORDER);
+    }
+
     /**
      * Executes the search, and checks that the default entity is returned.
      */
@@ -462,7 +581,8 @@ class LeaveTypeResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(leaveType.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
-            .andExpect(jsonPath("$.[*].processName").value(hasItem(DEFAULT_PROCESS_NAME)));
+            .andExpect(jsonPath("$.[*].processName").value(hasItem(DEFAULT_PROCESS_NAME)))
+            .andExpect(jsonPath("$.[*].dashboardOrder").value(hasItem(DEFAULT_DASHBOARD_ORDER)));
 
         // Check, that the count call also returns 1
         restLeaveTypeMockMvc
@@ -510,7 +630,11 @@ class LeaveTypeResourceIT {
         LeaveType updatedLeaveType = leaveTypeRepository.findById(leaveType.getId()).get();
         // Disconnect from session so that the updates on updatedLeaveType are not directly saved in db
         em.detach(updatedLeaveType);
-        updatedLeaveType.name(UPDATED_NAME).description(UPDATED_DESCRIPTION).processName(UPDATED_PROCESS_NAME);
+        updatedLeaveType
+            .name(UPDATED_NAME)
+            .description(UPDATED_DESCRIPTION)
+            .processName(UPDATED_PROCESS_NAME)
+            .dashboardOrder(UPDATED_DASHBOARD_ORDER);
         LeaveTypeDTO leaveTypeDTO = leaveTypeMapper.toDto(updatedLeaveType);
 
         restLeaveTypeMockMvc
@@ -529,6 +653,7 @@ class LeaveTypeResourceIT {
         assertThat(testLeaveType.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testLeaveType.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
         assertThat(testLeaveType.getProcessName()).isEqualTo(UPDATED_PROCESS_NAME);
+        assertThat(testLeaveType.getDashboardOrder()).isEqualTo(UPDATED_DASHBOARD_ORDER);
     }
 
     @Test
@@ -633,6 +758,7 @@ class LeaveTypeResourceIT {
         assertThat(testLeaveType.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testLeaveType.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
         assertThat(testLeaveType.getProcessName()).isEqualTo(UPDATED_PROCESS_NAME);
+        assertThat(testLeaveType.getDashboardOrder()).isEqualTo(DEFAULT_DASHBOARD_ORDER);
     }
 
     @Test
@@ -647,7 +773,11 @@ class LeaveTypeResourceIT {
         LeaveType partialUpdatedLeaveType = new LeaveType();
         partialUpdatedLeaveType.setId(leaveType.getId());
 
-        partialUpdatedLeaveType.name(UPDATED_NAME).description(UPDATED_DESCRIPTION).processName(UPDATED_PROCESS_NAME);
+        partialUpdatedLeaveType
+            .name(UPDATED_NAME)
+            .description(UPDATED_DESCRIPTION)
+            .processName(UPDATED_PROCESS_NAME)
+            .dashboardOrder(UPDATED_DASHBOARD_ORDER);
 
         restLeaveTypeMockMvc
             .perform(
@@ -665,6 +795,7 @@ class LeaveTypeResourceIT {
         assertThat(testLeaveType.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testLeaveType.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
         assertThat(testLeaveType.getProcessName()).isEqualTo(UPDATED_PROCESS_NAME);
+        assertThat(testLeaveType.getDashboardOrder()).isEqualTo(UPDATED_DASHBOARD_ORDER);
     }
 
     @Test

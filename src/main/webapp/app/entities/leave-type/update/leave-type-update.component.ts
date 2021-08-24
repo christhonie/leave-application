@@ -20,6 +20,7 @@ export class LeaveTypeUpdateComponent implements OnInit {
     name: [null, [Validators.required, Validators.maxLength(50)]],
     description: [null, [Validators.maxLength(200)]],
     processName: [null, [Validators.maxLength(200)]],
+    dashboardOrder: [],
   });
 
   constructor(protected leaveTypeService: LeaveTypeService, protected activatedRoute: ActivatedRoute, protected fb: FormBuilder) {}
@@ -69,6 +70,7 @@ export class LeaveTypeUpdateComponent implements OnInit {
       name: leaveType.name,
       description: leaveType.description,
       processName: leaveType.processName,
+      dashboardOrder: leaveType.dashboardOrder,
     });
   }
 
@@ -79,6 +81,7 @@ export class LeaveTypeUpdateComponent implements OnInit {
       name: this.editForm.get(['name'])!.value,
       description: this.editForm.get(['description'])!.value,
       processName: this.editForm.get(['processName'])!.value,
+      dashboardOrder: this.editForm.get(['dashboardOrder'])!.value,
     };
   }
 }

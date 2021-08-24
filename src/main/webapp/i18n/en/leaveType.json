@@ -21,9 +21,11 @@
       "name": "Name",
       "description": "Description",
       "processName": "Process Name",
+      "dashboardOrder": "Dashboard Order",
       "help": {
         "name": "A unique name for the leave type.",
-        "processName": "The process ID to invoke for a new leave application."
+        "processName": "The process ID to invoke for a new leave application.",
+        "dashboardOrder": "The order in which the types are displayed on the dashboard. Omit when type should not be displayed."
       }
     }
   }

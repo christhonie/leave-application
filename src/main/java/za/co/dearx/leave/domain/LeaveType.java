@@ -39,6 +39,12 @@ public class LeaveType implements Serializable {
     @Column(name = "process_name", length = 200)
     private String processName;
 
+    /**
+     * The order in which the types are displayed on the dashboard. Omit when type should not be displayed.
+     */
+    @Column(name = "dashboard_order")
+    private Integer dashboardOrder;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public Long getId() {
         return id;
@@ -92,6 +98,19 @@ public class LeaveType implements Serializable {
         this.processName = processName;
     }
 
+    public Integer getDashboardOrder() {
+        return this.dashboardOrder;
+    }
+
+    public LeaveType dashboardOrder(Integer dashboardOrder) {
+        this.dashboardOrder = dashboardOrder;
+        return this;
+    }
+
+    public void setDashboardOrder(Integer dashboardOrder) {
+        this.dashboardOrder = dashboardOrder;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -119,6 +138,7 @@ public class LeaveType implements Serializable {
             ", name='" + getName() + "'" +
             ", description='" + getDescription() + "'" +
             ", processName='" + getProcessName() + "'" +
+            ", dashboardOrder=" + getDashboardOrder() +
             "}";
     }
 }

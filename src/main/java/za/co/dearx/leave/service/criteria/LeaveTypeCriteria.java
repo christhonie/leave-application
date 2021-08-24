@@ -32,6 +32,8 @@ public class LeaveTypeCriteria implements Serializable, Criteria {
 
     private StringFilter processName;
 
+    private IntegerFilter dashboardOrder;
+
     public LeaveTypeCriteria() {}
 
     public LeaveTypeCriteria(LeaveTypeCriteria other) {
@@ -39,6 +41,7 @@ public class LeaveTypeCriteria implements Serializable, Criteria {
         this.name = other.name == null ? null : other.name.copy();
         this.description = other.description == null ? null : other.description.copy();
         this.processName = other.processName == null ? null : other.processName.copy();
+        this.dashboardOrder = other.dashboardOrder == null ? null : other.dashboardOrder.copy();
     }
 
     @Override
@@ -106,6 +109,21 @@ public class LeaveTypeCriteria implements Serializable, Criteria {
         this.processName = processName;
     }
 
+    public IntegerFilter getDashboardOrder() {
+        return dashboardOrder;
+    }
+
+    public IntegerFilter dashboardOrder() {
+        if (dashboardOrder == null) {
+            dashboardOrder = new IntegerFilter();
+        }
+        return dashboardOrder;
+    }
+
+    public void setDashboardOrder(IntegerFilter dashboardOrder) {
+        this.dashboardOrder = dashboardOrder;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -119,13 +137,14 @@ public class LeaveTypeCriteria implements Serializable, Criteria {
             Objects.equals(id, that.id) &&
             Objects.equals(name, that.name) &&
             Objects.equals(description, that.description) &&
-            Objects.equals(processName, that.processName)
+            Objects.equals(processName, that.processName) &&
+            Objects.equals(dashboardOrder, that.dashboardOrder)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, processName);
+        return Objects.hash(id, name, description, processName, dashboardOrder);
     }
 
     // prettier-ignore
@@ -136,6 +155,7 @@ public class LeaveTypeCriteria implements Serializable, Criteria {
             (name != null ? "name=" + name + ", " : "") +
             (description != null ? "description=" + description + ", " : "") +
             (processName != null ? "processName=" + processName + ", " : "") +
+            (dashboardOrder != null ? "dashboardOrder=" + dashboardOrder + ", " : "") +
             "}";
     }
 }

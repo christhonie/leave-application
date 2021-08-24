@@ -34,6 +34,12 @@ public class LeaveTypeDTO implements Serializable {
     @ApiModelProperty(value = "The process ID to invoke for a new leave application.")
     private String processName;
 
+    /**
+     * The order in which the types are displayed on the dashboard. Omit when type should not be displayed.
+     */
+    @ApiModelProperty(value = "The order in which the types are displayed on the dashboard. Omit when type should not be displayed.")
+    private Integer dashboardOrder;
+
     public Long getId() {
         return id;
     }
@@ -66,6 +72,14 @@ public class LeaveTypeDTO implements Serializable {
         this.processName = processName;
     }
 
+    public Integer getDashboardOrder() {
+        return dashboardOrder;
+    }
+
+    public void setDashboardOrder(Integer dashboardOrder) {
+        this.dashboardOrder = dashboardOrder;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -95,6 +109,7 @@ public class LeaveTypeDTO implements Serializable {
             ", name='" + getName() + "'" +
             ", description='" + getDescription() + "'" +
             ", processName='" + getProcessName() + "'" +
+            ", dashboardOrder=" + getDashboardOrder() +
             "}";
     }
 }

@@ -20,6 +20,11 @@
       "javadoc": "The process ID to invoke for a new leave application.",
       "fieldValidateRules": ["maxlength"],
       "fieldValidateRulesMaxlength": "200"
+    },
+    {
+      "fieldName": "dashboardOrder",
+      "fieldType": "Integer",
+      "javadoc": "The order in which the types are displayed on the dashboard. Omit when type should not be displayed."
     }
   ],
   "relationships": [],

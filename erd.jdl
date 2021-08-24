@@ -79,6 +79,8 @@ entity LeaveType {
 	description String maxlength(200)
 	/** The process ID to invoke for a new leave application. */
   processName String maxlength(200)
+	/** The order in which the types are displayed on the dashboard. Omit when type should not be displayed. */
+	dashboardOrder Integer
 }
 
 //*************************************
