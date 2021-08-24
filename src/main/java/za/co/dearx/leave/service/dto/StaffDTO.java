@@ -42,6 +42,12 @@ public class StaffDTO implements Serializable {
     private LocalDate startDate;
 
     /**
+     * When employment ended. If set, it indicates a person is an active employee anymore.
+     */
+    @ApiModelProperty(value = "When employment ended. If set, it indicates a person is an active employee anymore.")
+    private LocalDate endDate;
+
+    /**
      * A read-only field consisting out of the first name and last name of the person.
      */
     @Size(max = 100)
@@ -109,6 +115,14 @@ public class StaffDTO implements Serializable {
 
     public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public String getName() {
@@ -212,6 +226,7 @@ public class StaffDTO implements Serializable {
             ", position='" + getPosition() + "'" +
             ", employeeID='" + getEmployeeID() + "'" +
             ", startDate='" + getStartDate() + "'" +
+            ", endDate='" + getEndDate() + "'" +
             ", name='" + getName() + "'" +
             ", firstName='" + getFirstName() + "'" +
             ", lastName='" + getLastName() + "'" +

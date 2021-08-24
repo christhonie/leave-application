@@ -42,6 +42,9 @@
           <th scope="col" jhiSortBy="startDate">
             <span jhiTranslate="leaveApplicationApp.staff.startDate">Start Date</span> <fa-icon icon="sort"></fa-icon>
           </th>
+          <th scope="col" jhiSortBy="endDate">
+            <span jhiTranslate="leaveApplicationApp.staff.endDate">End Date</span> <fa-icon icon="sort"></fa-icon>
+          </th>
           <th scope="col" jhiSortBy="name">
             <span jhiTranslate="leaveApplicationApp.staff.name">Name</span> <fa-icon icon="sort"></fa-icon>
           </th>
@@ -78,6 +81,7 @@
           <td>{{ staff.position }}</td>
           <td>{{ staff.employeeID }}</td>
           <td>{{ staff.startDate | formatMediumDate }}</td>
+          <td>{{ staff.endDate | formatMediumDate }}</td>
           <td>{{ staff.name }}</td>
           <td>{{ staff.firstName }}</td>
           <td>{{ staff.lastName }}</td>

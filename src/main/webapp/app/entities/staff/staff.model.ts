@@ -7,6 +7,7 @@ export interface IStaff {
   position?: string | null;
   employeeID?: string;
   startDate?: dayjs.Dayjs;
+  endDate?: dayjs.Dayjs | null;
   name?: string | null;
   firstName?: string;
   lastName?: string;
@@ -24,6 +25,7 @@ export class Staff implements IStaff {
     public position?: string | null,
     public employeeID?: string,
     public startDate?: dayjs.Dayjs,
+    public endDate?: dayjs.Dayjs | null,
     public name?: string | null,
     public firstName?: string,
     public lastName?: string,

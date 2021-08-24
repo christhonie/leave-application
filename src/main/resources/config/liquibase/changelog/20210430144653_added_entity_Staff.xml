@@ -23,6 +23,9 @@
             <column name="start_date" type="date" remarks="When the person started at the organisation. This is used by some LeaveEntitlement calculations.">
                 <constraints nullable="false" />
             </column>
+            <column name="end_date" type="date" remarks="When employment ended. If set, it indicates a person is an active employee anymore.">
+                <constraints nullable="true" />
+            </column>
             <column name="first_name" type="varchar(50)">
                 <constraints nullable="false" />
             </column>
@@ -86,6 +89,7 @@
             <column name="position" type="string"/>
             <column name="employee_id" type="string"/>
             <column name="start_date" type="date"/>
+            <column name="end_date" type="date"/>
             <column name="first_name" type="string"/>
             <column name="last_name" type="string"/>
             <column name="email" type="string"/>

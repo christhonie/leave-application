@@ -29,6 +29,7 @@ describe('Service Tests', () => {
         position: 'AAAAAAA',
         employeeID: 'AAAAAAA',
         startDate: currentDate,
+        endDate: currentDate,
         name: 'AAAAAAA',
         firstName: 'AAAAAAA',
         lastName: 'AAAAAAA',
@@ -44,6 +45,7 @@ describe('Service Tests', () => {
         const returnedFromService = Object.assign(
           {
             startDate: currentDate.format(DATE_FORMAT),
+            endDate: currentDate.format(DATE_FORMAT),
           },
           elemDefault
         );
@@ -60,6 +62,7 @@ describe('Service Tests', () => {
           {
             id: 0,
             startDate: currentDate.format(DATE_FORMAT),
+            endDate: currentDate.format(DATE_FORMAT),
           },
           elemDefault
         );
@@ -67,6 +70,7 @@ describe('Service Tests', () => {
         const expected = Object.assign(
           {
             startDate: currentDate,
+            endDate: currentDate,
           },
           returnedFromService
         );
@@ -85,6 +89,7 @@ describe('Service Tests', () => {
             position: 'BBBBBB',
             employeeID: 'BBBBBB',
             startDate: currentDate.format(DATE_FORMAT),
+            endDate: currentDate.format(DATE_FORMAT),
             name: 'BBBBBB',
             firstName: 'BBBBBB',
             lastName: 'BBBBBB',
@@ -99,6 +104,7 @@ describe('Service Tests', () => {
         const expected = Object.assign(
           {
             startDate: currentDate,
+            endDate: currentDate,
           },
           returnedFromService
         );
@@ -124,6 +130,7 @@ describe('Service Tests', () => {
         const expected = Object.assign(
           {
             startDate: currentDate,
+            endDate: currentDate,
           },
           returnedFromService
         );
@@ -142,6 +149,7 @@ describe('Service Tests', () => {
             position: 'BBBBBB',
             employeeID: 'BBBBBB',
             startDate: currentDate.format(DATE_FORMAT),
+            endDate: currentDate.format(DATE_FORMAT),
             name: 'BBBBBB',
             firstName: 'BBBBBB',
             lastName: 'BBBBBB',
@@ -156,6 +164,7 @@ describe('Service Tests', () => {
         const expected = Object.assign(
           {
             startDate: currentDate,
+            endDate: currentDate,
           },
           returnedFromService
         );

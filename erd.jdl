@@ -34,6 +34,8 @@ entity Staff {
 	employeeID String maxlength(50) required
 	/** When the person started at the organisation. This is used by some LeaveEntitlement calculations. */
 	startDate LocalDate required
+	/** When employment ended. If set, it indicates a person is an active employee anymore. */
+	endDate LocalDate
 	/** A read-only field consisting out of the first name and last name of the person. */
 	name String maxlength(100)
 	firstName String maxlength(50) required
