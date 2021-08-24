@@ -71,7 +71,7 @@ public class Staff implements Serializable {
     private String gender;
 
     /**
-     * The number of annual leave days an employee is entitled to according to there employment contract,\nThis should be populated using {@link EntitlementValue} table according to the linked user
+     * The number of annual leave days an employee is entitled to according to there employment contract.
      */
     @Column(name = "annual_leave_entitlement", precision = 21, scale = 2)
     private BigDecimal annualLeaveEntitlement;
