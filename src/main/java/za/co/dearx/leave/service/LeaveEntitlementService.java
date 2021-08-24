@@ -47,11 +47,6 @@ public class LeaveEntitlementService {
         log.debug("Request to save LeaveEntitlement : {}", leaveEntitlementDTO);
         LeaveEntitlement leaveEntitlement = leaveEntitlementMapper.toEntity(leaveEntitlementDTO);
         leaveEntitlement = leaveEntitlementRepository.save(leaveEntitlement);
-        // Checks if {@Link LeaveType} is 'Annual Leave'
-        if (leaveEntitlement.getLeaveType().getId() == 2) {
-            // Updates the staff member annual leave entitlement value after leave is saved
-            staffService.updateLeaveEntitlement(leaveEntitlement.getStaff(), leaveEntitlement.getDays());
-        }
         return leaveEntitlementMapper.toDto(leaveEntitlement);
     }
 
