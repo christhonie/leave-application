@@ -1,23 +1,17 @@
 package za.co.dearx.leave.service;
 
-import camundajar.impl.scala.Option;
 import java.math.BigDecimal;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import za.co.dearx.leave.domain.EntitlementValue;
-import za.co.dearx.leave.domain.LeaveEntitlement;
-import za.co.dearx.leave.domain.LeaveType;
 import za.co.dearx.leave.domain.Staff;
 import za.co.dearx.leave.repository.LeaveEntitlementRepository;
 import za.co.dearx.leave.repository.LeaveTypeRepository;
 import za.co.dearx.leave.repository.StaffRepository;
-import za.co.dearx.leave.service.dto.EntitlementValueDTO;
 import za.co.dearx.leave.service.dto.StaffDTO;
 import za.co.dearx.leave.service.mapper.StaffMapper;
 
