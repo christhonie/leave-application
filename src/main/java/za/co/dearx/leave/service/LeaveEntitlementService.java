@@ -1,5 +1,8 @@
 package za.co.dearx.leave.service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,15 +106,27 @@ public class LeaveEntitlementService {
     /**
      * Apply {@link LeaveEntitlement}s to all {@link Staff} members of all {@link LeaveType}s.
      */
-    public void apply() {
-        // TODO Auto-generated method stub
-
+    public void apply(LocalDate date) {
+        List<Staff> staff = new ArrayList<>(); //TODO Loop through all active staff. This is only a placeholder.
+        List<LeaveType> types = new ArrayList<>(); //TODO Loop through all available ones. This is only a placeholder.
+        types.forEach(
+            type -> {
+                //Find the relevant strategy
+                //This uses the following patterns:
+                // * Factory Pattern - https://springframework.guru/gang-of-four-design-patterns/factory-method-design-pattern/
+                // * Strategy Pattern - https://springframework.guru/gang-of-four-design-patterns/strategy-pattern/
+                LeaveEntitlementStrategyFactory
+                    .create(type)
+                    .ifPresent(
+                        strategy -> {
+                            staff.forEach(
+                                s -> {
+                                    strategy.apply(s, date);
+                                }
+                            );
+                        }
+                    );
+            }
+        );
     }
-
-    /**
-     * Apply {@link LeaveEntitlement}s for a given {@link Staff} member and {@link LeaveType}.
-     * @param staff to which to apply the entitlement
-     * @param type of entitlement
-     */
-    private void apply(Staff staff, LeaveType type) {}
 }
