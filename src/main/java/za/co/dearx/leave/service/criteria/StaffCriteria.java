@@ -3,6 +3,7 @@ package za.co.dearx.leave.service.criteria;
 import java.io.Serializable;
 import java.util.Objects;
 import tech.jhipster.service.Criteria;
+import tech.jhipster.service.filter.BigDecimalFilter;
 import tech.jhipster.service.filter.BooleanFilter;
 import tech.jhipster.service.filter.DoubleFilter;
 import tech.jhipster.service.filter.Filter;
@@ -43,6 +44,8 @@ public class StaffCriteria implements Serializable, Criteria {
 
     private StringFilter gender;
 
+    private BigDecimalFilter annualLeaveEntitlement;
+
     private LongFilter userId;
 
     private LongFilter teamId;
@@ -59,6 +62,7 @@ public class StaffCriteria implements Serializable, Criteria {
         this.email = other.email == null ? null : other.email.copy();
         this.contractNumber = other.contractNumber == null ? null : other.contractNumber.copy();
         this.gender = other.gender == null ? null : other.gender.copy();
+        this.annualLeaveEntitlement = other.annualLeaveEntitlement == null ? null : other.annualLeaveEntitlement.copy();
         this.userId = other.userId == null ? null : other.userId.copy();
         this.teamId = other.teamId == null ? null : other.teamId.copy();
     }
@@ -203,6 +207,21 @@ public class StaffCriteria implements Serializable, Criteria {
         this.gender = gender;
     }
 
+    public BigDecimalFilter getAnnualLeaveEntitlement() {
+        return annualLeaveEntitlement;
+    }
+
+    public BigDecimalFilter annualLeaveEntitlement() {
+        if (annualLeaveEntitlement == null) {
+            annualLeaveEntitlement = new BigDecimalFilter();
+        }
+        return annualLeaveEntitlement;
+    }
+
+    public void setAnnualLeaveEntitlement(BigDecimalFilter annualLeaveEntitlement) {
+        this.annualLeaveEntitlement = annualLeaveEntitlement;
+    }
+
     public LongFilter getUserId() {
         return userId;
     }
@@ -252,6 +271,7 @@ public class StaffCriteria implements Serializable, Criteria {
             Objects.equals(email, that.email) &&
             Objects.equals(contractNumber, that.contractNumber) &&
             Objects.equals(gender, that.gender) &&
+            Objects.equals(annualLeaveEntitlement, that.annualLeaveEntitlement) &&
             Objects.equals(userId, that.userId) &&
             Objects.equals(teamId, that.teamId)
         );
@@ -259,24 +279,38 @@ public class StaffCriteria implements Serializable, Criteria {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, position, employeeID, startDate, firstName, lastName, email, contractNumber, gender, userId, teamId);
+        return Objects.hash(
+            id,
+            position,
+            employeeID,
+            startDate,
+            firstName,
+            lastName,
+            email,
+            contractNumber,
+            gender,
+            annualLeaveEntitlement,
+            userId,
+            teamId
+        );
     }
 
     // prettier-ignore
     @Override
     public String toString() {
         return "StaffCriteria{" +
-                (id != null ? "id=" + id + ", " : "") +
-                (position != null ? "position=" + position + ", " : "") +
-                (employeeID != null ? "employeeID=" + employeeID + ", " : "") +
-                (startDate != null ? "startDate=" + startDate + ", " : "") +
-                (firstName != null ? "firstName=" + firstName + ", " : "") +
-                (lastName != null ? "lastName=" + lastName + ", " : "") +
-                (email != null ? "email=" + email + ", " : "") +
-                (contractNumber != null ? "contractNumber=" + contractNumber + ", " : "") +
-                (gender != null ? "gender=" + gender + ", " : "") +
-                (userId != null ? "userId=" + userId + ", " : "") +
-                (teamId != null ? "teamId=" + teamId + ", " : "") +
+            (id != null ? "id=" + id + ", " : "") +
+            (position != null ? "position=" + position + ", " : "") +
+            (employeeID != null ? "employeeID=" + employeeID + ", " : "") +
+            (startDate != null ? "startDate=" + startDate + ", " : "") +
+            (firstName != null ? "firstName=" + firstName + ", " : "") +
+            (lastName != null ? "lastName=" + lastName + ", " : "") +
+            (email != null ? "email=" + email + ", " : "") +
+            (contractNumber != null ? "contractNumber=" + contractNumber + ", " : "") +
+            (gender != null ? "gender=" + gender + ", " : "") +
+            (annualLeaveEntitlement != null ? "annualLeaveEntitlement=" + annualLeaveEntitlement + ", " : "") +
+            (userId != null ? "userId=" + userId + ", " : "") +
+            (teamId != null ? "teamId=" + teamId + ", " : "") +
             "}";
     }
 }

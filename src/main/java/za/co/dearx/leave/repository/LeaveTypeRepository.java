@@ -9,4 +9,6 @@ import za.co.dearx.leave.domain.LeaveType;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface LeaveTypeRepository extends JpaRepository<LeaveType, Long>, JpaSpecificationExecutor<LeaveType> {}
+public interface LeaveTypeRepository extends JpaRepository<LeaveType, Long>, JpaSpecificationExecutor<LeaveType> {
+    LeaveType findByName(String name);
+}

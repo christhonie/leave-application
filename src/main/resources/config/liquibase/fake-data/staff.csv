@@ -1,11 +1,11 @@
-id;position;employee_id;start_date;first_name;last_name;email;contract_number;gender
-1;Engineer;001;2020-03-09;Albert;Austin;aaustin@dearx.co.za;0827000001;M
-2;Engineer;002;2020-03-16;Ben;Bernmeister;bbernmeister@dearx.co.za;0828432002;M
-3;Engineer;003;2020-05-04;Charles;Cooke;ccooke@dearx.co.za;0671843003;M
-4;Engineer;004;2020-07-01;Dana;Donahue;ddonahue@dearx.co.za;0727630104;F
-5;Engineer;005;2020-08-03;Elias;Essle;eessle@dearx.co.za;0739339005;M
-6;Engineer;006;2020-11-02;Frankie;Ford;fford@dearx.co.za;0828008144;M
-7;Engineer;007;2021-01-04;Gerald;Gerbrand;ggerbard@dearx.co.za;0727027681;M
-8;Engineer;008;2021-03-01;Hether;Huxtable;hhuxtable@dearx.co.za;0737081131;H
-9;Engineer;009;2021-03-08;Iris;Isaacs;iisaacs@dearx.co.za;0825734009;H
-10;Engineer;010;2020-03-01;Joseph;Jackson;jjackson@dearx.co.za;0837730601;M
+id;position;employee_id;start_date;name;first_name;last_name;email;contract_number;gender;annual_leave_entitlement
+1;Software Developer;EMP015;2021/04/30;Kory Cummerata;Kory;Cummerata;Oceane74@yahoo.com;0873382785;M;15
+2;Integration Developer;EMP125;2021/04/29;Rubye Nolan;Rubye;Nolan;Emmett_Runte@gmail.com;0780038946;F;15
+3;Solutions Architect;EMP055;2021/04/29;Bridgette Spencer;Bridgette;Spencer;Orin.Schiller90@hotmail.com;0627583348;F;18
+4;Integration Developer;EMP031;2021/04/30;Nelle Runolfsson;Nelle;Runolfsson;Kurt_Armstrong@gmail.com;0713351548;M;15
+5;Software Developer;EMP005;2021/04/30;Vinnie Schuppe;Vinnie;Schuppe;Carolyn_Goldner50@gmail.com;0817713658;M;15
+6;Front-End Developer;EMP022;2021/04/30;Alfonso Kutch;Alfonso;Kutch;Coby_Kshlerin@yahoo.com;0216964879;F;15
+7;Team Lead;EMP126;2021/04/29;Augusta Bartoletti;Augusta;Bartoletti;Mack.Abbott70@yahoo.com;0880325684;F;18
+8;Integration Developer;EMP010;2021/04/30;Daniella Schiller;Daniella;Schiller;Paolo.Langworth75@hotmail.com;0820056489;M;15
+9;Manager;EMP098;2021/04/30;Kailee Leannon;Kailee;Leannon;Nayeli_Feil65@hotmail.com;0650065897;M;20
+10;Software Developer;EMP110;2021/04/30;Lesly Baumbach;Lesly;Baumbach;Robbie59@hotmail.com;0713597895;M;15

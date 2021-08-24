@@ -110,6 +110,10 @@ public class StaffQueryService extends QueryService<Staff> {
             if (criteria.getGender() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getGender(), Staff_.gender));
             }
+            if (criteria.getAnnualLeaveEntitlement() != null) {
+                specification =
+                    specification.and(buildRangeSpecification(criteria.getAnnualLeaveEntitlement(), Staff_.annualLeaveEntitlement));
+            }
             if (criteria.getUserId() != null) {
                 specification =
                     specification.and(

@@ -7,6 +7,5 @@ import za.co.dearx.leave.domain.LeaveEntitlement;
 /**
  * Spring Data SQL repository for the LeaveEntitlement entity.
  */
-@SuppressWarnings("unused")
 @Repository
 public interface LeaveEntitlementRepository extends JpaRepository<LeaveEntitlement, Long>, JpaSpecificationExecutor<LeaveEntitlement> {}

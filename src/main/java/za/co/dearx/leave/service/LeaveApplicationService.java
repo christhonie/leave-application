@@ -91,7 +91,7 @@ public class LeaveApplicationService {
             }
         }
 
-        Staff staffMemeber;
+        Staff staffMember;
         String username;
         if (SecurityUtils.hasCurrentUserThisAuthority(AuthoritiesConstants.ADMIN)) {
             username = "admin";
@@ -99,12 +99,12 @@ public class LeaveApplicationService {
             username = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new NotFoundException("Could not determine logged in user"));
         }
 
-        staffMemeber =
+        staffMember =
             staffRepository
                 .findBySpecificUsername(username)
                 .orElseThrow(() -> new NotFoundException("There is no staff member linked to the current user"));
 
-        leaveApplication.setStaff(staffMemeber);
+        leaveApplication.setStaff(staffMember);
 
         LeaveApplication savedleaveApplication = leaveApplicationRepository.save(leaveApplication);
 

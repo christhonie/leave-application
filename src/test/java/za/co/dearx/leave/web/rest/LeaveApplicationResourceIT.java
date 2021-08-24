@@ -36,7 +36,6 @@ import za.co.dearx.leave.domain.LeaveStatus;
 import za.co.dearx.leave.domain.LeaveType;
 import za.co.dearx.leave.domain.Staff;
 import za.co.dearx.leave.repository.LeaveApplicationRepository;
-import za.co.dearx.leave.service.criteria.LeaveApplicationCriteria;
 import za.co.dearx.leave.service.dto.LeaveApplicationDTO;
 import za.co.dearx.leave.service.mapper.LeaveApplicationMapper;
 

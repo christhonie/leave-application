@@ -33,6 +33,7 @@ export class StaffUpdateComponent implements OnInit {
     email: [null, [Validators.maxLength(100)]],
     contractNumber: [null, [Validators.maxLength(50)]],
     gender: [null, [Validators.required, Validators.maxLength(2)]],
+    annualLeaveEntitlement: [],
     user: [],
     teams: [],
   });
@@ -117,6 +118,7 @@ export class StaffUpdateComponent implements OnInit {
       email: staff.email,
       contractNumber: staff.contractNumber,
       gender: staff.gender,
+      annualLeaveEntitlement: staff.annualLeaveEntitlement,
       user: staff.user,
       teams: staff.teams,
     });
@@ -152,6 +154,7 @@ export class StaffUpdateComponent implements OnInit {
       email: this.editForm.get(['email'])!.value,
       contractNumber: this.editForm.get(['contractNumber'])!.value,
       gender: this.editForm.get(['gender'])!.value,
+      annualLeaveEntitlement: this.editForm.get(['annualLeaveEntitlement'])!.value,
       user: this.editForm.get(['user'])!.value,
       teams: this.editForm.get(['teams'])!.value,
     };

@@ -89,7 +89,7 @@ class LeaveEntitlementResourceIT {
         // Add required entity
         Staff staff;
         if (TestUtil.findAll(em, Staff.class).isEmpty()) {
-            staff = StaffResourceIT.createEntity(em);
+            staff = StaffResourceIT.createEntityWithUser(em);
             em.persist(staff);
             em.flush();
         } else {

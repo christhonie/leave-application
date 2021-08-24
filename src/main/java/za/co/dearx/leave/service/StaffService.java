@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import za.co.dearx.leave.domain.Staff;
+import za.co.dearx.leave.repository.LeaveEntitlementRepository;
 import za.co.dearx.leave.repository.StaffRepository;
 import za.co.dearx.leave.service.dto.StaffDTO;
 import za.co.dearx.leave.service.mapper.StaffMapper;
@@ -25,7 +26,7 @@ public class StaffService {
 
     private final StaffMapper staffMapper;
 
-    public StaffService(StaffRepository staffRepository, StaffMapper staffMapper) {
+    public StaffService(StaffRepository staffRepository, StaffMapper staffMapper, LeaveEntitlementRepository leaveEntitlementRepository) {
         this.staffRepository = staffRepository;
         this.staffMapper = staffMapper;
     }
