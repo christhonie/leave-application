@@ -1,6 +1,5 @@
 package za.co.dearx.leave.service;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import za.co.dearx.leave.domain.Staff;
 import za.co.dearx.leave.repository.LeaveEntitlementRepository;
-import za.co.dearx.leave.repository.LeaveTypeRepository;
 import za.co.dearx.leave.repository.StaffRepository;
 import za.co.dearx.leave.service.dto.StaffDTO;
 import za.co.dearx.leave.service.mapper.StaffMapper;
@@ -26,18 +24,10 @@ public class StaffService {
 
     private final StaffRepository staffRepository;
 
-    private final LeaveTypeRepository leaveTypeRepository;
-
     private final StaffMapper staffMapper;
 
-    public StaffService(
-        StaffRepository staffRepository,
-        StaffMapper staffMapper,
-        LeaveEntitlementRepository leaveEntitlementRepository,
-        LeaveTypeRepository leaveTypeRepository
-    ) {
+    public StaffService(StaffRepository staffRepository, StaffMapper staffMapper, LeaveEntitlementRepository leaveEntitlementRepository) {
         this.staffRepository = staffRepository;
-        this.leaveTypeRepository = leaveTypeRepository;
         this.staffMapper = staffMapper;
     }
 

@@ -25,16 +25,9 @@ public class LeaveEntitlementService {
 
     private final LeaveEntitlementMapper leaveEntitlementMapper;
 
-    private final StaffService staffService;
-
-    public LeaveEntitlementService(
-        LeaveEntitlementRepository leaveEntitlementRepository,
-        LeaveEntitlementMapper leaveEntitlementMapper,
-        StaffService staffService
-    ) {
+    public LeaveEntitlementService(LeaveEntitlementRepository leaveEntitlementRepository, LeaveEntitlementMapper leaveEntitlementMapper) {
         this.leaveEntitlementRepository = leaveEntitlementRepository;
         this.leaveEntitlementMapper = leaveEntitlementMapper;
-        this.staffService = staffService;
     }
 
     /**
