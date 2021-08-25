@@ -33,6 +33,6 @@ public interface StaffRepository extends JpaRepository<Staff, Long>, JpaSpecific
     @Query("select staff from Staff staff left join fetch staff.teams where staff.id =:id")
     Optional<Staff> findOneWithEagerRelationships(@Param("id") Long id);
 
-    @Query("select staff from Staff s where s.startDate <= :date and (s.endDate is null or s.endDate >= :date)")
+    @Query("select s from Staff s where s.startDate <= :date and (s.endDate is null or s.endDate >= :date)")
     List<Staff> findActiveOn(@Param("date") LocalDate date);
 }
