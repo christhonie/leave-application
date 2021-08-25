@@ -1,6 +1,8 @@
 package za.co.dearx.leave.service;
 
 import java.time.LocalDate;
+import java.time.Period;
+
 import za.co.dearx.leave.domain.Staff;
 import za.co.dearx.leave.repository.LeaveEntitlementRepository;
 
@@ -22,6 +24,13 @@ public class AnnualLeaveEntitlementStrategy implements ILeaveEntitlementStrategy
 
     @Override
     public byte getLeaveCycleNumber(Staff staff, LocalDate date) {
+    	
+        LocalDate start = staff.getStartDate();
+        Period diff = Period.between(
+        		start.withDayOfMonth(1),
+        		date.withDayOfMonth(1));
+
+        int leaveCycleNumber = diff.getMonths()/12 +1;
         return 0; //TODO: Implement Theunis
     }
 
