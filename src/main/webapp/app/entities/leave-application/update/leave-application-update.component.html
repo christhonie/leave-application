@@ -19,10 +19,9 @@
 
         <div class="form-group">
           <label class="form-control-label" jhiTranslate="leaveApplicationApp.leaveApplication.startDate" for="field_startDate"
-            >Start Date</label
-          >
-          <div class="form-group p-fluid p-grid p-formgrid">
-            <!-- class="input-group" <input
+            >Start Date</label>
+            <div class="input-group">
+           <input
               id="field_startDate"
               data-cy="startDate"
               type="text"
@@ -37,13 +36,7 @@
               <button type="button" class="btn btn-secondary" (click)="startDateDp.toggle()">
                 <fa-icon icon="calendar-alt"></fa-icon>
               </button>
-            </span> -->
-              <p-calender class="form-control"
-
-               id="field_startDate"
-               name="startDate"
-                formControlName="startDate">
-              </p-calender>
+            </span> 
           </div>
           <div *ngIf="editForm.get('startDate')!.invalid && (editForm.get('startDate')!.dirty || editForm.get('startDate')!.touched)">
             <small
