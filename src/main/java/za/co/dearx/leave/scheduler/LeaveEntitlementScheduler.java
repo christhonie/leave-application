@@ -28,8 +28,9 @@ public class LeaveEntitlementScheduler {
     @Scheduled(cron = "0 5 0 1 * ?")
     public void update() {
         //Set to date of previous month
-        LocalDate date = null; //TODO calculate a date in the previous month.
+        final LocalDate date = LocalDate.now().minusMonths(1);
         service.apply(date);
+
         log.debug("Leave entitlements updated using scheduler");
     }
 }
