@@ -115,7 +115,8 @@ public class LeaveEntitlementService {
      * Apply {@link LeaveEntitlement}s to all {@link Staff} members of all {@link LeaveType}s.
      */
     public void apply(LocalDate date) {
-        List<Staff> staff = new ArrayList<>(); //TODO Loop through all active staff. This is only a placeholder.
+        List<Staff> staff = staffRepository.findActiveOn(date);
+
         List<LeaveType> types = new ArrayList<>(); //TODO Loop through all available ones. This is only a placeholder.
         types.forEach(
             type -> {
