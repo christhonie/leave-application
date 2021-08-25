@@ -13,4 +13,8 @@ public interface ILeaveEntitlementStrategy {
      * For instance, a monthly entitlement which should start on 1 Jan to 31 Jan could have a valid date of 1 Jan or even 31 Jan.
      */
     void apply(Staff staff, LocalDate date);
+
+    byte getLeaveCycleNumber(Staff staff, LocalDate date);
+
+    byte getLeaveCycleMonth(Staff staff, LocalDate date);
 }

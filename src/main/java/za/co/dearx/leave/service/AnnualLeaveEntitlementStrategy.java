@@ -15,6 +15,18 @@ public class AnnualLeaveEntitlementStrategy implements ILeaveEntitlementStrategy
     @Override
     public void apply(Staff staff, LocalDate date) {
         // TODO Auto-generated method stub
+        //getLeaveEntitleMent for Staff
+        //check if leaveEnt already exists
+        //create leave entitlement
+    }
 
+    @Override
+    public byte getLeaveCycleNumber(Staff staff, LocalDate date) {
+        return 0; //TODO: Implement Theunis
+    }
+
+    @Override
+    public byte getLeaveCycleMonth(Staff staff, LocalDate date) {
+        return 0; //TODO: Implement Theunis
     }
 }
