@@ -116,7 +116,7 @@ public class LeaveEntitlementService {
                 // * Factory Pattern - https://springframework.guru/gang-of-four-design-patterns/factory-method-design-pattern/
                 // * Strategy Pattern - https://springframework.guru/gang-of-four-design-patterns/strategy-pattern/
                 LeaveEntitlementStrategyFactory
-                    .create(type)
+                    .create(type, this.leaveEntitlementRepository)
                     .ifPresent(
                         strategy -> {
                             staff.forEach(
