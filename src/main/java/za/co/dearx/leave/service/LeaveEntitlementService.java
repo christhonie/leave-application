@@ -14,6 +14,7 @@ import za.co.dearx.leave.domain.LeaveEntitlement;
 import za.co.dearx.leave.domain.LeaveType;
 import za.co.dearx.leave.domain.Staff;
 import za.co.dearx.leave.repository.LeaveEntitlementRepository;
+import za.co.dearx.leave.repository.StaffRepository;
 import za.co.dearx.leave.service.dto.LeaveEntitlementDTO;
 import za.co.dearx.leave.service.mapper.LeaveEntitlementMapper;
 
@@ -28,11 +29,18 @@ public class LeaveEntitlementService {
 
     private final LeaveEntitlementRepository leaveEntitlementRepository;
 
+    private final StaffRepository staffRepository;
+
     private final LeaveEntitlementMapper leaveEntitlementMapper;
 
-    public LeaveEntitlementService(LeaveEntitlementRepository leaveEntitlementRepository, LeaveEntitlementMapper leaveEntitlementMapper) {
+    public LeaveEntitlementService(
+        LeaveEntitlementRepository leaveEntitlementRepository,
+        LeaveEntitlementMapper leaveEntitlementMapper,
+        StaffRepository staffRepository
+    ) {
         this.leaveEntitlementRepository = leaveEntitlementRepository;
         this.leaveEntitlementMapper = leaveEntitlementMapper;
+        this.staffRepository = staffRepository;
     }
 
     /**
