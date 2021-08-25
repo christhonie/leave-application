@@ -14,6 +14,7 @@ import za.co.dearx.leave.domain.LeaveEntitlement;
 import za.co.dearx.leave.domain.LeaveType;
 import za.co.dearx.leave.domain.Staff;
 import za.co.dearx.leave.repository.LeaveEntitlementRepository;
+import za.co.dearx.leave.repository.LeaveTypeRepository;
 import za.co.dearx.leave.repository.StaffRepository;
 import za.co.dearx.leave.service.dto.LeaveEntitlementDTO;
 import za.co.dearx.leave.service.mapper.LeaveEntitlementMapper;
@@ -29,18 +30,18 @@ public class LeaveEntitlementService {
 
     private final LeaveEntitlementRepository leaveEntitlementRepository;
 
+    private final LeaveEntitlementMapper leaveEntitlementMapper;
+    
+    private final LeaveTypeRepository leaveTypeRepository;
+    
     private final StaffRepository staffRepository;
 
-    private final LeaveEntitlementMapper leaveEntitlementMapper;
-
-    public LeaveEntitlementService(
-        LeaveEntitlementRepository leaveEntitlementRepository,
-        LeaveEntitlementMapper leaveEntitlementMapper,
-        StaffRepository staffRepository
-    ) {
+    public LeaveEntitlementService(LeaveEntitlementRepository leaveEntitlementRepository, LeaveEntitlementMapper leaveEntitlementMapper,
+    		LeaveTypeRepository leaveTypeRepository, StaffRepository staffRepository) {
         this.leaveEntitlementRepository = leaveEntitlementRepository;
         this.leaveEntitlementMapper = leaveEntitlementMapper;
         this.staffRepository = staffRepository;
+        this.leaveTypeRepository = leaveTypeRepository;
     }
 
     /**
@@ -115,9 +116,8 @@ public class LeaveEntitlementService {
      * Apply {@link LeaveEntitlement}s to all {@link Staff} members of all {@link LeaveType}s.
      */
     public void apply(LocalDate date) {
-        List<Staff> staff = staffRepository.findActiveOn(date);
-
-        List<LeaveType> types = new ArrayList<>(); //TODO Loop through all available ones. This is only a placeholder.
+    	List<Staff> staff = staffRepository.findActiveOn(date);
+        List<LeaveType> types = leaveTypeRepository.findAll();
         types.forEach(
             type -> {
                 //Find the relevant strategy
