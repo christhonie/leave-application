@@ -21,6 +21,11 @@
       "fieldValidateRules": ["required"]
     },
     {
+      "fieldName": "endDate",
+      "fieldType": "LocalDate",
+      "javadoc": "When employment ended. If set, it indicates a person is an active employee anymore."
+    },
+    {
       "fieldName": "name",
       "fieldType": "String",
       "javadoc": "A read-only field consisting out of the first name and last name of the person.",

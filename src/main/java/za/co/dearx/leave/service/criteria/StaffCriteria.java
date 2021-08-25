@@ -4,11 +4,7 @@ import java.io.Serializable;
 import java.util.Objects;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.BigDecimalFilter;
-import tech.jhipster.service.filter.BooleanFilter;
-import tech.jhipster.service.filter.DoubleFilter;
 import tech.jhipster.service.filter.Filter;
-import tech.jhipster.service.filter.FloatFilter;
-import tech.jhipster.service.filter.IntegerFilter;
 import tech.jhipster.service.filter.LocalDateFilter;
 import tech.jhipster.service.filter.LongFilter;
 import tech.jhipster.service.filter.StringFilter;
@@ -34,6 +30,8 @@ public class StaffCriteria implements Serializable, Criteria {
 
     private LocalDateFilter startDate;
 
+    private LocalDateFilter endDate;
+
     private StringFilter firstName;
 
     private StringFilter lastName;
@@ -57,6 +55,7 @@ public class StaffCriteria implements Serializable, Criteria {
         this.position = other.position == null ? null : other.position.copy();
         this.employeeID = other.employeeID == null ? null : other.employeeID.copy();
         this.startDate = other.startDate == null ? null : other.startDate.copy();
+        this.endDate = other.endDate == null ? null : other.endDate.copy();
         this.firstName = other.firstName == null ? null : other.firstName.copy();
         this.lastName = other.lastName == null ? null : other.lastName.copy();
         this.email = other.email == null ? null : other.email.copy();
@@ -130,6 +129,21 @@ public class StaffCriteria implements Serializable, Criteria {
 
     public void setStartDate(LocalDateFilter startDate) {
         this.startDate = startDate;
+    }
+
+    public LocalDateFilter getEndDate() {
+        return endDate;
+    }
+
+    public LocalDateFilter endDate() {
+        if (endDate == null) {
+            endDate = new LocalDateFilter();
+        }
+        return endDate;
+    }
+
+    public void setEndDate(LocalDateFilter endDate) {
+        this.endDate = endDate;
     }
 
     public StringFilter getFirstName() {
@@ -266,6 +280,7 @@ public class StaffCriteria implements Serializable, Criteria {
             Objects.equals(position, that.position) &&
             Objects.equals(employeeID, that.employeeID) &&
             Objects.equals(startDate, that.startDate) &&
+            Objects.equals(endDate, that.endDate) &&
             Objects.equals(firstName, that.firstName) &&
             Objects.equals(lastName, that.lastName) &&
             Objects.equals(email, that.email) &&
@@ -284,6 +299,7 @@ public class StaffCriteria implements Serializable, Criteria {
             position,
             employeeID,
             startDate,
+            endDate,
             firstName,
             lastName,
             email,
@@ -303,6 +319,7 @@ public class StaffCriteria implements Serializable, Criteria {
             (position != null ? "position=" + position + ", " : "") +
             (employeeID != null ? "employeeID=" + employeeID + ", " : "") +
             (startDate != null ? "startDate=" + startDate + ", " : "") +
+            (endDate != null ? "endDate=" + endDate + ", " : "") +
             (firstName != null ? "firstName=" + firstName + ", " : "") +
             (lastName != null ? "lastName=" + lastName + ", " : "") +
             (email != null ? "email=" + email + ", " : "") +

@@ -35,6 +35,14 @@
           <span>{{ staff.startDate | formatMediumDate }}</span>
         </dd>
         <dt>
+          <span jhiTranslate="leaveApplicationApp.staff.endDate" [ngbTooltip]="'leaveApplicationApp.staff.help.endDate' | translate"
+            >End Date</span
+          >
+        </dt>
+        <dd>
+          <span>{{ staff.endDate | formatMediumDate }}</span>
+        </dd>
+        <dt>
           <span jhiTranslate="leaveApplicationApp.staff.name" [ngbTooltip]="'leaveApplicationApp.staff.help.name' | translate">Name</span>
         </dt>
         <dd>

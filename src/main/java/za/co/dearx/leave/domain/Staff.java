@@ -44,6 +44,12 @@ public class Staff implements Serializable {
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
 
+    /**
+     * When employment ended. If set, it indicates a person is an active employee anymore.
+     */
+    @Column(name = "end_date")
+    private LocalDate endDate;
+
     @NotNull
     @Size(max = 50)
     @Column(name = "first_name", length = 50, nullable = false)
@@ -142,6 +148,19 @@ public class Staff implements Serializable {
 
     public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return this.endDate;
+    }
+
+    public Staff endDate(LocalDate endDate) {
+        this.endDate = endDate;
+        return this;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     @Transient
@@ -294,6 +313,7 @@ public class Staff implements Serializable {
             ", position='" + getPosition() + "'" +
             ", employeeID='" + getEmployeeID() + "'" +
             ", startDate='" + getStartDate() + "'" +
+            ", endDate='" + getEndDate() + "'" +
             ", name='" + getName() + "'" +
             ", firstName='" + getFirstName() + "'" +
             ", lastName='" + getLastName() + "'" +

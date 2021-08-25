@@ -95,6 +95,9 @@ public class StaffQueryService extends QueryService<Staff> {
             if (criteria.getStartDate() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getStartDate(), Staff_.startDate));
             }
+            if (criteria.getEndDate() != null) {
+                specification = specification.and(buildRangeSpecification(criteria.getEndDate(), Staff_.endDate));
+            }
             if (criteria.getFirstName() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getFirstName(), Staff_.firstName));
             }

@@ -77,12 +77,14 @@ export class StaffService {
   protected convertDateFromClient(staff: IStaff): IStaff {
     return Object.assign({}, staff, {
       startDate: staff.startDate?.isValid() ? staff.startDate.format(DATE_FORMAT) : undefined,
+      endDate: staff.endDate?.isValid() ? staff.endDate.format(DATE_FORMAT) : undefined,
     });
   }
 
   protected convertDateFromServer(res: EntityResponseType): EntityResponseType {
     if (res.body) {
       res.body.startDate = res.body.startDate ? dayjs(res.body.startDate) : undefined;
+      res.body.endDate = res.body.endDate ? dayjs(res.body.endDate) : undefined;
     }
     return res;
   }
@@ -91,6 +93,7 @@ export class StaffService {
     if (res.body) {
       res.body.forEach((staff: IStaff) => {
         staff.startDate = staff.startDate ? dayjs(staff.startDate) : undefined;
+        staff.endDate = staff.endDate ? dayjs(staff.endDate) : undefined;
       });
     }
     return res;

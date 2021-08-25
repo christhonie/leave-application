@@ -57,6 +57,10 @@ class StaffResourceIT {
     private static final LocalDate UPDATED_START_DATE = LocalDate.now(ZoneId.systemDefault());
     private static final LocalDate SMALLER_START_DATE = LocalDate.ofEpochDay(-1L);
 
+    private static final LocalDate DEFAULT_END_DATE = LocalDate.ofEpochDay(0L);
+    private static final LocalDate UPDATED_END_DATE = LocalDate.now(ZoneId.systemDefault());
+    private static final LocalDate SMALLER_END_DATE = LocalDate.ofEpochDay(-1L);
+
     private static final String DEFAULT_FIRST_NAME = "AAAAAAAAAA";
     private static final String UPDATED_FIRST_NAME = "BBBBBBBBBB";
 
@@ -116,6 +120,7 @@ class StaffResourceIT {
             .position(DEFAULT_POSITION)
             .employeeID(DEFAULT_EMPLOYEE_ID)
             .startDate(DEFAULT_START_DATE)
+            .endDate(DEFAULT_END_DATE)
             .firstName(DEFAULT_FIRST_NAME)
             .lastName(DEFAULT_LAST_NAME)
             .email(DEFAULT_EMAIL)
@@ -161,6 +166,7 @@ class StaffResourceIT {
             .position(UPDATED_POSITION)
             .employeeID(UPDATED_EMPLOYEE_ID)
             .startDate(UPDATED_START_DATE)
+            .endDate(UPDATED_END_DATE)
             .firstName(UPDATED_FIRST_NAME)
             .lastName(UPDATED_LAST_NAME)
             .email(UPDATED_EMAIL)
@@ -197,6 +203,7 @@ class StaffResourceIT {
         assertThat(testStaff.getPosition()).isEqualTo(DEFAULT_POSITION);
         assertThat(testStaff.getEmployeeID()).isEqualTo(DEFAULT_EMPLOYEE_ID);
         assertThat(testStaff.getStartDate()).isEqualTo(DEFAULT_START_DATE);
+        assertThat(testStaff.getEndDate()).isEqualTo(DEFAULT_END_DATE);
         assertThat(testStaff.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testStaff.getFirstName()).isEqualTo(DEFAULT_FIRST_NAME);
         assertThat(testStaff.getLastName()).isEqualTo(DEFAULT_LAST_NAME);
@@ -360,6 +367,7 @@ class StaffResourceIT {
             .andExpect(jsonPath("$.[*].position").value(hasItem(DEFAULT_POSITION)))
             .andExpect(jsonPath("$.[*].employeeID").value(hasItem(DEFAULT_EMPLOYEE_ID)))
             .andExpect(jsonPath("$.[*].startDate").value(hasItem(DEFAULT_START_DATE.toString())))
+            .andExpect(jsonPath("$.[*].endDate").value(hasItem(DEFAULT_END_DATE.toString())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].firstName").value(hasItem(DEFAULT_FIRST_NAME)))
             .andExpect(jsonPath("$.[*].lastName").value(hasItem(DEFAULT_LAST_NAME)))
@@ -402,6 +410,7 @@ class StaffResourceIT {
             .andExpect(jsonPath("$.position").value(DEFAULT_POSITION))
             .andExpect(jsonPath("$.employeeID").value(DEFAULT_EMPLOYEE_ID))
             .andExpect(jsonPath("$.startDate").value(DEFAULT_START_DATE.toString()))
+            .andExpect(jsonPath("$.endDate").value(DEFAULT_END_DATE.toString()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
             .andExpect(jsonPath("$.firstName").value(DEFAULT_FIRST_NAME))
             .andExpect(jsonPath("$.lastName").value(DEFAULT_LAST_NAME))
@@ -691,7 +700,111 @@ class StaffResourceIT {
 
     @Test
     @Transactional
-    public void getAllStaffByFirstNameIsEqualToSomething() throws Exception {
+    void getAllStaffByEndDateIsEqualToSomething() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        // Get all the staffList where endDate equals to DEFAULT_END_DATE
+        defaultStaffShouldBeFound("endDate.equals=" + DEFAULT_END_DATE);
+
+        // Get all the staffList where endDate equals to UPDATED_END_DATE
+        defaultStaffShouldNotBeFound("endDate.equals=" + UPDATED_END_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllStaffByEndDateIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        // Get all the staffList where endDate not equals to DEFAULT_END_DATE
+        defaultStaffShouldNotBeFound("endDate.notEquals=" + DEFAULT_END_DATE);
+
+        // Get all the staffList where endDate not equals to UPDATED_END_DATE
+        defaultStaffShouldBeFound("endDate.notEquals=" + UPDATED_END_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllStaffByEndDateIsInShouldWork() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        // Get all the staffList where endDate in DEFAULT_END_DATE or UPDATED_END_DATE
+        defaultStaffShouldBeFound("endDate.in=" + DEFAULT_END_DATE + "," + UPDATED_END_DATE);
+
+        // Get all the staffList where endDate equals to UPDATED_END_DATE
+        defaultStaffShouldNotBeFound("endDate.in=" + UPDATED_END_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllStaffByEndDateIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        // Get all the staffList where endDate is not null
+        defaultStaffShouldBeFound("endDate.specified=true");
+
+        // Get all the staffList where endDate is null
+        defaultStaffShouldNotBeFound("endDate.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllStaffByEndDateIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        // Get all the staffList where endDate is greater than or equal to DEFAULT_END_DATE
+        defaultStaffShouldBeFound("endDate.greaterThanOrEqual=" + DEFAULT_END_DATE);
+
+        // Get all the staffList where endDate is greater than or equal to UPDATED_END_DATE
+        defaultStaffShouldNotBeFound("endDate.greaterThanOrEqual=" + UPDATED_END_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllStaffByEndDateIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        // Get all the staffList where endDate is less than or equal to DEFAULT_END_DATE
+        defaultStaffShouldBeFound("endDate.lessThanOrEqual=" + DEFAULT_END_DATE);
+
+        // Get all the staffList where endDate is less than or equal to SMALLER_END_DATE
+        defaultStaffShouldNotBeFound("endDate.lessThanOrEqual=" + SMALLER_END_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllStaffByEndDateIsLessThanSomething() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        // Get all the staffList where endDate is less than DEFAULT_END_DATE
+        defaultStaffShouldNotBeFound("endDate.lessThan=" + DEFAULT_END_DATE);
+
+        // Get all the staffList where endDate is less than UPDATED_END_DATE
+        defaultStaffShouldBeFound("endDate.lessThan=" + UPDATED_END_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllStaffByEndDateIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        staffRepository.saveAndFlush(staff);
+
+        // Get all the staffList where endDate is greater than DEFAULT_END_DATE
+        defaultStaffShouldNotBeFound("endDate.greaterThan=" + DEFAULT_END_DATE);
+
+        // Get all the staffList where endDate is greater than SMALLER_END_DATE
+        defaultStaffShouldBeFound("endDate.greaterThan=" + SMALLER_END_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllStaffByFirstNameIsEqualToSomething() throws Exception {
         // Initialize the database
         staffRepository.saveAndFlush(staff);
 
@@ -1233,6 +1346,7 @@ class StaffResourceIT {
             .andExpect(jsonPath("$.[*].position").value(hasItem(DEFAULT_POSITION)))
             .andExpect(jsonPath("$.[*].employeeID").value(hasItem(DEFAULT_EMPLOYEE_ID)))
             .andExpect(jsonPath("$.[*].startDate").value(hasItem(DEFAULT_START_DATE.toString())))
+            .andExpect(jsonPath("$.[*].endDate").value(hasItem(DEFAULT_END_DATE.toString())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].firstName").value(hasItem(DEFAULT_FIRST_NAME)))
             .andExpect(jsonPath("$.[*].lastName").value(hasItem(DEFAULT_LAST_NAME)))
@@ -1291,6 +1405,7 @@ class StaffResourceIT {
             .position(UPDATED_POSITION)
             .employeeID(UPDATED_EMPLOYEE_ID)
             .startDate(UPDATED_START_DATE)
+            .endDate(UPDATED_END_DATE)
             .firstName(UPDATED_FIRST_NAME)
             .lastName(UPDATED_LAST_NAME)
             .email(UPDATED_EMAIL)
@@ -1315,6 +1430,7 @@ class StaffResourceIT {
         assertThat(testStaff.getPosition()).isEqualTo(UPDATED_POSITION);
         assertThat(testStaff.getEmployeeID()).isEqualTo(UPDATED_EMPLOYEE_ID);
         assertThat(testStaff.getStartDate()).isEqualTo(UPDATED_START_DATE);
+        assertThat(testStaff.getEndDate()).isEqualTo(UPDATED_END_DATE);
         assertThat(testStaff.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testStaff.getFirstName()).isEqualTo(UPDATED_FIRST_NAME);
         assertThat(testStaff.getLastName()).isEqualTo(UPDATED_LAST_NAME);
@@ -1426,6 +1542,7 @@ class StaffResourceIT {
         assertThat(testStaff.getPosition()).isEqualTo(UPDATED_POSITION);
         assertThat(testStaff.getEmployeeID()).isEqualTo(DEFAULT_EMPLOYEE_ID);
         assertThat(testStaff.getStartDate()).isEqualTo(UPDATED_START_DATE);
+        assertThat(testStaff.getEndDate()).isEqualTo(DEFAULT_END_DATE);
         assertThat(testStaff.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testStaff.getFirstName()).isEqualTo(DEFAULT_FIRST_NAME);
         assertThat(testStaff.getLastName()).isEqualTo(DEFAULT_LAST_NAME);
@@ -1451,6 +1568,7 @@ class StaffResourceIT {
             .position(UPDATED_POSITION)
             .employeeID(UPDATED_EMPLOYEE_ID)
             .startDate(UPDATED_START_DATE)
+            .endDate(UPDATED_END_DATE)
             .firstName(UPDATED_FIRST_NAME)
             .lastName(UPDATED_LAST_NAME)
             .email(UPDATED_EMAIL)
@@ -1474,6 +1592,7 @@ class StaffResourceIT {
         assertThat(testStaff.getPosition()).isEqualTo(UPDATED_POSITION);
         assertThat(testStaff.getEmployeeID()).isEqualTo(UPDATED_EMPLOYEE_ID);
         assertThat(testStaff.getStartDate()).isEqualTo(UPDATED_START_DATE);
+        assertThat(testStaff.getEndDate()).isEqualTo(UPDATED_END_DATE);
         assertThat(testStaff.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testStaff.getFirstName()).isEqualTo(UPDATED_FIRST_NAME);
         assertThat(testStaff.getLastName()).isEqualTo(UPDATED_LAST_NAME);

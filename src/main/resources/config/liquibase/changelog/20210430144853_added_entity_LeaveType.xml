@@ -23,6 +23,9 @@
             <column name="process_name" type="varchar(200)" remarks="The process ID to invoke for a new leave application.">
                 <constraints nullable="true" />
             </column>
+            <column name="dashboard_order" type="integer" remarks="The order in which the types are displayed on the dashboard. Omit when type should not be displayed.">
+                <constraints nullable="true" />
+            </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
     </changeSet>
@@ -57,6 +60,7 @@
             <column name="id" type="numeric"/>
             <column name="name" type="string"/>
             <column name="description" type="string"/>
+            <column name="dashboard_order" type="numeric"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

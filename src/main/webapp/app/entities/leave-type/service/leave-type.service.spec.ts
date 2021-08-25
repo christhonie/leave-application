@@ -25,6 +25,7 @@ describe('Service Tests', () => {
         name: 'AAAAAAA',
         description: 'AAAAAAA',
         processName: 'AAAAAAA',
+        dashboardOrder: 0,
       };
     });
 
@@ -63,6 +64,7 @@ describe('Service Tests', () => {
             name: 'BBBBBB',
             description: 'BBBBBB',
             processName: 'BBBBBB',
+            dashboardOrder: 1,
           },
           elemDefault
         );
@@ -103,6 +105,7 @@ describe('Service Tests', () => {
             name: 'BBBBBB',
             description: 'BBBBBB',
             processName: 'BBBBBB',
+            dashboardOrder: 1,
           },
           elemDefault
         );
@@ -154,7 +157,7 @@ describe('Service Tests', () => {
         });
 
         it('should add only unique LeaveType to an array', () => {
-          const leaveTypeArray: ILeaveType[] = [{ id: 123 }, { id: 456 }, { id: 33968 }];
+          const leaveTypeArray: ILeaveType[] = [{ id: 123 }, { id: 456 }, { id: 12028 }];
           const leaveTypeCollection: ILeaveType[] = [{ id: 123 }];
           expectedResult = service.addLeaveTypeToCollectionIfMissing(leaveTypeCollection, ...leaveTypeArray);
           expect(expectedResult).toHaveLength(3);

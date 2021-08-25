@@ -92,6 +92,24 @@
             </small>
           </div>
         </div>
+
+        <div class="form-group">
+          <label
+            class="form-control-label"
+            jhiTranslate="leaveApplicationApp.leaveType.dashboardOrder"
+            for="field_dashboardOrder"
+            [ngbTooltip]="'leaveApplicationApp.leaveType.help.dashboardOrder' | translate"
+            >Dashboard Order</label
+          >
+          <input
+            type="number"
+            class="form-control"
+            name="dashboardOrder"
+            id="field_dashboardOrder"
+            data-cy="dashboardOrder"
+            formControlName="dashboardOrder"
+          />
+        </div>
       </div>
 
       <div>

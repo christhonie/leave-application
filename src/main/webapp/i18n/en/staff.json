@@ -21,6 +21,7 @@
       "position": "Position",
       "employeeID": "Employee ID",
       "startDate": "Start Date",
+      "endDate": "End Date",
       "name": "Name",
       "firstName": "First Name",
       "lastName": "Last Name",
@@ -33,6 +34,7 @@
       "help": {
         "employeeID": "The unique employee number assigned by the company or payroll system.",
         "startDate": "When the person started at the organisation. This is used by some LeaveEntitlement calculations.",
+        "endDate": "When employment ended. If set, it indicates a person is an active employee anymore.",
         "name": "A read-only field consisting out of the first name and last name of the person.",
         "contractNumber": "Preferably the cellphone number. This can be used for sending messages to the person.",
         "annualLeaveEntitlement": "The number of annual leave days an employee is entitled to according to there employment contract,\nThis should be populated using {@link EntitlementValue} table according to the linked user"

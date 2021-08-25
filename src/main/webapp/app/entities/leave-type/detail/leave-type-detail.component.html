@@ -36,6 +36,16 @@
         <dd>
           <span>{{ leaveType.processName }}</span>
         </dd>
+        <dt>
+          <span
+            jhiTranslate="leaveApplicationApp.leaveType.dashboardOrder"
+            [ngbTooltip]="'leaveApplicationApp.leaveType.help.dashboardOrder' | translate"
+            >Dashboard Order</span
+          >
+        </dt>
+        <dd>
+          <span>{{ leaveType.dashboardOrder }}</span>
+        </dd>
       </dl>
 
       <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
