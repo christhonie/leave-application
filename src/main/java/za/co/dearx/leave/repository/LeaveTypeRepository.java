@@ -1,7 +1,11 @@
 package za.co.dearx.leave.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
+
+
 import za.co.dearx.leave.domain.LeaveType;
 
 /**
@@ -11,4 +15,5 @@ import za.co.dearx.leave.domain.LeaveType;
 @Repository
 public interface LeaveTypeRepository extends JpaRepository<LeaveType, Long>, JpaSpecificationExecutor<LeaveType> {
     LeaveType findByName(String name);
+    List<LeaveType> findAll();
 }
