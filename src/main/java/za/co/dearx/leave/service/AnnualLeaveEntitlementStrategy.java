@@ -36,25 +36,26 @@ public class AnnualLeaveEntitlementStrategy implements ILeaveEntitlementStrategy
             );
     }
 
+    /**
+     *
+     * TODO We can possible remove the @Param date and use the system date
+     *
+     */
+
     @Override
     public byte getLeaveCycleNumber(Staff staff, LocalDate date) {
-        LocalDate start = staff.getStartDate();
-        Period diff = Period.between(start.withDayOfMonth(1), date.withDayOfMonth(1));
-
-        byte leaveCycleNumber = (byte)(diff.getMonths()/12 +1);
-        return leaveCycleNumber; 
+        return (byte) (Period.between(staff.getStartDate().withDayOfMonth(1), date).getYears() + 1);
     }
+
+    /**
+     *
+     * TODO We can possible remove the @Param date and use the system date
+     *
+     */
 
     @Override
     public byte getLeaveCycleMonth(Staff staff, LocalDate date) {
-    	
-    	LocalDate start = staff.getStartDate();
-        Period diff = Period.between(
-        		start.withDayOfMonth(1),
-        		date.withDayOfMonth(1));
-        
-        byte leaveCycleMonth = (byte)(diff.getMonths() - 12 * (int)(diff.getMonths()/12));        
-        return leaveCycleMonth; 
+        return (byte) ((date.getMonth().getValue() - staff.getStartDate().getMonth().getValue()) % 12 + 1);
     }
 
     public BigDecimal getMonthlyLeaveEntitlement(Staff staff) {
