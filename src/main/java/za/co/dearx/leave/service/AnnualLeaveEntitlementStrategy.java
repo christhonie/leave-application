@@ -23,7 +23,7 @@ public class AnnualLeaveEntitlementStrategy implements ILeaveEntitlementStrategy
      * Apply Annual Leave Entitlement to a staff memeber on a specific day
      *
      * @param staff The {@link Staff} member the leave deductions must be applied for
-     * @param fromDate The date which the leave deductions must be applied for
+     * @param date The date which the leave deductions must be applied for
      *
      */
     @Override
