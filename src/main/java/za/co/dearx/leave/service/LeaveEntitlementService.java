@@ -31,13 +31,17 @@ public class LeaveEntitlementService {
     private final LeaveEntitlementRepository leaveEntitlementRepository;
 
     private final LeaveEntitlementMapper leaveEntitlementMapper;
-    
+
     private final LeaveTypeRepository leaveTypeRepository;
-    
+
     private final StaffRepository staffRepository;
 
-    public LeaveEntitlementService(LeaveEntitlementRepository leaveEntitlementRepository, LeaveEntitlementMapper leaveEntitlementMapper,
-    		LeaveTypeRepository leaveTypeRepository, StaffRepository staffRepository) {
+    public LeaveEntitlementService(
+        LeaveEntitlementRepository leaveEntitlementRepository,
+        LeaveEntitlementMapper leaveEntitlementMapper,
+        LeaveTypeRepository leaveTypeRepository,
+        StaffRepository staffRepository
+    ) {
         this.leaveEntitlementRepository = leaveEntitlementRepository;
         this.leaveEntitlementMapper = leaveEntitlementMapper;
         this.staffRepository = staffRepository;
@@ -114,9 +118,12 @@ public class LeaveEntitlementService {
 
     /**
      * Apply {@link LeaveEntitlement}s to all {@link Staff} members of all {@link LeaveType}s.
+     *
+     * @param date the Date which the leave entitlement must be applied
+     *
      */
     public void apply(LocalDate date) {
-    	List<Staff> staff = staffRepository.findActiveOn(date);
+        List<Staff> staff = staffRepository.findActiveOn(date);
         List<LeaveType> types = leaveTypeRepository.findAll();
         types.forEach(
             type -> {

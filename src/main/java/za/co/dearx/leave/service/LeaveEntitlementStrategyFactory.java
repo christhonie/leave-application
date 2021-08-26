@@ -10,7 +10,7 @@ public class LeaveEntitlementStrategyFactory {
     /**
      * Returns a concrete implementation of the appropriate strategy to apply {@link LeaveEntitlement}s.
      * @param type of entitlement
-     * @param {{@link {@link LeaveEntitlementRepository}} from the calling flow
+     * @param leaveEntitlementRepository {{@link {@link LeaveEntitlementRepository}} from the calling flow
      * @return an optional strategy for the {@link LeaveType} provided.
      */
     public static Optional<ILeaveEntitlementStrategy> create(LeaveType type, LeaveEntitlementRepository leaveEntitlementRepository) {
