@@ -41,13 +41,20 @@ public class AnnualLeaveEntitlementStrategy implements ILeaveEntitlementStrategy
         LocalDate start = staff.getStartDate();
         Period diff = Period.between(start.withDayOfMonth(1), date.withDayOfMonth(1));
 
-        int leaveCycleNumber = diff.getMonths() / 12 + 1;
-        return 0; //TODO: Implement Theunis
+        byte leaveCycleNumber = (byte)(diff.getMonths()/12 +1);
+        return leaveCycleNumber; 
     }
 
     @Override
     public byte getLeaveCycleMonth(Staff staff, LocalDate date) {
-        return 0; //TODO: Implement Theunis
+    	
+    	LocalDate start = staff.getStartDate();
+        Period diff = Period.between(
+        		start.withDayOfMonth(1),
+        		date.withDayOfMonth(1));
+        
+        byte leaveCycleMonth = (byte)(diff.getMonths() - 12 * (int)(diff.getMonths()/12));        
+        return leaveCycleMonth; 
     }
 
     public BigDecimal getMonthlyLeaveEntitlement(Staff staff) {
