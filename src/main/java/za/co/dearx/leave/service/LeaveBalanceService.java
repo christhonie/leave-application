@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 import za.co.dearx.leave.domain.LeaveDeduction;
 import za.co.dearx.leave.domain.LeaveEntitlement;
+import za.co.dearx.leave.domain.Staff;
 
 /**
  * This service deals with the interplay between a {@link LeaveEntitlement} and {@link LeaveDeduction}. It is used to
