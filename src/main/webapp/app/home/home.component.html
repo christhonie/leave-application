@@ -27,6 +27,28 @@
   <div class="row" *ngSwitchCase="true">
     <div class="dash col-md-12">
       <h1>Leave Balances</h1>
+
+      <p-table [value]="leaveBalances">
+        <ng-template pTemplate="header">
+          <tr>
+            <th id="type">Type</th>
+            <th id="total">Total</th>
+            <th id="pending">Pending</th>
+            <th id="available">Available</th>
+            <th id="actions">Actions</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-leaveBalance>
+          <tr>
+            <td>{{ leaveBalance.type }}</td>
+            <td>{{ leaveBalance.total }}</td>
+            <td>{{ leaveBalance.pending }}</td>
+            <td>{{ leaveBalance.total - leaveBalance.pending }}</td>
+            <td style="color: blue; text-decoration: underline"><a>Apply</a>, <a>View</a></td>
+          </tr>
+        </ng-template>
+      </p-table>
+
       <table class="tbl">
         <tr>
           <th id="type">Type</th>

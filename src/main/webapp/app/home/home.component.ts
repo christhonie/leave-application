@@ -14,6 +14,19 @@ export class HomeComponent implements OnInit, OnDestroy {
   account: Account | null = null;
   authSubscription?: Subscription;
 
+  leaveBalances: any[] = [
+    {
+      type: 'Annual Leave',
+      total: 15,
+      pending: 1,
+    },
+    {
+      type: 'Study Leave',
+      total: 5,
+      pending: 2,
+    },
+  ];
+
   constructor(private accountService: AccountService, private router: Router) {}
 
   ngOnInit(): void {
