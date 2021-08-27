@@ -33,7 +33,14 @@ public class LeaveEntitlement implements Serializable {
     private LocalDate entitlementDate;
 
     /**
-     * @deprecated Use the EntitlementValue
+     * The date when this entitlement should expire.
+     */
+    @NotNull
+    @Column(name = "expiry_date", nullable = false)
+    private LocalDate expiryDate;
+
+    /**
+     * Use the EntitlementValue
      */
     @NotNull
     @Column(name = "days", precision = 21, scale = 2, nullable = false)
@@ -84,6 +91,19 @@ public class LeaveEntitlement implements Serializable {
 
     public void setEntitlementDate(LocalDate entitlementDate) {
         this.entitlementDate = entitlementDate;
+    }
+
+    public LocalDate getExpiryDate() {
+        return this.expiryDate;
+    }
+
+    public LeaveEntitlement expiryDate(LocalDate expiryDate) {
+        this.expiryDate = expiryDate;
+        return this;
+    }
+
+    public void setExpiryDate(LocalDate expiryDate) {
+        this.expiryDate = expiryDate;
     }
 
     public BigDecimal getDays() {
@@ -181,6 +201,7 @@ public class LeaveEntitlement implements Serializable {
         return "LeaveEntitlement{" +
             "id=" + getId() +
             ", entitlementDate='" + getEntitlementDate() + "'" +
+            ", expiryDate='" + getExpiryDate() + "'" +
             ", days=" + getDays() +
             "}";
     }

@@ -1,5 +1,8 @@
 package za.co.dearx.leave.service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,7 +11,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import za.co.dearx.leave.domain.LeaveEntitlement;
+import za.co.dearx.leave.domain.LeaveType;
+import za.co.dearx.leave.domain.Staff;
 import za.co.dearx.leave.repository.LeaveEntitlementRepository;
+import za.co.dearx.leave.repository.LeaveTypeRepository;
+import za.co.dearx.leave.repository.StaffRepository;
 import za.co.dearx.leave.service.dto.LeaveEntitlementDTO;
 import za.co.dearx.leave.service.mapper.LeaveEntitlementMapper;
 
@@ -25,9 +32,20 @@ public class LeaveEntitlementService {
 
     private final LeaveEntitlementMapper leaveEntitlementMapper;
 
-    public LeaveEntitlementService(LeaveEntitlementRepository leaveEntitlementRepository, LeaveEntitlementMapper leaveEntitlementMapper) {
+    private final LeaveTypeRepository leaveTypeRepository;
+
+    private final StaffRepository staffRepository;
+
+    public LeaveEntitlementService(
+        LeaveEntitlementRepository leaveEntitlementRepository,
+        LeaveEntitlementMapper leaveEntitlementMapper,
+        LeaveTypeRepository leaveTypeRepository,
+        StaffRepository staffRepository
+    ) {
         this.leaveEntitlementRepository = leaveEntitlementRepository;
         this.leaveEntitlementMapper = leaveEntitlementMapper;
+        this.staffRepository = staffRepository;
+        this.leaveTypeRepository = leaveTypeRepository;
     }
 
     /**
@@ -96,5 +114,35 @@ public class LeaveEntitlementService {
     public void delete(Long id) {
         log.debug("Request to delete LeaveEntitlement : {}", id);
         leaveEntitlementRepository.deleteById(id);
+    }
+
+    /**
+     * Apply {@link LeaveEntitlement}s to all {@link Staff} members of all {@link LeaveType}s.
+     *
+     * @param date the Date which the leave entitlement must be applied
+     *
+     */
+    public void apply(LocalDate date) {
+        List<Staff> staff = staffRepository.findActiveOn(date);
+        List<LeaveType> types = leaveTypeRepository.findAll();
+        types.forEach(
+            type -> {
+                //Find the relevant strategy
+                //This uses the following patterns:
+                // * Factory Pattern - https://springframework.guru/gang-of-four-design-patterns/factory-method-design-pattern/
+                // * Strategy Pattern - https://springframework.guru/gang-of-four-design-patterns/strategy-pattern/
+                LeaveEntitlementStrategyFactory
+                    .create(type, this.leaveEntitlementRepository)
+                    .ifPresent(
+                        strategy -> {
+                            staff.forEach(
+                                s -> {
+                                    strategy.apply(s, date);
+                                }
+                            );
+                        }
+                    );
+            }
+        );
     }
 }

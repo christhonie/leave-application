@@ -17,7 +17,10 @@
             <column name="entitlement_date" type="date" remarks="The date the entitlement is applied to the Staff member.">
                 <constraints nullable="false" />
             </column>
-            <column name="days" type="decimal(21,2)" remarks="@depricated Use the EntitlementValue">
+            <column name="expiry_date" type="date" remarks="The date when this entitlement should expire.">
+                <constraints nullable="false" />
+            </column>
+            <column name="days" type="decimal(21,2)" remarks="Use the EntitlementValue">
                 <constraints nullable="false" />
             </column>
             <column name="leave_type_id" type="bigint">
@@ -47,6 +50,7 @@
                   tableName="leave_entitlement">
             <column name="id" type="numeric"/>
             <column name="entitlement_date" type="date"/>
+            <column name="expiry_date" type="date"/>
             <column name="days" type="numeric"/>
             <column name="leave_type_id" type="numeric"/>
             <column name="staff_id" type="numeric"/>

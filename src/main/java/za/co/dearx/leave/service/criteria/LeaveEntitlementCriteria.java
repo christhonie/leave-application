@@ -30,6 +30,8 @@ public class LeaveEntitlementCriteria implements Serializable, Criteria {
 
     private LocalDateFilter entitlementDate;
 
+    private LocalDateFilter expiryDate;
+
     private BigDecimalFilter days;
 
     private LongFilter leaveTypeId;
@@ -43,6 +45,7 @@ public class LeaveEntitlementCriteria implements Serializable, Criteria {
     public LeaveEntitlementCriteria(LeaveEntitlementCriteria other) {
         this.id = other.id == null ? null : other.id.copy();
         this.entitlementDate = other.entitlementDate == null ? null : other.entitlementDate.copy();
+        this.expiryDate = other.expiryDate == null ? null : other.expiryDate.copy();
         this.days = other.days == null ? null : other.days.copy();
         this.leaveTypeId = other.leaveTypeId == null ? null : other.leaveTypeId.copy();
         this.staffId = other.staffId == null ? null : other.staffId.copy();
@@ -82,6 +85,21 @@ public class LeaveEntitlementCriteria implements Serializable, Criteria {
 
     public void setEntitlementDate(LocalDateFilter entitlementDate) {
         this.entitlementDate = entitlementDate;
+    }
+
+    public LocalDateFilter getExpiryDate() {
+        return expiryDate;
+    }
+
+    public LocalDateFilter expiryDate() {
+        if (expiryDate == null) {
+            expiryDate = new LocalDateFilter();
+        }
+        return expiryDate;
+    }
+
+    public void setExpiryDate(LocalDateFilter expiryDate) {
+        this.expiryDate = expiryDate;
     }
 
     public BigDecimalFilter getDays() {
@@ -156,6 +174,7 @@ public class LeaveEntitlementCriteria implements Serializable, Criteria {
         return (
             Objects.equals(id, that.id) &&
             Objects.equals(entitlementDate, that.entitlementDate) &&
+            Objects.equals(expiryDate, that.expiryDate) &&
             Objects.equals(days, that.days) &&
             Objects.equals(leaveTypeId, that.leaveTypeId) &&
             Objects.equals(staffId, that.staffId) &&
@@ -165,7 +184,7 @@ public class LeaveEntitlementCriteria implements Serializable, Criteria {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, entitlementDate, days, leaveTypeId, staffId, deductionId);
+        return Objects.hash(id, entitlementDate, expiryDate, days, leaveTypeId, staffId, deductionId);
     }
 
     // prettier-ignore
@@ -174,6 +193,7 @@ public class LeaveEntitlementCriteria implements Serializable, Criteria {
         return "LeaveEntitlementCriteria{" +
             (id != null ? "id=" + id + ", " : "") +
             (entitlementDate != null ? "entitlementDate=" + entitlementDate + ", " : "") +
+            (expiryDate != null ? "expiryDate=" + expiryDate + ", " : "") +
             (days != null ? "days=" + days + ", " : "") +
             (leaveTypeId != null ? "leaveTypeId=" + leaveTypeId + ", " : "") +
             (staffId != null ? "staffId=" + staffId + ", " : "") +

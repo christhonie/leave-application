@@ -86,12 +86,14 @@ export class LeaveEntitlementService {
   protected convertDateFromClient(leaveEntitlement: ILeaveEntitlement): ILeaveEntitlement {
     return Object.assign({}, leaveEntitlement, {
       entitlementDate: leaveEntitlement.entitlementDate?.isValid() ? leaveEntitlement.entitlementDate.format(DATE_FORMAT) : undefined,
+      expiryDate: leaveEntitlement.expiryDate?.isValid() ? leaveEntitlement.expiryDate.format(DATE_FORMAT) : undefined,
     });
   }
 
   protected convertDateFromServer(res: EntityResponseType): EntityResponseType {
     if (res.body) {
       res.body.entitlementDate = res.body.entitlementDate ? dayjs(res.body.entitlementDate) : undefined;
+      res.body.expiryDate = res.body.expiryDate ? dayjs(res.body.expiryDate) : undefined;
     }
     return res;
   }
@@ -100,6 +102,7 @@ export class LeaveEntitlementService {
     if (res.body) {
       res.body.forEach((leaveEntitlement: ILeaveEntitlement) => {
         leaveEntitlement.entitlementDate = leaveEntitlement.entitlementDate ? dayjs(leaveEntitlement.entitlementDate) : undefined;
+        leaveEntitlement.expiryDate = leaveEntitlement.expiryDate ? dayjs(leaveEntitlement.expiryDate) : undefined;
       });
     }
     return res;

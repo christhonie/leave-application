@@ -19,13 +19,15 @@
       },
       "id": "ID",
       "entitlementDate": "Entitlement Date",
+      "expiryDate": "Expiry Date",
       "days": "Days",
       "leaveType": "Leave Type",
       "staff": "Staff",
       "deduction": "Deduction",
       "help": {
         "entitlementDate": "The date the entitlement is applied to the Staff member.",
-        "days": "@depricated Use the EntitlementValue"
+        "expiryDate": "The date when this entitlement should expire.",
+        "days": "Use the EntitlementValue"
       }
     }
   }

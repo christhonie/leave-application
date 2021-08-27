@@ -1,5 +1,6 @@
 package za.co.dearx.leave.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -31,4 +32,7 @@ public interface StaffRepository extends JpaRepository<Staff, Long>, JpaSpecific
 
     @Query("select staff from Staff staff left join fetch staff.teams where staff.id =:id")
     Optional<Staff> findOneWithEagerRelationships(@Param("id") Long id);
+
+    @Query("select s from Staff s where s.startDate <= :date and (s.endDate is null or s.endDate >= :date)")
+    List<Staff> findActiveOn(@Param("date") LocalDate date);
 }

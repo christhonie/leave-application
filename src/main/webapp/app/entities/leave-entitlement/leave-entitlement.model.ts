@@ -6,6 +6,7 @@ import { ILeaveDeduction } from 'app/entities/leave-deduction/leave-deduction.mo
 export interface ILeaveEntitlement {
   id?: number;
   entitlementDate?: dayjs.Dayjs;
+  expiryDate?: dayjs.Dayjs;
   days?: number;
   leaveType?: ILeaveType;
   staff?: IStaff;
@@ -16,6 +17,7 @@ export class LeaveEntitlement implements ILeaveEntitlement {
   constructor(
     public id?: number,
     public entitlementDate?: dayjs.Dayjs,
+    public expiryDate?: dayjs.Dayjs,
     public days?: number,
     public leaveType?: ILeaveType,
     public staff?: IStaff,

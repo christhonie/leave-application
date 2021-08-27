@@ -44,6 +44,10 @@ class LeaveEntitlementResourceIT {
     private static final LocalDate UPDATED_ENTITLEMENT_DATE = LocalDate.now(ZoneId.systemDefault());
     private static final LocalDate SMALLER_ENTITLEMENT_DATE = LocalDate.ofEpochDay(-1L);
 
+    private static final LocalDate DEFAULT_EXPIRY_DATE = LocalDate.ofEpochDay(0L);
+    private static final LocalDate UPDATED_EXPIRY_DATE = LocalDate.now(ZoneId.systemDefault());
+    private static final LocalDate SMALLER_EXPIRY_DATE = LocalDate.ofEpochDay(-1L);
+
     private static final BigDecimal DEFAULT_DAYS = new BigDecimal(1);
     private static final BigDecimal UPDATED_DAYS = new BigDecimal(2);
     private static final BigDecimal SMALLER_DAYS = new BigDecimal(1 - 1);
@@ -75,7 +79,10 @@ class LeaveEntitlementResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static LeaveEntitlement createEntity(EntityManager em) {
-        LeaveEntitlement leaveEntitlement = new LeaveEntitlement().entitlementDate(DEFAULT_ENTITLEMENT_DATE).days(DEFAULT_DAYS);
+        LeaveEntitlement leaveEntitlement = new LeaveEntitlement()
+            .entitlementDate(DEFAULT_ENTITLEMENT_DATE)
+            .expiryDate(DEFAULT_EXPIRY_DATE)
+            .days(DEFAULT_DAYS);
         // Add required entity
         LeaveType leaveType;
         if (TestUtil.findAll(em, LeaveType.class).isEmpty()) {
@@ -89,7 +96,7 @@ class LeaveEntitlementResourceIT {
         // Add required entity
         Staff staff;
         if (TestUtil.findAll(em, Staff.class).isEmpty()) {
-            staff = StaffResourceIT.createEntityWithUser(em);
+            staff = StaffResourceIT.createEntity(em);
             em.persist(staff);
             em.flush();
         } else {
@@ -106,7 +113,10 @@ class LeaveEntitlementResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static LeaveEntitlement createUpdatedEntity(EntityManager em) {
-        LeaveEntitlement leaveEntitlement = new LeaveEntitlement().entitlementDate(UPDATED_ENTITLEMENT_DATE).days(UPDATED_DAYS);
+        LeaveEntitlement leaveEntitlement = new LeaveEntitlement()
+            .entitlementDate(UPDATED_ENTITLEMENT_DATE)
+            .expiryDate(UPDATED_EXPIRY_DATE)
+            .days(UPDATED_DAYS);
         // Add required entity
         LeaveType leaveType;
         if (TestUtil.findAll(em, LeaveType.class).isEmpty()) {
@@ -155,6 +165,7 @@ class LeaveEntitlementResourceIT {
         assertThat(leaveEntitlementList).hasSize(databaseSizeBeforeCreate + 1);
         LeaveEntitlement testLeaveEntitlement = leaveEntitlementList.get(leaveEntitlementList.size() - 1);
         assertThat(testLeaveEntitlement.getEntitlementDate()).isEqualTo(DEFAULT_ENTITLEMENT_DATE);
+        assertThat(testLeaveEntitlement.getExpiryDate()).isEqualTo(DEFAULT_EXPIRY_DATE);
         assertThat(testLeaveEntitlement.getDays()).isEqualByComparingTo(DEFAULT_DAYS);
     }
 
@@ -188,6 +199,29 @@ class LeaveEntitlementResourceIT {
         int databaseSizeBeforeTest = leaveEntitlementRepository.findAll().size();
         // set the field null
         leaveEntitlement.setEntitlementDate(null);
+
+        // Create the LeaveEntitlement, which fails.
+        LeaveEntitlementDTO leaveEntitlementDTO = leaveEntitlementMapper.toDto(leaveEntitlement);
+
+        restLeaveEntitlementMockMvc
+            .perform(
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(leaveEntitlementDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        List<LeaveEntitlement> leaveEntitlementList = leaveEntitlementRepository.findAll();
+        assertThat(leaveEntitlementList).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkExpiryDateIsRequired() throws Exception {
+        int databaseSizeBeforeTest = leaveEntitlementRepository.findAll().size();
+        // set the field null
+        leaveEntitlement.setExpiryDate(null);
 
         // Create the LeaveEntitlement, which fails.
         LeaveEntitlementDTO leaveEntitlementDTO = leaveEntitlementMapper.toDto(leaveEntitlement);
@@ -241,6 +275,7 @@ class LeaveEntitlementResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(leaveEntitlement.getId().intValue())))
             .andExpect(jsonPath("$.[*].entitlementDate").value(hasItem(DEFAULT_ENTITLEMENT_DATE.toString())))
+            .andExpect(jsonPath("$.[*].expiryDate").value(hasItem(DEFAULT_EXPIRY_DATE.toString())))
             .andExpect(jsonPath("$.[*].days").value(hasItem(sameNumber(DEFAULT_DAYS))));
     }
 
@@ -257,6 +292,7 @@ class LeaveEntitlementResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(leaveEntitlement.getId().intValue()))
             .andExpect(jsonPath("$.entitlementDate").value(DEFAULT_ENTITLEMENT_DATE.toString()))
+            .andExpect(jsonPath("$.expiryDate").value(DEFAULT_EXPIRY_DATE.toString()))
             .andExpect(jsonPath("$.days").value(sameNumber(DEFAULT_DAYS)));
     }
 
@@ -380,6 +416,110 @@ class LeaveEntitlementResourceIT {
 
         // Get all the leaveEntitlementList where entitlementDate is greater than SMALLER_ENTITLEMENT_DATE
         defaultLeaveEntitlementShouldBeFound("entitlementDate.greaterThan=" + SMALLER_ENTITLEMENT_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllLeaveEntitlementsByExpiryDateIsEqualToSomething() throws Exception {
+        // Initialize the database
+        leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
+
+        // Get all the leaveEntitlementList where expiryDate equals to DEFAULT_EXPIRY_DATE
+        defaultLeaveEntitlementShouldBeFound("expiryDate.equals=" + DEFAULT_EXPIRY_DATE);
+
+        // Get all the leaveEntitlementList where expiryDate equals to UPDATED_EXPIRY_DATE
+        defaultLeaveEntitlementShouldNotBeFound("expiryDate.equals=" + UPDATED_EXPIRY_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllLeaveEntitlementsByExpiryDateIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
+
+        // Get all the leaveEntitlementList where expiryDate not equals to DEFAULT_EXPIRY_DATE
+        defaultLeaveEntitlementShouldNotBeFound("expiryDate.notEquals=" + DEFAULT_EXPIRY_DATE);
+
+        // Get all the leaveEntitlementList where expiryDate not equals to UPDATED_EXPIRY_DATE
+        defaultLeaveEntitlementShouldBeFound("expiryDate.notEquals=" + UPDATED_EXPIRY_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllLeaveEntitlementsByExpiryDateIsInShouldWork() throws Exception {
+        // Initialize the database
+        leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
+
+        // Get all the leaveEntitlementList where expiryDate in DEFAULT_EXPIRY_DATE or UPDATED_EXPIRY_DATE
+        defaultLeaveEntitlementShouldBeFound("expiryDate.in=" + DEFAULT_EXPIRY_DATE + "," + UPDATED_EXPIRY_DATE);
+
+        // Get all the leaveEntitlementList where expiryDate equals to UPDATED_EXPIRY_DATE
+        defaultLeaveEntitlementShouldNotBeFound("expiryDate.in=" + UPDATED_EXPIRY_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllLeaveEntitlementsByExpiryDateIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
+
+        // Get all the leaveEntitlementList where expiryDate is not null
+        defaultLeaveEntitlementShouldBeFound("expiryDate.specified=true");
+
+        // Get all the leaveEntitlementList where expiryDate is null
+        defaultLeaveEntitlementShouldNotBeFound("expiryDate.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllLeaveEntitlementsByExpiryDateIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
+
+        // Get all the leaveEntitlementList where expiryDate is greater than or equal to DEFAULT_EXPIRY_DATE
+        defaultLeaveEntitlementShouldBeFound("expiryDate.greaterThanOrEqual=" + DEFAULT_EXPIRY_DATE);
+
+        // Get all the leaveEntitlementList where expiryDate is greater than or equal to UPDATED_EXPIRY_DATE
+        defaultLeaveEntitlementShouldNotBeFound("expiryDate.greaterThanOrEqual=" + UPDATED_EXPIRY_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllLeaveEntitlementsByExpiryDateIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
+
+        // Get all the leaveEntitlementList where expiryDate is less than or equal to DEFAULT_EXPIRY_DATE
+        defaultLeaveEntitlementShouldBeFound("expiryDate.lessThanOrEqual=" + DEFAULT_EXPIRY_DATE);
+
+        // Get all the leaveEntitlementList where expiryDate is less than or equal to SMALLER_EXPIRY_DATE
+        defaultLeaveEntitlementShouldNotBeFound("expiryDate.lessThanOrEqual=" + SMALLER_EXPIRY_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllLeaveEntitlementsByExpiryDateIsLessThanSomething() throws Exception {
+        // Initialize the database
+        leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
+
+        // Get all the leaveEntitlementList where expiryDate is less than DEFAULT_EXPIRY_DATE
+        defaultLeaveEntitlementShouldNotBeFound("expiryDate.lessThan=" + DEFAULT_EXPIRY_DATE);
+
+        // Get all the leaveEntitlementList where expiryDate is less than UPDATED_EXPIRY_DATE
+        defaultLeaveEntitlementShouldBeFound("expiryDate.lessThan=" + UPDATED_EXPIRY_DATE);
+    }
+
+    @Test
+    @Transactional
+    void getAllLeaveEntitlementsByExpiryDateIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        leaveEntitlementRepository.saveAndFlush(leaveEntitlement);
+
+        // Get all the leaveEntitlementList where expiryDate is greater than DEFAULT_EXPIRY_DATE
+        defaultLeaveEntitlementShouldNotBeFound("expiryDate.greaterThan=" + DEFAULT_EXPIRY_DATE);
+
+        // Get all the leaveEntitlementList where expiryDate is greater than SMALLER_EXPIRY_DATE
+        defaultLeaveEntitlementShouldBeFound("expiryDate.greaterThan=" + SMALLER_EXPIRY_DATE);
     }
 
     @Test
@@ -553,6 +693,7 @@ class LeaveEntitlementResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(leaveEntitlement.getId().intValue())))
             .andExpect(jsonPath("$.[*].entitlementDate").value(hasItem(DEFAULT_ENTITLEMENT_DATE.toString())))
+            .andExpect(jsonPath("$.[*].expiryDate").value(hasItem(DEFAULT_EXPIRY_DATE.toString())))
             .andExpect(jsonPath("$.[*].days").value(hasItem(sameNumber(DEFAULT_DAYS))));
 
         // Check, that the count call also returns 1
@@ -601,7 +742,7 @@ class LeaveEntitlementResourceIT {
         LeaveEntitlement updatedLeaveEntitlement = leaveEntitlementRepository.findById(leaveEntitlement.getId()).get();
         // Disconnect from session so that the updates on updatedLeaveEntitlement are not directly saved in db
         em.detach(updatedLeaveEntitlement);
-        updatedLeaveEntitlement.entitlementDate(UPDATED_ENTITLEMENT_DATE).days(UPDATED_DAYS);
+        updatedLeaveEntitlement.entitlementDate(UPDATED_ENTITLEMENT_DATE).expiryDate(UPDATED_EXPIRY_DATE).days(UPDATED_DAYS);
         LeaveEntitlementDTO leaveEntitlementDTO = leaveEntitlementMapper.toDto(updatedLeaveEntitlement);
 
         restLeaveEntitlementMockMvc
@@ -618,6 +759,7 @@ class LeaveEntitlementResourceIT {
         assertThat(leaveEntitlementList).hasSize(databaseSizeBeforeUpdate);
         LeaveEntitlement testLeaveEntitlement = leaveEntitlementList.get(leaveEntitlementList.size() - 1);
         assertThat(testLeaveEntitlement.getEntitlementDate()).isEqualTo(UPDATED_ENTITLEMENT_DATE);
+        assertThat(testLeaveEntitlement.getExpiryDate()).isEqualTo(UPDATED_EXPIRY_DATE);
         assertThat(testLeaveEntitlement.getDays()).isEqualTo(UPDATED_DAYS);
     }
 
@@ -705,7 +847,7 @@ class LeaveEntitlementResourceIT {
         LeaveEntitlement partialUpdatedLeaveEntitlement = new LeaveEntitlement();
         partialUpdatedLeaveEntitlement.setId(leaveEntitlement.getId());
 
-        partialUpdatedLeaveEntitlement.entitlementDate(UPDATED_ENTITLEMENT_DATE).days(UPDATED_DAYS);
+        partialUpdatedLeaveEntitlement.entitlementDate(UPDATED_ENTITLEMENT_DATE).expiryDate(UPDATED_EXPIRY_DATE).days(UPDATED_DAYS);
 
         restLeaveEntitlementMockMvc
             .perform(
@@ -721,6 +863,7 @@ class LeaveEntitlementResourceIT {
         assertThat(leaveEntitlementList).hasSize(databaseSizeBeforeUpdate);
         LeaveEntitlement testLeaveEntitlement = leaveEntitlementList.get(leaveEntitlementList.size() - 1);
         assertThat(testLeaveEntitlement.getEntitlementDate()).isEqualTo(UPDATED_ENTITLEMENT_DATE);
+        assertThat(testLeaveEntitlement.getExpiryDate()).isEqualTo(UPDATED_EXPIRY_DATE);
         assertThat(testLeaveEntitlement.getDays()).isEqualByComparingTo(UPDATED_DAYS);
     }
 
@@ -736,7 +879,7 @@ class LeaveEntitlementResourceIT {
         LeaveEntitlement partialUpdatedLeaveEntitlement = new LeaveEntitlement();
         partialUpdatedLeaveEntitlement.setId(leaveEntitlement.getId());
 
-        partialUpdatedLeaveEntitlement.entitlementDate(UPDATED_ENTITLEMENT_DATE).days(UPDATED_DAYS);
+        partialUpdatedLeaveEntitlement.entitlementDate(UPDATED_ENTITLEMENT_DATE).expiryDate(UPDATED_EXPIRY_DATE).days(UPDATED_DAYS);
 
         restLeaveEntitlementMockMvc
             .perform(
@@ -752,6 +895,7 @@ class LeaveEntitlementResourceIT {
         assertThat(leaveEntitlementList).hasSize(databaseSizeBeforeUpdate);
         LeaveEntitlement testLeaveEntitlement = leaveEntitlementList.get(leaveEntitlementList.size() - 1);
         assertThat(testLeaveEntitlement.getEntitlementDate()).isEqualTo(UPDATED_ENTITLEMENT_DATE);
+        assertThat(testLeaveEntitlement.getExpiryDate()).isEqualTo(UPDATED_EXPIRY_DATE);
         assertThat(testLeaveEntitlement.getDays()).isEqualByComparingTo(UPDATED_DAYS);
     }
 

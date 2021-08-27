@@ -25,6 +25,7 @@ export class LeaveEntitlementUpdateComponent implements OnInit {
   editForm = this.fb.group({
     id: [],
     entitlementDate: [null, [Validators.required]],
+    expiryDate: [null, [Validators.required]],
     days: [null, [Validators.required]],
     leaveType: [null, Validators.required],
     staff: [null, Validators.required],
@@ -91,6 +92,7 @@ export class LeaveEntitlementUpdateComponent implements OnInit {
     this.editForm.patchValue({
       id: leaveEntitlement.id,
       entitlementDate: leaveEntitlement.entitlementDate,
+      expiryDate: leaveEntitlement.expiryDate,
       days: leaveEntitlement.days,
       leaveType: leaveEntitlement.leaveType,
       staff: leaveEntitlement.staff,
@@ -126,6 +128,7 @@ export class LeaveEntitlementUpdateComponent implements OnInit {
       ...new LeaveEntitlement(),
       id: this.editForm.get(['id'])!.value,
       entitlementDate: this.editForm.get(['entitlementDate'])!.value,
+      expiryDate: this.editForm.get(['expiryDate'])!.value,
       days: this.editForm.get(['days'])!.value,
       leaveType: this.editForm.get(['leaveType'])!.value,
       staff: this.editForm.get(['staff'])!.value,

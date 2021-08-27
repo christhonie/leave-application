@@ -28,10 +28,17 @@ public class LeaveEntitlementDTO implements Serializable {
     private LocalDate entitlementDate;
 
     /**
-     * @deprecated Use the EntitlementValue
+     * The date when this entitlement should expire.
      */
     @NotNull
-    @ApiModelProperty(value = "@depricated Use the EntitlementValue", required = true)
+    @ApiModelProperty(value = "The date when this entitlement should expire.", required = true)
+    private LocalDate expiryDate;
+
+    /**
+     * Use the EntitlementValue
+     */
+    @NotNull
+    @ApiModelProperty(value = "Use the EntitlementValue", required = true)
     private BigDecimal days;
 
     private LeaveTypeDTO leaveType;
@@ -52,6 +59,14 @@ public class LeaveEntitlementDTO implements Serializable {
 
     public void setEntitlementDate(LocalDate entitlementDate) {
         this.entitlementDate = entitlementDate;
+    }
+
+    public LocalDate getExpiryDate() {
+        return expiryDate;
+    }
+
+    public void setExpiryDate(LocalDate expiryDate) {
+        this.expiryDate = expiryDate;
     }
 
     public BigDecimal getDays() {
@@ -105,6 +120,7 @@ public class LeaveEntitlementDTO implements Serializable {
         return "LeaveEntitlementDTO{" +
             "id=" + getId() +
             ", entitlementDate='" + getEntitlementDate() + "'" +
+            ", expiryDate='" + getExpiryDate() + "'" +
             ", days=" + getDays() +
             ", leaveType=" + getLeaveType() +
             ", staff=" + getStaff() +

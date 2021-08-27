@@ -93,6 +93,9 @@ public class LeaveEntitlementQueryService extends QueryService<LeaveEntitlement>
                 specification =
                     specification.and(buildRangeSpecification(criteria.getEntitlementDate(), LeaveEntitlement_.entitlementDate));
             }
+            if (criteria.getExpiryDate() != null) {
+                specification = specification.and(buildRangeSpecification(criteria.getExpiryDate(), LeaveEntitlement_.expiryDate));
+            }
             if (criteria.getDays() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getDays(), LeaveEntitlement_.days));
             }

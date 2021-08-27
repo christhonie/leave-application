@@ -1,7 +1,5 @@
 package za.co.dearx.leave.service;
 
-import java.math.BigDecimal;
-import java.time.Period;
 import java.util.Optional;
 import javax.validation.Valid;
 import org.slf4j.Logger;
@@ -117,6 +115,8 @@ public class LeaveApplicationService {
             messageHandler.processLeaveApplication(leaveApplication);
         }
 
+        //TODO Re-apply LeaveDeductions
+
         return leaveApplicationMapper.toDto(leaveApplication);
     }
 
@@ -149,6 +149,8 @@ public class LeaveApplicationService {
 
         //Start a new business process, if defined
         if (newProcess && savedApplication.getLeaveType().getProcessName() != null) {}
+
+        //TODO Re-apply LeaveDeductions
 
         return leaveApplicationMapper.toDto(savedApplication);
         //TODO Make sure we cannot save a deleted record. Must throw exception.

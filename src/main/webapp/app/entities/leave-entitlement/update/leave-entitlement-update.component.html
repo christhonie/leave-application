@@ -61,6 +61,42 @@
         <div class="form-group">
           <label
             class="form-control-label"
+            jhiTranslate="leaveApplicationApp.leaveEntitlement.expiryDate"
+            for="field_expiryDate"
+            [ngbTooltip]="'leaveApplicationApp.leaveEntitlement.help.expiryDate' | translate"
+            >Expiry Date</label
+          >
+          <div class="input-group">
+            <input
+              id="field_expiryDate"
+              data-cy="expiryDate"
+              type="text"
+              class="form-control"
+              name="expiryDate"
+              ngbDatepicker
+              #expiryDateDp="ngbDatepicker"
+              formControlName="expiryDate"
+            />
+            <span class="input-group-append">
+              <button type="button" class="btn btn-secondary" (click)="expiryDateDp.toggle()">
+                <fa-icon icon="calendar-alt"></fa-icon>
+              </button>
+            </span>
+          </div>
+          <div *ngIf="editForm.get('expiryDate')!.invalid && (editForm.get('expiryDate')!.dirty || editForm.get('expiryDate')!.touched)">
+            <small
+              class="form-text text-danger"
+              *ngIf="editForm.get('expiryDate')?.errors?.required"
+              jhiTranslate="entity.validation.required"
+            >
+              This field is required.
+            </small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label
+            class="form-control-label"
             jhiTranslate="leaveApplicationApp.leaveEntitlement.days"
             for="field_days"
             [ngbTooltip]="'leaveApplicationApp.leaveEntitlement.help.days' | translate"
