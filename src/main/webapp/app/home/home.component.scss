@@ -10,7 +10,37 @@ Main page styles
   background-size: contain;
 }
 
+.dash {
+  padding: 5px;
+  margin: 5px;
+  width: 100%;
+}
+
+h1 {
+  text-decoration: underline;
+  font: 22pt;
+}
+
+.tbl {
+  width: 100%;
+  border: 1mm solid black;
+}
+
+th {
+  color: grey;
+  text-decoration: underline;
+}
+
+table,
+th,
+td {
+  border: 0.5mm solid black;
+  text-align: center;
+  padding: 5px;
+}
+
 /* wait autoprefixer update to allow simple generation of high pixel density media query */
+
 @media only screen and (-webkit-min-device-pixel-ratio: 2),
   only screen and (-moz-min-device-pixel-ratio: 2),
   only screen and (-o-min-device-pixel-ratio: 2/1),
