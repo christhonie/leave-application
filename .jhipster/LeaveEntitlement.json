@@ -8,9 +8,15 @@
       "fieldValidateRules": ["required"]
     },
     {
+      "fieldName": "expiryDate",
+      "fieldType": "LocalDate",
+      "javadoc": "The date when this entitlement should expire.",
+      "fieldValidateRules": ["required"]
+    },
+    {
       "fieldName": "days",
       "fieldType": "BigDecimal",
-      "javadoc": "@depricated Use the EntitlementValue",
+      "javadoc": "Use the EntitlementValue",
       "fieldValidateRules": ["required"]
     }
   ],

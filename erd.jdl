@@ -95,7 +95,9 @@ entity LeaveType {
 entity LeaveEntitlement {
   /** The date the entitlement is applied to the Staff member. */
 	entitlementDate LocalDate required
-	/** @depricated Use the EntitlementValue */
+  /** The date when this entitlement should expire. */
+	expiryDate LocalDate required
+	/** Use the EntitlementValue */
 	days BigDecimal required
 }
 relationship ManyToOne {

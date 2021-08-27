@@ -46,10 +46,10 @@ describe('Component Tests', () => {
     describe('ngOnInit', () => {
       it('Should call LeaveType query and add missing value', () => {
         const leaveEntitlement: ILeaveEntitlement = { id: 456 };
-        const leaveType: ILeaveType = { id: 12028 };
+        const leaveType: ILeaveType = { id: 23696 };
         leaveEntitlement.leaveType = leaveType;
 
-        const leaveTypeCollection: ILeaveType[] = [{ id: 23696 }];
+        const leaveTypeCollection: ILeaveType[] = [{ id: 83773 }];
         spyOn(leaveTypeService, 'query').and.returnValue(of(new HttpResponse({ body: leaveTypeCollection })));
         const additionalLeaveTypes = [leaveType];
         const expectedCollection: ILeaveType[] = [...additionalLeaveTypes, ...leaveTypeCollection];
@@ -65,10 +65,10 @@ describe('Component Tests', () => {
 
       it('Should call Staff query and add missing value', () => {
         const leaveEntitlement: ILeaveEntitlement = { id: 456 };
-        const staff: IStaff = { id: 48141 };
+        const staff: IStaff = { id: 51416 };
         leaveEntitlement.staff = staff;
 
-        const staffCollection: IStaff[] = [{ id: 33566 }];
+        const staffCollection: IStaff[] = [{ id: 20969 }];
         spyOn(staffService, 'query').and.returnValue(of(new HttpResponse({ body: staffCollection })));
         const additionalStaff = [staff];
         const expectedCollection: IStaff[] = [...additionalStaff, ...staffCollection];
@@ -84,9 +84,9 @@ describe('Component Tests', () => {
 
       it('Should update editForm', () => {
         const leaveEntitlement: ILeaveEntitlement = { id: 456 };
-        const leaveType: ILeaveType = { id: 83773 };
+        const leaveType: ILeaveType = { id: 37821 };
         leaveEntitlement.leaveType = leaveType;
-        const staff: IStaff = { id: 51416 };
+        const staff: IStaff = { id: 84658 };
         leaveEntitlement.staff = staff;
 
         activatedRoute.data = of({ leaveEntitlement });

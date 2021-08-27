@@ -27,6 +27,7 @@ describe('Service Tests', () => {
       elemDefault = {
         id: 0,
         entitlementDate: currentDate,
+        expiryDate: currentDate,
         days: 0,
       };
     });
@@ -36,6 +37,7 @@ describe('Service Tests', () => {
         const returnedFromService = Object.assign(
           {
             entitlementDate: currentDate.format(DATE_FORMAT),
+            expiryDate: currentDate.format(DATE_FORMAT),
           },
           elemDefault
         );
@@ -52,6 +54,7 @@ describe('Service Tests', () => {
           {
             id: 0,
             entitlementDate: currentDate.format(DATE_FORMAT),
+            expiryDate: currentDate.format(DATE_FORMAT),
           },
           elemDefault
         );
@@ -59,6 +62,7 @@ describe('Service Tests', () => {
         const expected = Object.assign(
           {
             entitlementDate: currentDate,
+            expiryDate: currentDate,
           },
           returnedFromService
         );
@@ -75,6 +79,7 @@ describe('Service Tests', () => {
           {
             id: 1,
             entitlementDate: currentDate.format(DATE_FORMAT),
+            expiryDate: currentDate.format(DATE_FORMAT),
             days: 1,
           },
           elemDefault
@@ -83,6 +88,7 @@ describe('Service Tests', () => {
         const expected = Object.assign(
           {
             entitlementDate: currentDate,
+            expiryDate: currentDate,
           },
           returnedFromService
         );
@@ -98,6 +104,7 @@ describe('Service Tests', () => {
         const patchObject = Object.assign(
           {
             entitlementDate: currentDate.format(DATE_FORMAT),
+            expiryDate: currentDate.format(DATE_FORMAT),
             days: 1,
           },
           new LeaveEntitlement()
@@ -108,6 +115,7 @@ describe('Service Tests', () => {
         const expected = Object.assign(
           {
             entitlementDate: currentDate,
+            expiryDate: currentDate,
           },
           returnedFromService
         );
@@ -124,6 +132,7 @@ describe('Service Tests', () => {
           {
             id: 1,
             entitlementDate: currentDate.format(DATE_FORMAT),
+            expiryDate: currentDate.format(DATE_FORMAT),
             days: 1,
           },
           elemDefault
@@ -132,6 +141,7 @@ describe('Service Tests', () => {
         const expected = Object.assign(
           {
             entitlementDate: currentDate,
+            expiryDate: currentDate,
           },
           returnedFromService
         );
@@ -181,7 +191,7 @@ describe('Service Tests', () => {
         });
 
         it('should add only unique LeaveEntitlement to an array', () => {
-          const leaveEntitlementArray: ILeaveEntitlement[] = [{ id: 123 }, { id: 456 }, { id: 75190 }];
+          const leaveEntitlementArray: ILeaveEntitlement[] = [{ id: 123 }, { id: 456 }, { id: 77694 }];
           const leaveEntitlementCollection: ILeaveEntitlement[] = [{ id: 123 }];
           expectedResult = service.addLeaveEntitlementToCollectionIfMissing(leaveEntitlementCollection, ...leaveEntitlementArray);
           expect(expectedResult).toHaveLength(3);

@@ -37,6 +37,9 @@
             <span jhiTranslate="leaveApplicationApp.leaveEntitlement.entitlementDate">Entitlement Date</span>
             <fa-icon icon="sort"></fa-icon>
           </th>
+          <th scope="col" jhiSortBy="expiryDate">
+            <span jhiTranslate="leaveApplicationApp.leaveEntitlement.expiryDate">Expiry Date</span> <fa-icon icon="sort"></fa-icon>
+          </th>
           <th scope="col" jhiSortBy="days">
             <span jhiTranslate="leaveApplicationApp.leaveEntitlement.days">Days</span> <fa-icon icon="sort"></fa-icon>
           </th>
@@ -55,6 +58,7 @@
             <a [routerLink]="['/leave-entitlement', leaveEntitlement.id, 'view']">{{ leaveEntitlement.id }}</a>
           </td>
           <td>{{ leaveEntitlement.entitlementDate | formatMediumDate }}</td>
+          <td>{{ leaveEntitlement.expiryDate | formatMediumDate }}</td>
           <td>{{ leaveEntitlement.days }}</td>
           <td>
             <div *ngIf="leaveEntitlement.leaveType">
