@@ -1,12 +1,15 @@
 package za.co.dearx.leave.service;
 
 import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import za.co.dearx.leave.domain.LeaveStatus;
 import za.co.dearx.leave.repository.LeaveStatusRepository;
 import za.co.dearx.leave.service.dto.LeaveStatusDTO;
@@ -25,10 +28,17 @@ public class LeaveStatusService {
     private final LeaveStatusRepository leaveStatusRepository;
 
     private final LeaveStatusMapper leaveStatusMapper;
+    
+    private final LeaveApplicationService leaveApplicationService;
+    
+    private final LeaveApplicationQueryService leaveAppQueryService;
 
-    public LeaveStatusService(LeaveStatusRepository leaveStatusRepository, LeaveStatusMapper leaveStatusMapper) {
+    public LeaveStatusService(LeaveStatusRepository leaveStatusRepository, LeaveStatusMapper leaveStatusMapper, @Lazy LeaveApplicationService leaveApplicationService
+    		, @Lazy LeaveApplicationQueryService leaveAppQueryService) {
         this.leaveStatusRepository = leaveStatusRepository;
         this.leaveStatusMapper = leaveStatusMapper;
+        this.leaveApplicationService = leaveApplicationService;
+        this.leaveAppQueryService = leaveAppQueryService;
     }
 
     /**
@@ -108,4 +118,6 @@ public class LeaveStatusService {
     public LeaveStatus getDraft() throws NotFoundException {
         return findEntityByName("Draft").orElseThrow(() -> new NotFoundException("LeaveStatus", "Draft status not found"));
     }
+
+   
 }

@@ -1,11 +1,10 @@
 package za.co.dearx.leave.service;
 
-import java.math.BigDecimal;
-import java.time.Period;
 import java.util.Optional;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -55,7 +54,7 @@ public class LeaveApplicationService {
         LeaveApplicationRepository leaveApplicationRepository,
         LeaveApplicationMapper leaveApplicationMapper,
         LeaveStatusService leaveStatusService,
-        LeaveTypeService leaveTypeService,
+        @Lazy LeaveTypeService leaveTypeService,
         MessageHander messageHandler,
         StaffRepository staffRepository
     ) {
